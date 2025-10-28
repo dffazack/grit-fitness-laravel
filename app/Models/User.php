@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory; // Tambahkan ini jika belum ada
+use Illuminate\Database\Eloquent\SoftDeletes; // Tambahkan ini karena migrasi Anda ada softDeletes()
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    use Notifiable;
+    use HasFactory, Notifiable, SoftDeletes; // Tambahkan HasFactory dan SoftDeletes
 
     protected $fillable = [
         'name',
@@ -41,7 +43,7 @@ class User extends Authenticatable
         return $this->hasMany(Transaction::class);
     }
 
-    // Helper methods
+    // Helper methods (Digunakan di LoginController dan Middleware)
     public function isAdmin()
     {
         return $this->role === 'admin';
@@ -67,6 +69,7 @@ class User extends Authenticatable
         return $this->membership_status === 'pending';
     }
 
+    // Mutator/Accessor untuk badge class (sangat berguna di View)
     public function getMembershipStatusBadgeClass()
     {
         return match($this->membership_status) {
