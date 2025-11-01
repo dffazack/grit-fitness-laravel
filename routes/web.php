@@ -47,30 +47,40 @@ Route::post('register', [RegisterController::class, 'register']);
 
 /*
 |--------------------------------------------------------------------------
-| Member Routes (Role: member)
+| MEMBER ROUTES (Perlu login sebagai member/guest)
 |--------------------------------------------------------------------------
-| Memerlukan autentikasi dan role 'member'
 */
 
-Route::middleware(['auth', 'role:member'])->prefix('member')->name('member.')->group(function () {
-    
-    // Dashboard (Menggunakan MemberDashboardController)
-    Route::get('/dashboard', [MemberDashboardController::class, 'index'])->name('dashboard');
-    
-    // Profile Management
-    Route::get('/profile', [MemberProfileController::class, 'index'])->name('profile');
-    Route::post('/profile/update', [MemberProfileController::class, 'update'])->name('profile.update');
+// Rute yang BISA diakses GUEST (setelah login)
+Route::middleware(['auth'])->prefix('member')->name('member.')->group(function () {
 
-    // Payment & Subscription
-    Route::get('/payment', [MemberPaymentController::class, 'index'])->name('payment');
-    Route::post('/payment/submit', [MemberPaymentController::class, 'submitPayment'])->name('payment.submit');
+    // Payment (Guest harus bisa akses ini)
+    Route::get('/payment', [MemberPaymentController::class, 'index'])
+        ->name('payment');
 
-    // Class Booking/Schedule View
-    Route::get('/schedule', [ClassController::class, 'schedule'])->name('schedule');
-    Route::post('/class/book/{schedule}', [ClassController::class, 'book'])->name('class.book');
-    Route::post('/class/cancel/{schedule}', [ClassController::class, 'cancel'])->name('class.cancel');
+    Route::post('/payment', [MemberPaymentController::class, 'store'])
+        ->name('payment.store');
 });
 
+
+// Rute yang HANYA BISA diakses oleh ROLE 'MEMBER' AKTIF
+Route::middleware(['auth', 'role:member'])->prefix('member')->name('member.')->group(function () {
+
+    Route::get('/dashboard', [MemberDashboardController::class, 'index'])
+        ->name('dashboard');
+
+    Route::get('/profile', [MemberProfileController::class, 'index']) // <-- GUNAKAN ALIAS INI
+        ->name('profile');
+
+    Route::post('/profile', [MemberProfileController::class, 'update']) // <-- GUNAKAN ALIAS INI JUGA
+        ->name('profile.update');
+
+        // TAMBAHKAN BARIS INI:
+    Route::post('/profile/password', [MemberProfileController::class, 'updatePassword'])->name('profile.updatePassword');
+
+    // Tambahkan rute lain yang khusus member di sini
+    // (Contoh: Booking kelas)
+});
 
 /*
 |--------------------------------------------------------------------------
