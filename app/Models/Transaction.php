@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo; // <-- TAMBAHKAN INI
 
 class Transaction extends Model
 {
@@ -12,7 +13,7 @@ class Transaction extends Model
     protected $fillable = [
         'user_id',
         'transaction_code',
-        'package',
+        'package', // <-- Kunci relasi (string)
         'amount',
         'proof_url',
         'status',
@@ -27,15 +28,31 @@ class Transaction extends Model
     ];
 
     // Relationships
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function approver()
+    public function approver(): BelongsTo
     {
         return $this->belongsTo(User::class, 'approved_by');
     }
+
+    // ==============================================================
+    //  TAMBAHKAN FUNGSI INI (INI UNTUK FIX ERROR DI CONTROLLER)
+    // ==============================================================
+    /**
+     * Mendapatkan paket membership yang dibeli dalam transaksi ini.
+     * Relasi ini mencocokkan kolom string 'package' di tabel 'transactions'
+     * dengan kolom string 'name' di tabel 'membership_packages'.
+     */
+    public function membership(): BelongsTo
+    {
+        // Pastikan nama modelnya 'MembershipPackage'
+        return $this->belongsTo(MembershipPackage::class, 'package', 'name');
+    }
+    // ==============================================================
+
 
     // Scopes
     public function scopePending($query)
@@ -43,6 +60,7 @@ class Transaction extends Model
         return $query->where('status', 'pending');
     }
 
+    // ... (sisa file Anda tidak perlu diubah) ...
     public function scopeApproved($query)
     {
         return $query->where('status', 'approved');

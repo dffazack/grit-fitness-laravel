@@ -8,11 +8,7 @@ use Illuminate\Http\Request;
 
 class MemberController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware(['auth', 'role:admin']);
-    }
-    
+
     public function index(Request $request)
     {
         $query = User::where('role', '!=', 'admin');
@@ -28,13 +24,21 @@ class MemberController extends Controller
             $query->where('membership_status', $request->status);
         }
         
-        $members = $query->latest()->paginate(15);
+        // KITA PERBARUI INI:
+        // Tambahkan with('membership') dan with('transactions')
+        // 'membership' untuk info paket di tabel
+        // 'transactions' untuk riwayat di modal
+        $members = $query->with(['membership', 'transactions'])
+                         ->latest()
+                         ->paginate(15);
         
         return view('admin.members.index', compact('members'));
     }
     
     public function show($id)
     {
+        // Method ini mungkin tidak terpakai jika kita pakai modal,
+        // tapi kita biarkan saja untuk referensi
         $member = User::with('transactions')->findOrFail($id);
         return view('admin.members.show', compact('member'));
     }
@@ -48,4 +52,3 @@ class MemberController extends Controller
             ->with('success', 'Member berhasil dihapus');
     }
 }
-

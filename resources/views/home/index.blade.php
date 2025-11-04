@@ -1,24 +1,22 @@
-{{-- File: resources/views/home/index.blade.php --}}
-{{-- Diadaptasi dari HomePage.tsx --}}
-
 @extends('layouts.app')
 
-@section('title', $hero->title ?? 'GRIT Fitness - Transform Your Body')
+{{-- Gunakan sintaks Array [] alih-alih object -> --}}
+@section('title', $homepage['title'] ?? 'GRIT Fitness - Transform Your Body')
 
 @section('content')
 
     {{-- Notification Banner (Jika ada notifikasi aktif) --}}
-    @include('components.notification-banner') {{-- Pastikan komponen ini ada --}}
+    @include('components.notification-banner')
 
     {{-- Hero Section --}}
-    <section class="hero-section position-relative d-flex align-items-center justify-content-center text-white" style="min-height: 600px; background: linear-gradient(rgba(43, 50, 130, 0.7), rgba(43, 50, 130, 0.7)), url('{{ asset('images/hero-bg.jpg') }}') center/cover no-repeat;">
+    <section class="hero-section position-relative d-flex align-items-center justify-content-center text-white" style="min-height: 600px; background: linear-gradient(rgba(43, 50, 130, 0.7), rgba(43, 50, 130, 0.7)), url('{{ $homepage['image'] ?? asset('images/hero-bg.jpg') }}') center/cover no-repeat;">
         <div class="container text-center animate-fade-in">
             <h1 class="display-4 fw-bold text-white mb-4 px-5" style="line-height: 1.1;">
-             {{-- Tampilkan title dengan line break jika ada \n --}}
-        {!! nl2br(e($hero->title ?? 'Transform Your Body, Transform Your Life')) !!}
+                {{-- Tampilkan title dengan line break jika ada \n --}}
+                {!! nl2br(e($homepage['title'] ?? 'Transform Your Body, Transform Your Life')) !!}
             </h1>
             <p class="lead fs-5 mb-5 text-white mx-auto" style="opacity: 0.9; max-width: 700px;">
-                {{ $hero->subtitle ?? 'Bergabunglah dengan GRIT Fitness dan mulai perjalanan transformasi Anda bersama komunitas yang supportif' }}
+                {{ $homepage['subtitle'] ?? 'Bergabunglah dengan GRIT Fitness dan mulai perjalanan transformasi Anda bersama komunitas yang supportif' }}
             </p>
             <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
                 <a href="{{ route('membership') }}" class="btn btn-accent btn-lg px-5 py-3">
@@ -36,9 +34,11 @@
     <section class="bg-white py-5 shadow-sm">
         <div class="container">
             <div class="row g-4 text-center">
+                {{-- Pastikan $stats adalah array dan tidak kosong --}}
                 @if(!empty($stats) && is_array($stats))
                     @foreach($stats as $stat)
                         <div class="col-6 col-md-3">
+                            {{-- Gunakan sintaks Array [] --}}
                             <h2 class="display-4 fw-bold mb-1" style="color: var(--grit-accent);">{{ $stat['value'] ?? 'N/A' }}</h2>
                             <p class="text-muted small text-uppercase">{{ $stat['label'] ?? 'N/A' }}</p>
                         </div>
@@ -69,14 +69,34 @@
                                      style="width: 70px; height: 70px; background: rgba(229, 27, 131, 0.1);">
                                      {{-- Icon mapping --}}
                                      @php
-                                         $iconClass = match($benefit['iconName'] ?? 'dumbbell') {
-                                             'Users' => 'bi-people-fill',
-                                             'Calendar' => 'bi-calendar-check-fill',
-                                             'Trophy' => 'bi-trophy-fill',
-                                             default => 'bi-dumbbell',
-                                         };
-                                     @endphp
-                                    <i class="bi {{ $iconClass }} fs-2" style="color: var(--grit-accent);"></i>
+                                  // Ambil nilai icon baik dari array ataupun object
+                                $rawIcon = null;
+                                if (is_array($benefit)) {
+                                    $rawIcon = $benefit['icon'] ?? null;
+                                } elseif (is_object($benefit)) {
+                                    $rawIcon = $benefit->icon ?? null;
+                                }
+
+                                // Normalisasi: lowercase dan hapus spasi
+                                $icon = strtolower(trim((string) ($rawIcon ?? 'dumbbell')));
+
+                                // Pemetaan nama icon (key = kemungkinan nama dari DB, value = kelas bootstrap icons tanpa duplikasi 'bi-')
+                                $iconMap = [
+                                    'dumbbell'       => 'bi-dumbbell',
+                                    'dumbell'        => 'bi-dumbbell',      // handle typo
+                                    'people'         => 'bi-people-fill',
+                                    'users'          => 'bi-people-fill',   // alternative name
+                                    'calendar'       => 'bi-calendar-check-fill',
+                                    'calendar-check' => 'bi-calendar-check-fill',
+                                    'trophy'         => 'bi-trophy-fill',
+                                    // tambah mapping lain bila perlu
+                                ];
+
+                                // Pilih kelas icon, fallback ke dumbbell jika tidak dikenali
+                                $iconClass = $iconMap[$icon] ?? 'bi-dumbbell';
+                                @endphp
+
+                                <i class="bi {{ $iconClass }} fs-2" style="color: var(--grit-accent);"></i>
                                 </div>
                                 <h5 class="card-title fw-semibold mb-3" style="color: var(--grit-primary);">{{ $benefit['title'] ?? 'Benefit Title' }}</h5>
                                 <p class="card-text small text-muted flex-grow-1">{{ $benefit['description'] ?? 'Benefit description.' }}</p>
@@ -107,6 +127,7 @@
                             <div class="card border-0 shadow-sm h-100 card-hover">
                                 <div class="card-body">
                                     <div class="mb-3">
+                                        {{-- Gunakan sintaks Array [] --}}
                                         @for($i = 0; $i < ($testimonial['rating'] ?? 5); $i++)
                                             <i class="bi bi-star-fill" style="color: #FFC107;"></i>
                                         @endfor
