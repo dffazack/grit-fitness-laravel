@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory; // Tambahkan ini jika bel
 use Illuminate\Database\Eloquent\SoftDeletes; // Tambahkan ini karena migrasi Anda ada softDeletes()
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\HasMany; // <-- TAMBAHKAN INI
+use Illuminate\Database\Eloquent\Relations\BelongsTo; // <-- TAMBAHKAN INI
 
 class User extends Authenticatable
 {
@@ -19,7 +21,7 @@ class User extends Authenticatable
         'profile_photo',
         'role',
         'membership_status',
-        'membership_package',
+        'membership_package', // <-- Kunci relasi (string)
         'membership_expiry',
         'remaining_sessions',
         'joined_date',
@@ -38,10 +40,26 @@ class User extends Authenticatable
     ];
 
     // Relationships
-    public function transactions()
+    public function transactions(): HasMany
     {
         return $this->hasMany(Transaction::class);
     }
+
+    // ==============================================================
+    //  TAMBAHKAN FUNGSI INI (INI YANG MEMPERBAIKI ERROR ANDA)
+    // ==============================================================
+    /**
+     * Mendapatkan paket membership yang dimiliki user.
+     * Relasi ini mencocokkan kolom string 'membership_package' di tabel 'users'
+     * dengan kolom string 'name' di tabel 'membership_packages'.
+     */
+    public function membership(): BelongsTo
+    {
+        // Pastikan nama modelnya 'MembershipPackage'
+        return $this->belongsTo(MembershipPackage::class, 'membership_package', 'name');
+    }
+    // ==============================================================
+
 
     // Helper methods (Digunakan di LoginController dan Middleware)
     public function isAdmin()
@@ -49,6 +67,7 @@ class User extends Authenticatable
         return $this->role === 'admin';
     }
 
+    // ... (sisa method Anda tidak perlu diubah) ...
     public function isMember()
     {
         return $this->role === 'member';
@@ -68,8 +87,7 @@ class User extends Authenticatable
     {
         return $this->membership_status === 'pending';
     }
-
-    // Mutator/Accessor untuk badge class (sangat berguna di View)
+    
     public function getMembershipStatusBadgeClass()
     {
         return match($this->membership_status) {
@@ -80,3 +98,4 @@ class User extends Authenticatable
         };
     }
 }
+

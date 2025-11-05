@@ -20,7 +20,7 @@ use App\Http\Controllers\Admin\ScheduleController as AdminScheduleController;
 use App\Http\Controllers\Admin\TrainerController as AdminTrainerController;
 use App\Http\Controllers\Admin\HomepageController as AdminHomepageController;
 use App\Http\Controllers\Admin\NotificationController as AdminNotificationController;
-
+use App\Http\Controllers\Auth\AdminLoginController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,11 +33,14 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Classes & Trainers (Publicly visible)
 Route::get('/classes', [ClassController::class, 'index'])->name('classes');
-Route::get('/trainers', [TrainerController::class, 'index'])->name('trainers'); // Menggunakan TrainerController Admin
+Route::get('/trainers', [AdminTrainerController::class, 'index'])->name('trainers'); // Menggunakan TrainerController Admin
 Route::get('/membership', [MembershipController::class, 'index'])->name('membership');
 
-// Authentication Routes (Default Laravel UI Scaffolding)
-// Note: Karena Anda menggunakan Laravel 11, routing auth harus ditambahkan manual jika tidak menggunakan Breeze/Jetstream
+/*
+|--------------------------------------------------------------------------
+| Member Auth Routes
+|--------------------------------------------------------------------------
+*/
 Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('login', [LoginController::class, 'login']);
 Route::post('logout', [LoginController::class, 'logout'])->name('logout');
@@ -50,9 +53,14 @@ Route::post('register', [RegisterController::class, 'register']);
 | MEMBER ROUTES (Perlu login sebagai member/guest)
 |--------------------------------------------------------------------------
 */
-
-// Rute yang BISA diakses GUEST (setelah login)
-Route::middleware(['auth'])->prefix('member')->name('member.')->group(function () {
+Route::middleware(['auth', 'role:member'])->prefix('member')->name('member.')->group(function () {
+    
+    // Dashboard (Menggunakan MemberDashboardController)
+    Route::get('/dashboard', [MemberDashboardController::class, 'index'])->name('dashboard');
+    
+    // Profile Management
+    Route::get('/profile', [MemberProfileController::class, 'index'])->name('profile');
+    Route::post('/profile/update', [MemberProfileController::class, 'update'])->name('profile.update');
 
     // Payment (Guest harus bisa akses ini)
     Route::get('/payment', [MemberPaymentController::class, 'index'])
@@ -84,30 +92,60 @@ Route::middleware(['auth', 'role:member'])->prefix('member')->name('member.')->g
 
 /*
 |--------------------------------------------------------------------------
-| Admin Routes (Role: admin)
+| Admin Routes (Login & Protected Dashboard)
 |--------------------------------------------------------------------------
-| Memerlukan autentikasi dan role 'admin'
+|
+| SEMUA rute yang berawalan /admin diatur di sini.
+| Kita beri nama grup 'admin.' agar semua nama rutenya diawali 'admin.'
+|
 */
+Route::prefix('admin')->name('admin.')->group(function () {
+    
+    // Rute Login Admin (Publik / Guest)
+    // URL: /admin/login
+    // Nama: admin.login
+    Route::get('/login', [AdminLoginController::class, 'showLoginForm'])->name('login');
+    
+    // URL: /admin/login (saat tombol login ditekan)
+    // Nama: admin.login.submit
+    Route::post('/login', [AdminLoginController::class, 'login'])->name('login.submit');
 
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    
+    // Rute Admin yang Terproteksi (Wajib Login sebagai 'admin')
+    Route::middleware('auth:admin')->group(function () {
+        
+        // URL: /admin/dashboard
+        // Nama: admin.dashboard
+        Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/reports/financial', [AdminDashboardController::class, 'financialReport'])->name('reports.financial');
 
-    // Dashboard & Financial Report
-    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-    Route::get('/reports/financial', [AdminDashboardController::class, 'financialReport'])->name('reports.financial');
+        // Member Management (CRUD)
+        Route::resource('members', AdminMemberController::class)->except(['create']);
+        Route::resource('schedules', AdminScheduleController::class);
 
-    // Member Management (CRUD)
-    Route::resource('members', AdminMemberController::class)->except(['create']);
+        // Payment Validation
+        Route::get('payments', [AdminPaymentController::class, 'index'])->name('payments.index');
+        Route::post('payments/approve/{transaction}', [AdminPaymentController::class, 'approve'])->name('payments.approve');
+        Route::post('payments/reject/{transaction}', [AdminPaymentController::class, 'reject'])->name('payments.reject');
 
-    // Payment Validation
-    Route::get('payments', [AdminPaymentController::class, 'index'])->name('payments.index');
-    Route::post('payments/approve/{transaction}', [AdminPaymentController::class, 'approve'])->name('payments.approve');
-    Route::post('payments/reject/{transaction}', [AdminPaymentController::class, 'reject'])->name('payments.reject');
+        // Schedule Management (CRUD)
+        Route::resource('schedules', AdminScheduleController::class);
 
-    // Schedule Management (CRUD)
-    Route::resource('schedules', AdminScheduleController::class);
+        // Data Master
+        Route::resource('trainers', AdminTrainerController::class);
+        Route::post('notifications/{notification}/toggle', [AdminNotificationController::class, 'toggleStatus'])
+        ->name('notifications.toggle');
+        Route::resource('notifications', AdminNotificationController::class);('auth:admin');
 
-    // Data Master
-    Route::resource('trainers', AdminTrainerController::class);
-    Route::resource('notifications', AdminNotificationController::class);
-    Route::resource('homepage', AdminHomepageController::class)->only(['index', 'update']);
+    // Ganti Route::resource menjadi rute manual ini
+        Route::get('homepage', [AdminHomepageController::class, 'index'])->name('homepage.index');
+        Route::get('homepage/edit', [AdminHomepageController::class, 'edit'])->name('homepage.edit');
+
+// Menangani 4 form update yang terpisah
+        Route::put('homepage/hero', [AdminHomepageController::class, 'updateHero'])->name('homepage.hero');
+        Route::put('homepage/stats', [AdminHomepageController::class, 'updateStats'])->name('homepage.stats');
+        Route::put('homepage/benefits', [AdminHomepageController::class, 'updateBenefits'])->name('homepage.benefits');
+        Route::put('homepage/testimonials', [AdminHomepageController::class, 'updateTestimonials'])->name('homepage.testimonials');
+    });
+    
 });

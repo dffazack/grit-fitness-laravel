@@ -4,69 +4,74 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Transaction;
+use App\Models\User; // Pastikan ini ada
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon;
 
 class PaymentController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware(['auth', 'role:admin']);
-    }
-    
+
+    /**
+     * Menampilkan daftar pembayaran yang PERLU VALIDASI (pending).
+     */
     public function index(Request $request)
     {
-        $query = Transaction::with('user');
-        
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
+        // Modifikasi query: Hanya ambil yang statusnya 'pending'
+        $query = Transaction::where('status', 'pending')
+                            ->with(['user', 'membership']); // Muat relasi user & membership
+
+        // Logika filter (opsional, tapi bagus untuk masa depan)
+        if ($request->filled('search')) {
+            $query->whereHas('user', function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%')
+                  ->orWhere('email', 'like', '%' . $request->search . '%');
+            });
         }
         
         $transactions = $query->latest()->paginate(15);
         
         return view('admin.payments.index', compact('transactions'));
     }
-    
-    public function approve($id)
+
+    /**
+     * Menyetujui (approve) sebuah transaksi.
+     */
+    public function approve(Transaction $transaction)
     {
-        $transaction = Transaction::findOrFail($id);
-        
+        // 1. Ubah status transaksi
         $transaction->update([
             'status' => 'approved',
-            'approved_by' => Auth::id(),
             'approved_at' => now(),
+            'approved_by' => auth('admin')->id(), // Catat siapa admin yang approve
         ]);
-        
-        // Update user membership
-        $expiryDate = Carbon::now()->addMonths(12);
-        
-        $transaction->user->update([
-            'membership_status' => 'active',
-            'membership_package' => $transaction->package,
-            'membership_expiry' => $expiryDate,
-            'role' => 'member',
-        ]);
-        
-        return back()->with('success', 'Pembayaran berhasil disetujui');
+
+        // 2. Perbarui status member di tabel 'users'
+        $user = $transaction->user;
+        if ($user && $transaction->membership) {
+            $duration = $transaction->membership->duration_months;
+            
+            $user->update([
+                'membership_status' => 'active',
+                'membership_package' => $transaction->package,
+                // Hitung tanggal kedaluwarsa dari SEKARANG
+                'membership_expiry' => now()->addMonths($duration), 
+            ]);
+        }
+
+        return back()->with('success', 'Pembayaran berhasil disetujui.');
     }
-    
-    public function reject(Request $request, $id)
+
+    /**
+     * Menolak (reject) sebuah transaksi.
+     */
+    public function reject(Transaction $transaction)
     {
-        $transaction = Transaction::findOrFail($id);
-        
+        // 1. Ubah status transaksi
         $transaction->update([
             'status' => 'rejected',
-            'approved_by' => Auth::id(),
-            'approved_at' => now(),
-            'admin_note' => $request->note,
         ]);
         
-        $transaction->user->update([
-            'membership_status' => 'non-member',
-        ]);
-        
-        return back()->with('success', 'Pembayaran ditolak');
+        // (Opsional) Anda bisa tambahkan logika untuk mengirim notifikasi ke user
+
+        return back()->with('success', 'Pembayaran berhasil ditolak.');
     }
 }
-
