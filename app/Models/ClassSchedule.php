@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes; // Tambahkan ini jika Anda punya k
 
 class ClassSchedule extends Model
 {
-    use HasFactory, SoftDeletes; // Tambahkan SoftDeletes jika Anda punya kolom deleted_at
+    use HasFactory, SoftDeletes;
      public const DAYS = [
         'Senin', 
         'Selasa', 
@@ -82,7 +82,7 @@ class ClassSchedule extends Model
      */
     public function trainer(): BelongsTo
     {
-        // Satu ClassSchedule 'belongsTo' (dimiliki oleh) satu Trainer
+
         return $this->belongsTo(Trainer::class);
     }
 }
