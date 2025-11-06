@@ -1,9 +1,8 @@
 <?php
 
-// File: database/seeders/DatabaseSeeder.php
+namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Database\Seeders\GritFitnessSeeder; // <-- Import class seeder kustom
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,7 +12,13 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-             GritFitnessSeeder::class, // Panggil class GritFitnessSeeder
+            UserSeeder::class,
+            MembershipPackageSeeder::class,
+            TrainerSeeder::class,
+            ClassScheduleSeeder::class,
+            FacilitySeeder::class,
+            NotificationSeeder::class,
+            HomepageContentSeeder::class,
         ]);
     }
 }
