@@ -28,12 +28,9 @@ use App\Http\Controllers\Auth\AdminLoginController;
 |--------------------------------------------------------------------------
 */
 
-// Homepage
 Route::get('/', [HomeController::class, 'index'])->name('home');
-
-// Classes & Trainers (Publicly visible)
 Route::get('/classes', [ClassController::class, 'index'])->name('classes');
-Route::get('/trainers', [AdminTrainerController::class, 'index'])->name('trainers'); // Menggunakan TrainerController Admin
+Route::get('/trainers', [AdminTrainerController::class, 'index'])->name('trainers');
 Route::get('/membership', [MembershipController::class, 'index'])->name('membership');
 
 /*
@@ -41,95 +38,83 @@ Route::get('/membership', [MembershipController::class, 'index'])->name('members
 | Member Auth Routes
 |--------------------------------------------------------------------------
 */
-Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
-Route::post('login', [LoginController::class, 'login']);
-Route::post('logout', [LoginController::class, 'logout'])->name('logout');
-Route::get('register', [RegisterController::class, 'showRegistrationForm'])->name('register');
-Route::post('register', [RegisterController::class, 'register']);
+Route::middleware('guest')->group(function () {
+    Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
+    Route::post('login', [LoginController::class, 'login']);
+    Route::get('register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+    Route::post('register', [RegisterController::class, 'register']);
+});
 
+Route::post('logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
 
 /*
 |--------------------------------------------------------------------------
-| Member Routes (Role: member)
+| Member Routes
 |--------------------------------------------------------------------------
-| Memerlukan autentikasi dan role 'member'
 */
 Route::middleware(['auth', 'role:member'])->prefix('member')->name('member.')->group(function () {
-    
-    // Dashboard (Menggunakan MemberDashboardController)
     Route::get('/dashboard', [MemberDashboardController::class, 'index'])->name('dashboard');
-    
-    // Profile Management
     Route::get('/profile', [MemberProfileController::class, 'index'])->name('profile');
     Route::post('/profile/update', [MemberProfileController::class, 'update'])->name('profile.update');
-
-    // Payment & Subscription
     Route::get('/payment', [MemberPaymentController::class, 'index'])->name('payment');
-    Route::post('/payment/submit', [MemberPaymentController::class, 'submitPayment'])->name('payment.submit');
-
-    // Class Booking/Schedule View
+    Route::post('/payment/submit', [MemberPaymentController::class, 'submitPayment'])->name('payment.submit')->middleware(\App\Http\Middleware\RejectLargeUploads::class);
     Route::get('/schedule', [ClassController::class, 'schedule'])->name('schedule');
     Route::post('/class/book/{schedule}', [ClassController::class, 'book'])->name('class.book');
     Route::post('/class/cancel/{schedule}', [ClassController::class, 'cancel'])->name('class.cancel');
 });
 
+/*
+|--------------------------------------------------------------------------
+| Admin Login Routes
+|--------------------------------------------------------------------------
+*/
+// TIDAK pakai middleware guest:admin karena ada bug
+// Kita handle manual di controller
+Route::get('admin/login', [AdminLoginController::class, 'showLoginForm'])->name('admin.login');
+Route::post('admin/login', [AdminLoginController::class, 'login'])->name('admin.login.submit');
 
 /*
 |--------------------------------------------------------------------------
-| Admin Routes (Login & Protected Dashboard)
+| Admin Protected Routes
 |--------------------------------------------------------------------------
-|
-| SEMUA rute yang berawalan /admin diatur di sini.
-| Kita beri nama grup 'admin.' agar semua nama rutenya diawali 'admin.'
-|
 */
-Route::prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(function () {
     
-    // Rute Login Admin (Publik / Guest)
-    // URL: /admin/login
-    // Nama: admin.login
-    Route::get('/login', [AdminLoginController::class, 'showLoginForm'])->name('login');
+    // Dashboard
+    Route::get('dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+    Route::get('reports/financial', [AdminDashboardController::class, 'financialReport'])->name('reports.financial');
     
-    // URL: /admin/login (saat tombol login ditekan)
-    // Nama: admin.login.submit
-    Route::post('/login', [AdminLoginController::class, 'login'])->name('login.submit');
-
+    // Members
+    Route::get('members', [AdminMemberController::class, 'index'])->name('members.index');
+    Route::post('members', [AdminMemberController::class, 'store'])->name('members.store');
+    Route::get('members/{member}', [AdminMemberController::class, 'show'])->name('members.show');
+    Route::get('members/{member}/edit', [AdminMemberController::class, 'edit'])->name('members.edit');
+    Route::put('members/{member}', [AdminMemberController::class, 'update'])->name('members.update');
+    Route::delete('members/{member}', [AdminMemberController::class, 'destroy'])->name('members.destroy');
     
-    // Rute Admin yang Terproteksi (Wajib Login sebagai 'admin')
-    Route::middleware('auth:admin')->group(function () {
-        
-        // URL: /admin/dashboard
-        // Nama: admin.dashboard
-        Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-        Route::get('/reports/financial', [AdminDashboardController::class, 'financialReport'])->name('reports.financial');
-
-        // Member Management (CRUD)
-        Route::resource('members', AdminMemberController::class)->except(['create']);
-        Route::resource('schedules', AdminScheduleController::class);
-
-        // Payment Validation
-        Route::get('payments', [AdminPaymentController::class, 'index'])->name('payments.index');
-        Route::post('payments/approve/{transaction}', [AdminPaymentController::class, 'approve'])->name('payments.approve');
-        Route::post('payments/reject/{transaction}', [AdminPaymentController::class, 'reject'])->name('payments.reject');
-
-        // Schedule Management (CRUD)
-        Route::resource('schedules', AdminScheduleController::class);
-
-        // Data Master
-        Route::resource('trainers', AdminTrainerController::class);
-        Route::post('notifications/{notification}/toggle', [AdminNotificationController::class, 'toggleStatus'])
-        ->name('notifications.toggle');
-        Route::resource('notifications', AdminNotificationController::class);('auth:admin');
-
-    // Ganti Route::resource menjadi rute manual ini
-        Route::get('homepage', [AdminHomepageController::class, 'index'])->name('homepage.index');
-        Route::get('homepage/edit', [AdminHomepageController::class, 'edit'])->name('homepage.edit');
-
-// Menangani 4 form update yang terpisah
-        Route::put('homepage/hero', [AdminHomepageController::class, 'updateHero'])->name('homepage.hero');
-        Route::put('homepage/stats', [AdminHomepageController::class, 'updateStats'])->name('homepage.stats');
-        Route::put('homepage/benefits', [AdminHomepageController::class, 'updateBenefits'])->name('homepage.benefits');
-        Route::put('homepage/testimonials', [AdminHomepageController::class, 'updateTestimonials'])->name('homepage.testimonials');
-    });
+    // Schedules
+    Route::resource('schedules', AdminScheduleController::class);
     
+    // Trainers
+    Route::resource('trainers', AdminTrainerController::class)->middleware(\App\Http\Middleware\RejectLargeUploads::class);
+    
+    // Payments
+    Route::get('payments', [AdminPaymentController::class, 'index'])->name('payments.index');
+    Route::post('payments/approve/{transaction}', [AdminPaymentController::class, 'approve'])->name('payments.approve');
+    Route::post('payments/reject/{transaction}', [AdminPaymentController::class, 'reject'])->name('payments.reject');
+    
+    // Notifications
+    Route::post('notifications/{notification}/toggle', [AdminNotificationController::class, 'toggleStatus'])->name('notifications.toggle');
+    Route::resource('notifications', AdminNotificationController::class);
+    
+    // Homepage Management
+    Route::get('homepage', [AdminHomepageController::class, 'index'])->name('homepage.index');
+    Route::get('homepage/edit', [AdminHomepageController::class, 'edit'])->name('homepage.edit');
+    Route::put('homepage/hero', [AdminHomepageController::class, 'updateHero'])->name('homepage.hero');
+    Route::put('homepage/stats', [AdminHomepageController::class, 'updateStats'])->name('homepage.stats');
+    Route::put('homepage/benefits', [AdminHomepageController::class, 'updateBenefits'])->name('homepage.benefits');
+    Route::put('homepage/testimonials', [AdminHomepageController::class, 'updateTestimonials'])->name('homepage.testimonials');
+    
+    // Logout
+    Route::post('logout', [AdminLoginController::class, 'logout'])->name('logout');
 });

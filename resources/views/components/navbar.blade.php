@@ -1,6 +1,5 @@
 {{-- File: resources/views/components/navbar.blade.php --}}
 
-{{-- TAMBAHKAN style="z-index: 1050;" DI SINI --}}
 <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top border-bottom shadow-sm" style="z-index: 1050;">
     <div class="container">
         {{-- Logo --}}
@@ -25,7 +24,7 @@
                     ];
                 @endphp
 
-                @if(Auth::guard('web')->check())
+                @auth('web')
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('member.dashboard') ? 'active fw-semibold' : '' }}"
                            style="{{ request()->routeIs('member.dashboard') ? 'color: var(--grit-accent);' : 'color: var(--grit-text);' }}"
@@ -33,7 +32,7 @@
                            <i class="bi bi-layout-text-sidebar-reverse me-1"></i> Dashboard
                         </a>
                     </li>
-                @endif
+                @endauth
 
                 {{-- Link Publik --}}
                 @foreach ($publicLinks as $link)
@@ -50,20 +49,19 @@
             {{-- Right Actions --}}
             <div class="d-flex align-items-center">
 
-                @if(Auth::guard('admin')->check())
-                    {{-- 1. Jika ADMIN yang logged in --}}
+                @auth('admin')
+                    {{-- 1. Admin sudah login --}}
                     <a href="{{ route('admin.dashboard') }}" class="btn btn-primary me-2">
                         <i class="bi bi-person-gear me-1"></i> Admin Panel
                     </a>
-                    <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                    <form action="{{ route('admin.logout') }}" method="POST" class="d-inline">
                         @csrf
                         <button type="submit" class="btn btn-outline-danger">
                             <i class="bi bi-box-arrow-right me-1"></i> Keluar
                         </button>
                     </form>
-
-                @elseif(Auth::guard('web')->check())
-                    {{-- 2. Jika MEMBER yang logged in --}}
+                @elseauth('web')
+                    {{-- 2. Member sudah login --}}
                     <div class="dropdown">
                         <button class="btn border-0 d-flex align-items-center p-0" type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                             <div class="rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px; background-color: var(--grit-primary); color: white;">
@@ -71,7 +69,6 @@
                             </div>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2" aria-labelledby="profileDropdown">
-                            {{-- ... (menu dropdown Anda) ... --}}
                             <li>
                                 <a class="dropdown-item py-2" href="{{ route('member.dashboard') }}">
                                     <i class="bi bi-layout-text-sidebar-reverse me-2 text-muted"></i> Dashboard Saya
@@ -98,21 +95,17 @@
                             </li>
                         </ul>
                     </div>
-
                 @else
-                    {{-- 3. Jika GUEST --}}
+                    {{-- 3. Guest (belum login) --}}
                     <a href="{{ route('login') }}" class="btn btn-link text-decoration-none me-2" style="color: var(--grit-primary);">
                         Masuk
                     </a>
                     <a href="{{ route('register') }}" class="btn btn-accent text-white">
                         Daftar Sekarang
                     </a>
-                @endif
+                @endauth
                 
             </div>
         </div>
     </div>
 </nav>
-
-{{-- ... (style Anda yang sudah ada) ... --}}
-

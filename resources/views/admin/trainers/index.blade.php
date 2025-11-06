@@ -7,13 +7,7 @@
     {{-- Memanggil komponen header dan tab navigasi --}}
     @include('admin.components.datamaster-tabs')
 
-    <!-- Sessions Flash Messages -->
-    @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
+
     
     {{-- Menampilkan error validasi --}}
     @if ($errors->any())
@@ -24,6 +18,15 @@
                     <li>{{ $error }}</li>
                 @endforeach
             </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    {{-- Menampilkan error upload ketika handler fallback menggunakan query param --}}
+    @if(request()->query('upload_error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Upload Gagal!</strong>
+            <p class="mb-0">{{ urldecode(request()->query('upload_error_message')) }}</p>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
@@ -50,7 +53,7 @@
                     <div class="card-body d-flex flex-column text-center">
                         
                         {{-- 3. Tambahkan foto bulat (circular) di dalam card-body --}}
-                        <img src="{{ $trainer->getImageUrl() }}" class="rounded-circle mx-auto" alt="{{ $trainer->name }}" 
+                        <img src="{{ asset('storage/' . $trainer->image) }}" class="rounded-circle mx-auto" alt="{{ $trainer->name }}" 
                              style="width: 180px; height: 180px; object-fit: cover; object-position: center top; margin-bottom: 1rem; border: 4px solid var(--admin-bg);">
 
                         {{-- 4. Sederhanakan Tampilan Nama dan Badge --}}
@@ -158,8 +161,22 @@
                                 <textarea class="form-control" id="add_bio" name="bio" rows="3">{{ old('bio') }}</textarea>
                             </div>
                             <div class="col-12">
-                                <label for="add_image" class="form-label">Foto Trainer</label>
-                                <input type="file" class="form-control" id="add_image" name="image" accept="image/*">
+                                <label for="add_image" class="form-label">Foto Trainer</label> 
+                                @php
+                                $isInvalid = $errors->has('image') && old('form_type') == 'add';
+                                @endphp
+                                <input type="file" 
+                                    class="form-control {{ $isInvalid ? 'is-invalid' : '' }} image-upload-input" 
+                                    id="add_image" 
+                                    name="image" 
+                                        accept=".png,.jpg">
+                                    <small class="form-text text-muted">Hanya file PNG atau JPG yang diizinkan. Maksimal 2MB.</small>
+
+                                @if($isInvalid)
+                                    <div class="invalid-feedback">
+                                    {{ $errors->first('image') }}
+                                    </div>
+                                @endif
                             </div>
                             <div class="col-12">
                                 <div class="form-check form-switch">
@@ -190,7 +207,7 @@
                     @csrf
                     @method('PUT')
                     <div class="modal-header border-0">
-                        <h5 class="modal-title" id="editModalLabel-{{ $trainer->id }}">Edit Trainer</h5>
+                        <h5 class="modal-title" id="editModalLabel-{{ $trainer->id }}">Edit Trainer - {{ $trainer->name }}</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body p-4">
@@ -198,45 +215,51 @@
                         <input type="hidden" name="trainer_id" value="{{ $trainer->id }}">
                         <div class="row g-3">
                             <div class="col-12 col-md-6">
-                                <label for="edit_name-{{ $trainer->id }}" class="form-label">Nama Lengkap</label>
-                                <input type="text" class="form-control" id="edit_name-{{ $trainer->id }}" name="name" value="{{ old('name', $trainer->name) }}" required>
+                                <label for="edit_name_{{ $trainer->id }}" class="form-label">Nama Lengkap</label>
+                                <input type="text" class="form-control" id="edit_name_{{ $trainer->id }}" name="name" value="{{ old('name', $trainer->name) }}" required>
                             </div>
                             <div class="col-12 col-md-6">
-                                <label for="edit_specialization-{{ $trainer->id }}" class="form-label">Spesialisasi</label>
-                                <input type="text" class="form-control" id="edit_specialization-{{ $trainer->id }}" name="specialization" value="{{ old('specialization', $trainer->specialization) }}" required>
+                                <label for="edit_specialization_{{ $trainer->id }}" class="form-label">Spesialisasi</label>
+                                <input type="text" class="form-control" id="edit_specialization_{{ $trainer->id }}" name="specialization" value="{{ old('specialization', $trainer->specialization) }}" required>
                             </div>
                             <div class="col-12 col-md-6">
-                                <label for="edit_email-{{ $trainer->id }}" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="edit_email-{{ $trainer->id }}" name="email" value="{{ old('email', $trainer->email) }}" required>
+                                <label for="edit_email_{{ $trainer->id }}" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="edit_email_{{ $trainer->id }}" name="email" value="{{ old('email', $trainer->email) }}" required>
                             </div>
                             <div class="col-12 col-md-6">
-                                <label for="edit_phone-{{ $trainer->id }}" class="form-label">No. Telepon</label>
-                                <input type="tel" class="form-control" id="edit_phone-{{ $trainer->id }}" name="phone" value="{{ old('phone', $trainer->phone) }}">
+                                <label for="edit_phone_{{ $trainer->id }}" class="form-label">No. Telepon</label>
+                                <input type="tel" class="form-control" id="edit_phone_{{ $trainer->id }}" name="phone" value="{{ old('phone', $trainer->phone) }}">
                             </div>
                             <div class="col-12 col-md-6">
-                                <label for="edit_experience-{{ $trainer->id }}" class="form-label">Pengalaman (Tahun)</label>
-                                <input type="number" class="form-control" id="edit_experience-{{ $trainer->id }}" name="experience" value="{{ old('experience', $trainer->experience) }}" min="0" required>
+                                <label for="edit_experience_{{ $trainer->id }}" class="form-label">Pengalaman (Tahun)</label>
+                                <input type="number" class="form-control" id="edit_experience_{{ $trainer->id }}" name="experience" value="{{ old('experience', $trainer->experience) }}" min="0" required>
                             </div>
                             <div class="col-12 col-md-6">
-                                <label for="edit_clients-{{ $trainer->id }}" class="form-label">Jumlah Klien (Opsional)</label>
-                                <input type="text" class="form-control" id="edit_clients-{{ $trainer->id }}" name="clients" value="{{ old('clients', $trainer->clients) }}">
+                                <label for="edit_clients_{{ $trainer->id }}" class="form-label">Jumlah Klien (Opsional)</label>
+                                <input type="text" class="form-control" id="edit_clients_{{ $trainer->id }}" name="clients" value="{{ old('clients', $trainer->clients) }}" placeholder="Contoh: 150+">
                             </div>
                             <div class="col-12">
-                                <label for="edit_certifications-{{ $trainer->id }}" class="form-label">Sertifikasi (Pisahkan dengan koma)</label>
-                                <input type="text" class="form-control" id="edit_certifications-{{ $trainer->id }}" name="certifications" value="{{ old('certifications', $trainer->certifications ? implode(', ', $trainer->certifications) : '') }}">
+                                <label for="edit_certifications_{{ $trainer->id }}" class="form-label">Sertifikasi (Pisahkan dengan koma)</label>
+                                <input type="text" class="form-control" id="edit_certifications_{{ $trainer->id }}" name="certifications" value="{{ old('certifications', $trainer->certifications ? implode(', ', $trainer->certifications) : '') }}" placeholder="Contoh: ACE, RYT-200">
                             </div>
                             <div class="col-12">
-                                <label for="edit_bio-{{ $trainer->id }}" class="form-label">Bio Singkat</label>
-                                <textarea class="form-control" id="edit_bio-{{ $trainer->id }}" name="bio" rows="3">{{ old('bio', $trainer->bio) }}</textarea>
+                                <label for="edit_bio_{{ $trainer->id }}" class="form-label">Bio Singkat</label>
+                                <textarea class="form-control" id="edit_bio_{{ $trainer->id }}" name="bio" rows="3">{{ old('bio', $trainer->bio) }}</textarea>
                             </div>
                             <div class="col-12">
-                                <label for="edit_image-{{ $trainer->id }}" class="form-label">Ganti Foto Trainer (Opsional)</label>
-                                <input type="file" class="form-control" id="edit_image-{{ $trainer->id }}" name="image" accept="image/*">
+                                <label for="edit_image_{{ $trainer->id }}" class="form-label">Ganti Foto Trainer (Opsional)</label>
+                                @php
+                                    $isInvalidEdit = $errors->has('image') && old('form_type') == 'edit' && old('trainer_id') == $trainer->id;
+                                @endphp
+                                <input type="file" class="form-control {{ $isInvalidEdit ? 'is-invalid' : '' }} image-upload-input" id="edit_image_{{ $trainer->id }}" name="image" accept=".png,.jpg">
+                                @if($isInvalidEdit)
+                                    <div class="invalid-feedback">{{ $errors->first('image') }}</div>
+                                @endif
                             </div>
                             <div class="col-12">
                                 <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" role="switch" id="edit_is_active-{{ $trainer->id }}" name="is_active" value="1" {{ (old('is_active', $trainer->is_active) == 1) ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="edit_is_active-{{ $trainer->id }}">Status Aktif</label>
+                                    <input class="form-check-input" type="checkbox" role="switch" id="edit_is_active_{{ $trainer->id }}" name="is_active" value="1" {{ (old('is_active', $trainer->is_active) == 1) ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="edit_is_active_{{ $trainer->id }}">Status Aktif</label>
                                 </div>
                             </div>
                         </div>
@@ -255,24 +278,71 @@
 
 @push('scripts')
 <script>
-    // Script untuk menangani jika ada error validasi
     document.addEventListener('DOMContentLoaded', function () {
-        @if($errors->any())
-            var formType = '{{ old('form_type') }}';
+        const handleFileValidation = (event) => {
+            const fileInput = event.target;
+            const form = fileInput.closest('form');
+            const submitButton = form.querySelector('button[type="submit"]');
+            const allowedExtensions = /(\.jpg|\.jpeg|\.png)$/i;
             
-            // Jika error terjadi saat 'add'
-            @if(old('form_type') == 'add')
-                var addModal = new bootstrap.Modal(document.getElementById('addTrainerModal'));
-                addModal.show();
-            
-            // Jika error terjadi saat 'edit'
-            @elseif(old('form_type') == 'edit' && old('trainer_id'))
-                var editModalId = '#editModal-{{ old('trainer_id') }}';
-                var editModal = new bootstrap.Modal(document.querySelector(editModalId));
-                editModal.show();
-            @endif
-        @endif
+            // Clear previous custom error
+            const existingError = form.querySelector('.custom-file-error');
+            if (existingError) {
+                existingError.remove();
+            }
+            fileInput.classList.remove('is-invalid');
+            if (submitButton) {
+                submitButton.disabled = false;
+            }
+
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const fileName = file.name;
+
+                if (!allowedExtensions.exec(fileName)) {
+                    fileInput.value = ''; // Clear the invalid file selection
+                    fileInput.classList.add('is-invalid');
+                    
+                    const errorFeedback = document.createElement('div');
+                    errorFeedback.classList.add('invalid-feedback', 'd-block', 'custom-file-error');
+                    errorFeedback.textContent = 'Format file harus PNG, JPG, atau JPEG.';
+                    
+                    fileInput.parentNode.insertBefore(errorFeedback, fileInput.nextSibling);
+                    
+                    if (submitButton) {
+                        submitButton.disabled = true;
+                    }
+                }
+            }
+        };
+
+        const imageUploadInputs = document.querySelectorAll('.image-upload-input');
+        imageUploadInputs.forEach(input => {
+            input.addEventListener('change', handleFileValidation);
+        });
+
+        // Also reset validation state when modal is closed
+        const modals = document.querySelectorAll('.modal');
+        modals.forEach(modal => {
+            modal.addEventListener('hidden.bs.modal', function () {
+                const form = this.querySelector('form');
+                if (form) {
+                    const fileInput = form.querySelector('.image-upload-input');
+                    const submitButton = form.querySelector('button[type="submit"]');
+                    
+                    if (fileInput) {
+                        fileInput.classList.remove('is-invalid');
+                        const existingError = form.querySelector('.custom-file-error');
+                        if (existingError) {
+                            existingError.remove();
+                        }
+                    }
+                    if (submitButton) {
+                        submitButton.disabled = false;
+                    }
+                }
+            });
+        });
     });
 </script>
 @endpush
-
