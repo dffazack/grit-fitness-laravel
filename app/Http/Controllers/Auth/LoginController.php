@@ -25,12 +25,6 @@ class LoginController extends Controller
             
             $user = Auth::user();
             
-            // Redirect based on role
-            if ($user->isAdmin()) {
-                return redirect()->route('admin.dashboard')
-                    ->with('success', 'Selamat datang, Admin!');
-            }
-            
             // Check membership status for members
             if ($user->membership_status === 'non-member') {
                 return redirect()->route('membership')

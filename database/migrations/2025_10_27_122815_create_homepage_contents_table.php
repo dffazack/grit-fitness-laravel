@@ -8,13 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('facilities', function (Blueprint $table) {
+        Schema::create('homepage_contents', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->text('description');
-            $table->string('icon')->nullable(); // Icon class or image
-            $table->string('image')->nullable();
-            $table->integer('order')->default(0);
+            $table->string('section'); // 'hero', 'features', 'testimonials'
+            $table->json('content'); // JSON data for each section
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
@@ -22,6 +19,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('facilities');
+        Schema::dropIfExists('homepage_contents');
     }
 };

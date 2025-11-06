@@ -8,55 +8,95 @@ use Illuminate\Http\Request;
 
 class NotificationController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware(['auth', 'role:admin']);
-    }
-    
+    /**
+     * Menampilkan daftar notifikasi.
+     */
     public function index()
     {
-        $notifications = Notification::latest()->paginate(15);
-        return view('admin.masterdata.notifications', compact('notifications'));
+        $notifications = Notification::orderBy('is_active', 'desc')
+                                     ->orderBy('start_date', 'desc')
+                                     ->paginate(10);
+                                     
+        // INI ADALAH PERBAIKANNYA:
+        // Kita panggil view 'admin.notifications.index'
+        return view('admin.notifications.index', compact('notifications'));
     }
-    
+
+    /**
+     * Menyimpan notifikasi baru.
+     */
     public function store(Request $request)
     {
+        // Tambahkan ini untuk error handling modal
+        $request->merge(['form_type' => 'add']);
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'message' => 'required|string',
-            'type' => 'required|in:promo,event,announcement',
+            'type' => 'required|in:'.implode(',', \App\Models\Notification::TYPES),
             'start_date' => 'required|date',
-            'end_date' => 'required|date|after:start_date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'is_active' => 'sometimes|boolean',
         ]);
-        
+
+        // Set 'is_active' ke true jika dicentang, false jika tidak
+        $validated['is_active'] = $request->has('is_active');
+
         Notification::create($validated);
-        
-        return back()->with('success', 'Notifikasi berhasil ditambahkan');
+
+        return redirect()->route('admin.notifications.index')
+                         ->with('success', 'Notifikasi baru berhasil ditambahkan.');
     }
-    
-    public function update(Request $request, $id)
+
+    /**
+     * Memperbarui notifikasi.
+     */
+    public function update(Request $request, Notification $notification)
     {
-        $notification = Notification::findOrFail($id);
+        // Tambahkan ini untuk error handling modal
+        $request->merge([
+            'form_type' => 'edit',
+            'notification_id' => $notification->id
+        ]);
         
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'message' => 'required|string',
-            'type' => 'required|in:promo,event,announcement',
+            'type' => 'required|in:'.implode(',', \App\Models\Notification::TYPES),
             'start_date' => 'required|date',
-            'end_date' => 'required|date|after:start_date',
-            'is_active' => 'boolean',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'is_active' => 'sometimes|boolean',
         ]);
         
+        // Set 'is_active' ke true jika dicentang, false jika tidak
+        $validated['is_active'] = $request->has('is_active');
+
         $notification->update($validated);
-        
-        return back()->with('success', 'Notifikasi berhasil diperbarui');
+
+        return redirect()->route('admin.notifications.index')
+                         ->with('success', 'Notifikasi berhasil diperbarui.');
     }
-    
-    public function destroy($id)
+
+    /**
+     * Menghapus notifikasi.
+     */
+    public function destroy(Notification $notification)
     {
-        $notification = Notification::findOrFail($id);
         $notification->delete();
+        return redirect()->route('admin.notifications.index')
+                         ->with('success', 'Notifikasi berhasil dihapus.');
+    }
+
+    /**
+     * Toggle status aktif/non-aktif.
+     * Ini untuk tombol "Non-aktifkan"
+     */
+    public function toggleStatus(Notification $notification)
+    {
+        $notification->update(['is_active' => !$notification->is_active]);
+        $message = $notification->is_active ? 'Notifikasi diaktifkan.' : 'Notifikasi dinon-aktifkan.';
         
-        return back()->with('success', 'Notifikasi berhasil dihapus');
+        return back()->with('success', $message);
     }
 }
+

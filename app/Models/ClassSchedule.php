@@ -2,12 +2,38 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ClassSchedule extends Model
 {
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
+
+    public const DAYS = [
+        'Senin', 
+        'Selasa', 
+        'Rabu', 
+        'Kamis', 
+        'Jumat', 
+        'Sabtu', 
+        'Minggu'
+    ];
+
+    public const CLASS_TYPES = [
+        'Cardio',
+        'Strength',
+        'Yoga',
+        'HIIT',
+        'Pilates',
+        'Boxing',
+        'Zumba',
+        'Other'
+    ];
+    
+    protected $table = 'class_schedules';
 
     protected $fillable = [
         'name',
@@ -23,20 +49,23 @@ class ClassSchedule extends Model
     ];
 
     protected $casts = [
-        'start_time' => 'datetime',
-        'end_time' => 'datetime',
+        'start_time' => 'datetime:H:i',
+        'end_time' => 'datetime:H:i',
         'is_active' => 'boolean',
+        'quota' => 'integer',
+        'max_quota' => 'integer',
     ];
 
-    // Relationships
-    public function trainer()
+    // --- RELASI ---
+
+    public function bookings(): HasMany
     {
-        return $this->belongsTo(Trainer::class);
+        return $this->hasMany(Booking::class);
     }
 
-    public function participants()
+    public function trainer(): BelongsTo
     {
-        return $this->hasMany(ClassParticipant::class);
+        return $this->belongsTo(Trainer::class);
     }
 
     // Scopes

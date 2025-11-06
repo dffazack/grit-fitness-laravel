@@ -1,11 +1,26 @@
 <?php
+
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Carbon\Carbon;
 
 class Notification extends Model
 {
+    use HasFactory;
+
+    /**
+     * Tipe notifikasi untuk dropdown.
+     */
+    public const TYPES = [
+        'Promo',
+        'Event',
+        'Info'
+    ];
+
+    /**
+     * Atribut yang dapat diisi secara massal.
+     */
     protected $fillable = [
         'title',
         'message',
@@ -15,51 +30,23 @@ class Notification extends Model
         'is_active',
     ];
 
+    /**
+     * Atribut yang harus di-cast ke tipe data tertentu.
+     */
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',
         'is_active' => 'boolean',
     ];
 
-    // Scopes
+    /**
+     * Scope untuk mengambil notifikasi yang sedang aktif.
+     * (Ini digunakan oleh HomeController Anda)
+     */
     public function scopeActive($query)
     {
         return $query->where('is_active', true)
-            ->where('start_date', '<=', Carbon::now())
-            ->where('end_date', '>=', Carbon::now());
-    }
-
-    public function scopeType($query, $type)
-    {
-        return $query->where('type', $type);
-    }
-
-    // Helpers
-    public function isCurrentlyActive()
-    {
-        if (!$this->is_active) return false;
-        
-        $now = Carbon::now();
-        return $this->start_date <= $now && $this->end_date >= $now;
-    }
-
-    public function getTypeBadgeClass()
-    {
-        return match($this->type) {
-            'promo' => 'bg-success',
-            'event' => 'bg-info',
-            'announcement' => 'bg-warning',
-            default => 'bg-secondary',
-        };
-    }
-
-    public function getTypeLabel()
-    {
-        return match($this->type) {
-            'promo' => 'Promo',
-            'event' => 'Event',
-            'announcement' => 'Pengumuman',
-            default => 'Lainnya',
-        };
+                     ->where('start_date', '<=', now())
+                     ->where('end_date', '>=', now());
     }
 }

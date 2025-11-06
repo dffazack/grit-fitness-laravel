@@ -29,7 +29,7 @@ class PaymentController extends Controller
     {
         $validated = $request->validate([
             'package' => 'required|in:basic,premium,vip',
-            'proof' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'proof' => 'required|image|mimes:png,jpg,jpeg|max:2048',
         ]);
         
         $package = MembershipPackage::where('type', $validated['package'])->first();
