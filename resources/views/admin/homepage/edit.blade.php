@@ -1,89 +1,87 @@
+{{-- ========================================================================= --}}
+{{-- 8. resources/views/admin/homepage/edit.blade.php - RESPONSIVE --}}
+{{-- ========================================================================= --}}
+
 @extends('layouts.admin')
 
 @section('title', 'Edit Homepage Content')
 
+@section('page-title', 'Edit Homepage Content')
+@section('page-subtitle', 'Kelola konten homepage secara real-time')
+
 @section('content')
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="h3 fw-bold" style="color: var(--admin-primary);">Edit Homepage Content</h1>
-            <p class="text-muted">Kelola konten homepage secara real-time</p>
-        </div>
         <a href="{{ route('admin.homepage.index') }}" class="btn btn-outline-primary">
             <i class="bi bi-arrow-left me-1"></i>
-            Kembali
+            <span class="d-none d-sm-inline">Kembali</span>
         </a>
     </div>
     
-    <!-- Tabs -->
-    {{-- Kita gunakan Alpine.js untuk tab dan mendeteksi hash URL (#hero, #stats, dll) --}}
+    {{-- Tabs - Responsive --}}
     <div x-data="{ activeTab: window.location.hash ? window.location.hash.substring(1) : 'hero' }">
-        <ul class="nav nav-tabs mb-4">
-            <li class="nav-item">
-                <button @click="activeTab = 'hero'; window.location.hash = 'hero';" 
-                        :class="{ 'active': activeTab === 'hero' }"
-                        class="nav-link">
-                    Hero Section
-                </button>
-            </li>
-            <li class="nav-item">
-                <button @click="activeTab = 'stats'; window.location.hash = 'stats';" 
-                        :class="{ 'active': activeTab === 'stats' }"
-                        class="nav-link">
-                    Statistics
-                </button>
-            </li>
-            <li class="nav-item">
-                <button @click="activeTab = 'benefits'; window.location.hash = 'benefits';" 
-                        :class="{ 'active': activeTab === 'benefits' }"
-                        class="nav-link">
-                    Benefits
-                </button>
-            </li>
-            <li class="nav-item">
-                <button @click="activeTab = 'testimonials'; window.location.hash = 'testimonials';" 
-                        :class="{ 'active': activeTab === 'testimonials' }"
-                        class="nav-link">
-                    Testimonials
-                </button>
-            </li>
-        </ul>
+        <div class="overflow-auto mb-4" style="-webkit-overflow-scrolling: touch;">
+            <ul class="nav nav-tabs flex-nowrap">
+                <li class="nav-item">
+                    <button @click="activeTab = 'hero'; window.location.hash = 'hero';" 
+                            :class="{ 'active': activeTab === 'hero' }"
+                            class="nav-link">
+                        <i class="bi bi-image-fill me-1 d-none d-sm-inline"></i>
+                        Hero Section
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button @click="activeTab = 'stats'; window.location.hash = 'stats';" 
+                            :class="{ 'active': activeTab === 'stats' }"
+                            class="nav-link">
+                        <i class="bi bi-graph-up me-1 d-none d-sm-inline"></i>
+                        Statistics
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button @click="activeTab = 'benefits'; window.location.hash = 'benefits';" 
+                            :class="{ 'active': activeTab === 'benefits' }"
+                            class="nav-link">
+                        <i class="bi bi-stars me-1 d-none d-sm-inline"></i>
+                        Benefits
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button @click="activeTab = 'testimonials'; window.location.hash = 'testimonials';" 
+                            :class="{ 'active': activeTab === 'testimonials' }"
+                            class="nav-link">
+                        <i class="bi bi-chat-quote me-1 d-none d-sm-inline"></i>
+                        Testimonials
+                    </button>
+                </li>
+            </ul>
+        </div>
         
-        <!-- Hero Tab -->
+        {{-- Hero Tab --}}
         <div x-show="activeTab === 'hero'" x-cloak>
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title-custom">Edit Hero Section</h5>
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="card-title-custom mb-0">Edit Hero Section</h5>
                 </div>
                 <form action="{{ route('admin.homepage.hero') }}" method="POST">
-                    <div class="card-body">
+                    <div class="card-body p-3 p-md-4">
                         @csrf
                         @method('PUT')
                         
-                        <x-form-input 
-                            label="Hero Title" 
-                            name="title"
-                            :value="$hero->title ?? ''"
-                            placeholder="Transform Your Body, Transform Your Life"
-                            required
-                        />
+                        <div class="mb-3">
+                            <label class="form-label">Hero Title</label>
+                            <input type="text" name="title" class="form-control" value="{{ $hero->title ?? '' }}" placeholder="Transform Your Body, Transform Your Life" required>
+                        </div>
                         
                         <div class="mb-3">
                             <label class="form-label">Hero Subtitle</label>
-                            <textarea name="subtitle" 
-                                      class="form-control" 
-                                      rows="3" 
-                                      required>{{ $hero->subtitle ?? '' }}</textarea>
+                            <textarea name="subtitle" class="form-control" rows="3" required>{{ $hero->subtitle ?? '' }}</textarea>
                         </div>
                         
-                        <x-form-input 
-                            label="Background Image URL" 
-                            name="image"
-                            :value="$hero->image ?? ''"
-                            placeholder="https://images.unsplash.com/photo-..."
-                            required
-                        />
+                        <div class="mb-3">
+                            <label class="form-label">Background Image URL</label>
+                            <input type="text" name="image" class="form-control" value="{{ $hero->image ?? '' }}" placeholder="https://images.unsplash.com/photo-..." required>
+                        </div>
                         
-                        <!-- Image Preview -->
                         @if(isset($hero->image) && $hero->image)
                         <div class="mb-3">
                             <label class="form-label">Preview</label>
@@ -91,189 +89,150 @@
                         </div>
                         @endif
                     </div>
-                    <div class="card-footer text-end">
+                    <div class="card-footer bg-white border-0 py-3 text-end">
                         <button type="submit" class="btn btn-accent">
-                            Update Hero Section
+                            <i class="bi bi-save me-1"></i>
+                            <span class="d-none d-sm-inline">Update Hero Section</span>
+                            <span class="d-sm-none">Simpan</span>
                         </button>
                     </div>
                 </form>
             </div>
         </div>
         
-        <!-- Stats Tab -->
+        {{-- Stats Tab --}}
         <div x-show="activeTab === 'stats'" x-cloak>
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title-custom">Edit Statistics Section</h5>
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="card-title-custom mb-0">Edit Statistics Section</h5>
                 </div>
                 <form action="{{ route('admin.homepage.stats') }}" method="POST">
-                    <div class="card-body">
+                    <div class="card-body p-3 p-md-4">
                         @csrf
                         @method('PUT')
                         
                         @for($i = 0; $i < 4; $i++)
-                        <div class="row mb-3">
-                            <div class="col-md-4">
-                                <x-form-input 
-                                    label="Stat {{ $i + 1 }} - Value" 
-                                    name="stats[{{ $i }}][value]"
-                                    :value="$stats[$i]->value ?? ''"
-                                    placeholder="500+"
-                                    required
-                                />
+                        <div class="row g-3 mb-4 pb-3 {{ $i < 3 ? 'border-bottom' : '' }}">
+                            <div class="col-12">
+                                <h6 class="fw-semibold text-muted">Stat {{ $i + 1 }}</h6>
                             </div>
-                            <div class="col-md-8">
-                                <x-form-input 
-                                    label="Stat {{ $i + 1 }} - Label" 
-                                    name="stats[{{ $i }}][label]"
-                                    :value="$stats[$i]->label ?? ''"
-                                    placeholder="Member Aktif"
-                                    required
-                                />
+                            <div class="col-12 col-md-4">
+                                <label class="form-label">Value</label>
+                                <input type="text" name="stats[{{ $i }}][value]" class="form-control" value="{{ $stats[$i]->value ?? '' }}" placeholder="500+" required>
+                            </div>
+                            <div class="col-12 col-md-8">
+                                <label class="form-label">Label</label>
+                                <input type="text" name="stats[{{ $i }}][label]" class="form-control" value="{{ $stats[$i]->label ?? '' }}" placeholder="Member Aktif" required>
                             </div>
                         </div>
                         @endfor
                     </div>
-                    <div class="card-footer text-end">
+                    <div class="card-footer bg-white border-0 py-3 text-end">
                         <button type="submit" class="btn btn-accent">
-                            Update Statistics
+                            <i class="bi bi-save me-1"></i>
+                            <span class="d-none d-sm-inline">Update Statistics</span>
+                            <span class="d-sm-none">Simpan</span>
                         </button>
                     </div>
                 </form>
             </div>
         </div>
         
-        <!-- Benefits Tab -->
+        {{-- Benefits Tab --}}
         <div x-show="activeTab === 'benefits'" x-cloak>
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title-custom">Edit Benefits Section</h5>
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="card-title-custom mb-0">Edit Benefits Section</h5>
                 </div>
                 <form action="{{ route('admin.homepage.benefits') }}" method="POST">
-                    <div class="card-body">
+                    <div class="card-body p-3 p-md-4">
                         @csrf
                         @method('PUT')
                         
                         @for($i = 0; $i < 4; $i++)
-                        <div class="border-bottom pb-4 mb-4">
-                            <h6 class="fw-semibold">Benefit {{ $i + 1 }}</h6>
+                        <div class="border rounded p-3 mb-3">
+                            <h6 class="fw-semibold mb-3">Benefit {{ $i + 1 }}</h6>
                             
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="mb-3">
-                                        <label class="form-label">Icon</label>
-                                        <select name="benefits[{{ $i }}][icon]" class="form-select" required>
-                                            <option value="dumbbell" {{ ($benefits[$i]->icon ?? '') === 'dumbbell' ? 'selected' : '' }}>Dumbbell</option>
-                                            <option value="people" {{ ($benefits[$i]->icon ?? '') === 'people' ? 'selected' : '' }}>People</option>
-                                            <option value="calendar" {{ ($benefits[$i]->icon ?? '') === 'calendar' ? 'selected' : '' }}>Calendar</option>
-                                            <option value="trophy" {{ ($benefits[$i]->icon ?? '') === 'trophy' ? 'selected' : '' }}>Trophy</option>
-                                        </select>
-                                    </div>
+                            <div class="row g-3">
+                                <div class="col-12 col-md-4">
+                                    <label class="form-label">Icon</label>
+                                    <select name="benefits[{{ $i }}][icon]" class="form-select" required>
+                                        <option value="dumbbell" {{ ($benefits[$i]->icon ?? '') === 'dumbbell' ? 'selected' : '' }}>Dumbbell</option>
+                                        <option value="people" {{ ($benefits[$i]->icon ?? '') === 'people' ? 'selected' : '' }}>People</option>
+                                        <option value="calendar" {{ ($benefits[$i]->icon ?? '') === 'calendar' ? 'selected' : '' }}>Calendar</option>
+                                        <option value="trophy" {{ ($benefits[$i]->icon ?? '') === 'trophy' ? 'selected' : '' }}>Trophy</option>
+                                    </select>
                                 </div>
-                                <div class="col-md-8">
-                                    <x-form-input 
-                                        label="Title" 
-                                        name="benefits[{{ $i }}][title]"
-                                        :value="$benefits[$i]->title ?? ''"
-                                        required
-                                    />
+                                <div class="col-12 col-md-8">
+                                    <label class="form-label">Title</label>
+                                    <input type="text" name="benefits[{{ $i }}][title]" class="form-control" value="{{ $benefits[$i]->title ?? '' }}" required>
                                 </div>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label class="form-label">Description</label>
-                                <textarea name="benefits[{{ $i }}][description]" 
-                                          class="form-control" 
-                                          rows="2" 
-                                          required>{{ $benefits[$i]->description ?? '' }}</textarea>
+                                <div class="col-12">
+                                    <label class="form-label">Description</label>
+                                    <textarea name="benefits[{{ $i }}][description]" class="form-control" rows="2" required>{{ $benefits[$i]->description ?? '' }}</textarea>
+                                </div>
                             </div>
                         </div>
                         @endfor
-                        <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Cari semua select icon di form Benefits
-    document.querySelectorAll('select[name^="benefits"]').forEach(select => {
-        // Buat elemen <i> untuk preview
-        const preview = document.createElement('i');
-        preview.classList.add('bi', `bi-${select.value}`, 'ms-2', 'fs-4', 'text-accent');
-        select.parentNode.appendChild(preview);
-
-        // Update preview kalau pilihan berubah
-        select.addEventListener('change', e => {
-            preview.className = `bi bi-${e.target.value} ms-2 fs-4 text-accent`;
-        });
-    });
-});
-</script>
                     </div>
-                    <div class="card-footer text-end">
+                    <div class="card-footer bg-white border-0 py-3 text-end">
                         <button type="submit" class="btn btn-accent">
-                            Update Benefits
+                            <i class="bi bi-save me-1"></i>
+                            <span class="d-none d-sm-inline">Update Benefits</span>
+                            <span class="d-sm-none">Simpan</span>
                         </button>
                     </div>
                 </form>
             </div>
         </div>
         
-        <!-- Testimonials Tab -->
+        {{-- Testimonials Tab --}}
         <div x-show="activeTab === 'testimonials'" x-cloak>
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title-custom">Edit Testimonials Section</h5>
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="card-title-custom mb-0">Edit Testimonials Section</h5>
                 </div>
                 <form action="{{ route('admin.homepage.testimonials') }}" method="POST">
-                    <div class="card-body">
+                    <div class="card-body p-3 p-md-4">
                         @csrf
                         @method('PUT')
                         
                         @for($i = 0; $i < 3; $i++)
-                        <div class="border-bottom pb-4 mb-4">
-                            <h6 class="fw-semibold">Testimonial {{ $i + 1 }}</h6>
+                        <div class="border rounded p-3 mb-3">
+                            <h6 class="fw-semibold mb-3">Testimonial {{ $i + 1 }}</h6>
                             
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <x-form-input 
-                                        label="Name" 
-                                        name="testimonials[{{ $i }}][name]"
-                                        :value="$testimonials[$i]->name ?? ''"
-                                        required
-                                    />
+                            <div class="row g-3">
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label">Name</label>
+                                    <input type="text" name="testimonials[{{ $i }}][name]" class="form-control" value="{{ $testimonials[$i]->name ?? '' }}" required>
                                 </div>
-                                <div class="col-md-6">
-                                    <x-form-input 
-                                        label="Role/Package" 
-                                        name="testimonials[{{ $i }}][role]"
-                                        :value="$testimonials[$i]->role ?? ''"
-                                        placeholder="Member Premium"
-                                        required
-                                    />
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label">Role/Package</label>
+                                    <input type="text" name="testimonials[{{ $i }}][role]" class="form-control" value="{{ $testimonials[$i]->role ?? '' }}" placeholder="Member Premium" required>
                                 </div>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label class="form-label">Testimonial Text</label>
-                                <textarea name="testimonials[{{ $i }}][text]" 
-                                          class="form-control" 
-                                          rows="3" 
-                                          required>{{ $testimonials[$i]->text ?? '' }}</textarea>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label class="form-label">Rating (1-5)</label>
-                                <select name="testimonials[{{ $i }}][rating]" class="form-select" required>
-                                    @for($r = 1; $r <= 5; $r++)
-                                    <option value="{{ $r }}" {{ ($testimonials[$i]->rating ?? 5) == $r ? 'selected' : '' }}>
-                                        {{ $r }} Star{{ $r > 1 ? 's' : '' }}
-                                    </option>
-                                    @endfor
-                                </select>
+                                <div class="col-12">
+                                    <label class="form-label">Testimonial Text</label>
+                                    <textarea name="testimonials[{{ $i }}][text]" class="form-control" rows="3" required>{{ $testimonials[$i]->text ?? '' }}</textarea>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label">Rating (1-5)</label>
+                                    <select name="testimonials[{{ $i }}][rating]" class="form-select" required>
+                                        @for($r = 1; $r <= 5; $r++)
+                                        <option value="{{ $r }}" {{ ($testimonials[$i]->rating ?? 5) == $r ? 'selected' : '' }}>
+                                            {{ $r }} Star{{ $r > 1 ? 's' : '' }}
+                                        </option>
+                                        @endfor
+                                    </select>
+                                </div>
                             </div>
                         </div>
                         @endfor
                     </div>
-                    <div class="card-footer text-end">
+                    <div class="card-footer bg-white border-0 py-3 text-end">
                         <button type="submit" class="btn btn-accent">
-                            Update Testimonials
+                            <i class="bi bi-save me-1"></i>
+                            <span class="d-none d-sm-inline">Update Testimonials</span>
+                            <span class="d-sm-none">Simpan</span>
                         </button>
                     </div>
                 </form>
@@ -281,16 +240,48 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
     </div>
     
-    <!-- Preview Button -->
+    {{-- Preview Button --}}
     <div class="mt-4 text-center">
         <a href="{{ route('home') }}" target="_blank" class="btn btn-outline-primary">
             <i class="bi bi-eye me-2"></i>
             Preview Homepage
         </a>
     </div>
-</div>
 
-<style>
-[x-cloak] { display: none !important; }
-</style>
 @endsection
+
+@push('styles')
+<style>
+    [x-cloak] { display: none !important; }
+    
+    .nav-tabs {
+        border-bottom: 2px solid var(--admin-border);
+    }
+    
+    .nav-tabs .nav-link {
+        border: none;
+        border-bottom: 2px solid transparent;
+        padding: 0.75rem 1rem;
+        white-space: nowrap;
+        transition: all 0.2s ease;
+    }
+    
+    .nav-tabs .nav-link.active {
+        background-color: transparent;
+        color: var(--admin-primary);
+        border-bottom-color: var(--admin-primary);
+        font-weight: 600;
+    }
+    
+    @media (max-width: 576px) {
+        .nav-tabs .nav-link {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+        }
+    }
+</style>
+@endpush
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+@endpush

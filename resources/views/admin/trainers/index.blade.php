@@ -1,27 +1,22 @@
+{{-- ========================================================================= --}}
+{{-- 5. resources/views/admin/trainers/index.blade.php --}}
+{{-- ========================================================================= --}}
+
 @extends('layouts.admin')
 
 @section('title', 'Data Master - Trainer')
 
 @section('content')
     
-    {{-- Memanggil komponen header dan tab navigasi --}}
     @include('admin.components.datamaster-tabs')
-
-
     
-    {{-- Menampilkan error validasi --}}
     @if ($errors->any())
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
             <strong>Validasi Gagal!</strong> Harap periksa input Anda di form.
-            <ul class="mb-0 mt-2">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
-
     {{-- Menampilkan error upload ketika handler fallback menggunakan query param --}}
     @if(request()->query('upload_error'))
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -36,58 +31,62 @@
         <h3 class="mb-0" style="color: var(--admin-primary);">Data Trainer</h3>
         <button type="button" class="btn btn-accent" data-bs-toggle="modal" data-bs-target="#addTrainerModal">
             <i class="bi bi-plus-circle me-1"></i>
-            Tambah Trainer
+            <span class="d-none d-sm-inline">Tambah Trainer</span>
+            <span class="d-sm-none">Tambah</span>
         </button>
     </div>
 
-    <!-- Grid Kartu Trainer -->
-    <div class="row g-4">
+    {{-- Grid Responsive --}}
+    <div class="row g-3 g-md-4">
         @forelse($trainers as $trainer)
-            <div class="col-12 col-md-6 col-lg-4">
-                {{-- [PERUBAHAN STRUKTUR CARD DIMULAI DI SINI] --}}
-                <div class="card h-100">
-                    {{-- 
-                      1. Hapus <img class="card-img-top"> dari sini.
-                      2. Tambahkan 'text-center' ke card-body.
-                    --}}
-                    <div class="card-body d-flex flex-column text-center">
-                        
+            <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+                <div class="card h-100 border-0 shadow-sm hover-card">
+                    <div class="card-body d-flex flex-column text-center p-3 p-md-4">
                         {{-- 3. Tambahkan foto bulat (circular) di dalam card-body --}}
                         <img src="{{ asset('storage/' . $trainer->image) }}" class="rounded-circle mx-auto" alt="{{ $trainer->name }}" 
                              style="width: 180px; height: 180px; object-fit: cover; object-position: center top; margin-bottom: 1rem; border: 4px solid var(--admin-bg);">
 
-                        {{-- 4. Sederhanakan Tampilan Nama dan Badge --}}
-                        <h5 class="card-title-custom mb-1">{{ $trainer->name }}</h5>
+                        {{-- Nama & Status --}}
+                        <h5 class="card-title-custom mb-1 text-truncate" title="{{ $trainer->name }}">{{ $trainer->name }}</h5>
                         @if($trainer->is_active)
-                            <span class="badge rounded-pill bg-active fw-semibold mb-2 align-self-center">Aktif</span>
+                            <span class="badge rounded-pill bg-active mb-2 align-self-center">Aktif</span>
                         @else
-                            <span class="badge rounded-pill bg-danger text-white fw-semibold mb-2 align-self-center">Non-Aktif</span>
+                            <span class="badge rounded-pill bg-danger text-white mb-2 align-self-center">Non-Aktif</span>
                         @endif
                         
-                        <p class="mb-1 fw-semibold" style="color: var(--admin-accent);">{{ $trainer->specialization }}</p>
-                        
-                        {{-- 5. Ubah teks Exp/Clients agar 'text-center' (sudah otomatis) --}}
-                        <p class="small text-muted mb-1">
-                            Exp: {{ $trainer->experience }} tahun | Clients: {{ $trainer->clients ?? 'N/A' }}
+                        {{-- Spesialisasi --}}
+                        <p class="mb-2 fw-semibold text-truncate" style="color: var(--admin-accent);" title="{{ $trainer->specialization }}">
+                            {{ $trainer->specialization }}
                         </p>
                         
-                        {{-- 6. 'flex-grow-1' akan mendorong tombol ke bawah --}}
-                        <p class="card-text small text-muted flex-grow-1">{{ Str::limit($trainer->bio, 100) }}</p>
+                        {{-- Exp & Clients --}}
+                        <p class="small text-muted mb-3">
+                            <i class="bi bi-award me-1"></i>{{ $trainer->experience }} tahun 
+                            <span class="mx-1">|</span>
+                            <i class="bi bi-people me-1"></i>{{ $trainer->clients ?? 'N/A' }}
+                        </p>
                         
-                        {{-- 7. Ubah tombol agar 'justify-content-center' dan 'mt-auto' --}}
-                        <div class="d-flex justify-content-center gap-2 mt-auto pt-3">
-                            <button type="button" class="btn btn-sm btn-primary w-100" 
+                        {{-- Bio --}}
+                        <p class="card-text small text-muted flex-grow-1 mb-3" style="line-height: 1.6;">
+                            {{ Str::limit($trainer->bio, 80) }}
+                        </p>
+                        
+                        {{-- Action Buttons --}}
+                        <div class="d-flex justify-content-center gap-2 mt-auto">
+                            <button type="button" class="btn btn-sm btn-primary flex-grow-1" 
                                     data-bs-toggle="modal" 
-                                    data-bs-target="#editModal-{{ $trainer->id }}"
-                                    data-trainer-json="{{ htmlspecialchars(json_encode($trainer), ENT_QUOTES, 'UTF-8') }}">
-                                <i class="bi bi-pencil-fill"></i> Edit
+                                    data-bs-target="#editModal-{{ $trainer->id }}">
+                                <i class="bi bi-pencil-fill me-1"></i>
+                                <span class="d-none d-sm-inline">Edit</span>
                             </button>
                             
-                            <form action="{{ route('admin.trainers.destroy', $trainer->id) }}" method="POST" class="d-inline-block w-100" onsubmit="return confirm('Anda yakin ingin menghapus trainer ini?');">
+                            <form action="{{ route('admin.trainers.destroy', $trainer->id) }}" 
+                                  method="POST" 
+                                  onsubmit="return confirm('Anda yakin ingin menghapus trainer ini?');">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger w-100">
-                                    <i class="bi bi-trash-fill"></i> Hapus
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash-fill"></i>
                                 </button>
                             </form>
                         </div>
@@ -96,36 +95,33 @@
             </div>
         @empty
             <div class="col-12">
-                <div class="card">
+                <div class="card border-0 shadow-sm">
                     <div class="card-body text-center p-5">
-                        <p class="text-muted">Belum ada data trainer.</p>
+                        <i class="bi bi-person-x fs-1 text-muted mb-3"></i>
+                        <p class="text-muted mb-0">Belum ada data trainer.</p>
                     </div>
                 </div>
             </div>
         @endforelse
     </div>
 
-    <!-- Pagination Links -->
     @if($trainers->hasPages())
         <div class="mt-4">
             {{ $trainers->links() }}
         </div>
     @endif
 
-
-    <!-- =================================================================================== -->
-    <!--                               MODAL TAMBAH TRAINER                                -->
-    <!-- =================================================================================== -->
-    <div class="modal fade" id="addTrainerModal" tabindex="-1" aria-labelledby="addTrainerModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content" style="border-radius: 12px;">
+    {{-- Modal Tambah - Responsive --}}
+    <div class="modal fade" id="addTrainerModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 12px;">
                 <form action="{{ route('admin.trainers.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-header border-0">
-                        <h5 class="modal-title" id="addTrainerModalLabel">Tambah Trainer Baru</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <h5 class="modal-title">Tambah Trainer Baru</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
-                    <div class="modal-body p-4">
+                    <div class="modal-body p-3 p-md-4">
                         <input type="hidden" name="form_type" value="add">
                         <div class="row g-3">
                             <div class="col-12 col-md-6">
@@ -195,26 +191,24 @@
         </div>
     </div>
 
-
-    <!-- =================================================================================== -->
-    <!--                               MODAL EDIT TRAINER                                  -->
-    <!-- =================================================================================== -->
+    {{-- Modal Edit for each trainer --}}
     @foreach($trainers as $trainer)
-    <div class="modal fade" id="editModal-{{ $trainer->id }}" tabindex="-1" aria-labelledby="editModalLabel-{{ $trainer->id }}" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content" style="border-radius: 12px;">
-                <form id="editForm-{{ $trainer->id }}" action="{{ route('admin.trainers.update', $trainer->id) }}" method="POST" enctype="multipart/form-data">
+    <div class="modal fade" id="editModal-{{ $trainer->id }}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 12px;">
+                <form action="{{ route('admin.trainers.update', $trainer->id) }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
                     <div class="modal-header border-0">
                         <h5 class="modal-title" id="editModalLabel-{{ $trainer->id }}">Edit Trainer - {{ $trainer->name }}</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body p-4">
+                    <div class="modal-body p-3 p-md-4">
                         <input type="hidden" name="form_type" value="edit">
                         <input type="hidden" name="trainer_id" value="{{ $trainer->id }}">
                         <div class="row g-3">
                             <div class="col-12 col-md-6">
+
                                 <label for="edit_name_{{ $trainer->id }}" class="form-label">Nama Lengkap</label>
                                 <input type="text" class="form-control" id="edit_name_{{ $trainer->id }}" name="name" value="{{ old('name', $trainer->name) }}" required>
                             </div>
@@ -276,9 +270,22 @@
 
 @endsection
 
+@push('styles')
+<style>
+    .hover-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .hover-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
+    }
+</style>
+@endpush
+
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+<<<<<<< HEAD
         const handleFileValidation = (event) => {
             const fileInput = event.target;
             const form = fileInput.closest('form');
