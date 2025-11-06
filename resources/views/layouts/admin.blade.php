@@ -204,6 +204,34 @@
             color: white;
         }
         
+        /* Burger Menu Button */
+        .burger-menu {
+            top: 1rem;
+            left: 1rem;
+            z-index: 1040;
+            background: var(--admin-primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .burger-menu:hover {
+            background: var(--admin-accent);
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 991.98px) {
+            .admin-content {
+                padding-top: 5rem;
+            }
+        }
+
         /* Custom Forms */
         .form-label {
             font-weight: 500;
@@ -232,9 +260,14 @@
     @stack('styles')
 </head>
 <body>
+    <!-- Burger Menu Button for Mobile -->
+    <button class="burger-menu d-lg-none position-fixed" type="button" data-bs-toggle="offcanvas" data-bs-target="#adminSidebar" aria-controls="adminSidebar">
+        <i class="bi bi-list fs-2"></i>
+    </button>
+
     <div class="admin-layout">
         <!-- Sidebar -->
-        <aside class="admin-sidebar">
+        <aside class="admin-sidebar d-none d-lg-block">
             <div class="admin-sidebar-header">
                 Admin Panel
             </div>
@@ -324,6 +357,70 @@
 
             @yield('content')
         </main>
+    </div>
+
+    <!-- Mobile Sidebar (Offcanvas) -->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="adminSidebar" aria-labelledby="adminSidebarLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="adminSidebarLabel">Admin Panel</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body p-0">
+            <nav class="admin-sidebar-nav">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">
+                            <i class="bi bi-grid-fill"></i>
+                            Laporan Harian
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('admin.members.*') ? 'active' : '' }}" href="{{ route('admin.members.index') }}">
+                            <i class="bi bi-people-fill"></i>
+                            Kelola Member
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('admin.payments.*') ? 'active' : '' }}" href="{{ route('admin.payments.index') }}">
+                            <i class="bi bi-credit-card-fill"></i>
+                            Validasi Pembayaran
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('admin.schedules.*') ? 'active' : '' }}" href="{{ route('admin.schedules.index') }}">
+                            <i class="bi bi-calendar-week-fill"></i>
+                            Kelola Jadwal
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        @php
+                            $isDataMasterActive = request()->routeIs('admin.trainers.*') || 
+                                                request()->routeIs('admin.homepage.*') || 
+                                                request()->routeIs('admin.notifications.*');
+                        @endphp
+                        <a class="nav-link {{ $isDataMasterActive ? 'active' : '' }}" 
+                           href="{{ route('admin.trainers.index') }}">
+                            <i class="bi bi-layers-fill"></i>
+                            Data Master
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="admin-sidebar-footer">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <form action="{{ route('logout') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="nav-link btn btn-link text-decoration-none text-start w-100">
+                                <i class="bi bi-box-arrow-left"></i>
+                                Logout
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
     </div>
 
     <!-- Bootstrap 5.3 JS -->

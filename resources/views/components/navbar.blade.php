@@ -114,5 +114,8 @@
     </div>
 </nav>
 
+</nav>
+
+
 {{-- ... (style Anda yang sudah ada) ... --}}
 
