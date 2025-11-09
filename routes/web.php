@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\MemberController as AdminMemberController;
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\ScheduleController as AdminScheduleController;
+use App\Http\Controllers\Admin\MembershipPackageController;
 use App\Http\Controllers\Admin\TrainerController as AdminTrainerController;
 use App\Http\Controllers\Admin\HomepageController as AdminHomepageController;
 use App\Http\Controllers\Admin\NotificationController as AdminNotificationController;
@@ -94,6 +95,12 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
     
     // Schedules
     Route::resource('schedules', AdminScheduleController::class);
+
+    // Facilities
+    Route::resource('facilities', \App\Http\Controllers\Admin\FacilityController::class);
+
+    // Memberships
+    Route::resource('memberships', MembershipPackageController::class);
     
     // Trainers
     Route::resource('trainers', AdminTrainerController::class)->middleware(\App\Http\Middleware\RejectLargeUploads::class);

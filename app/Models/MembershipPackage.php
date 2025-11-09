@@ -5,6 +5,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class MembershipPackage extends Model
 {
+    protected $table = 'membership_packages';
+
+    public const TYPES = [
+        'regular' => 'Regular',
+        'student' => 'Student',
+    ];
+    
     protected $fillable = [
         'type',
         'name',
@@ -13,12 +20,14 @@ class MembershipPackage extends Model
         'features',
         'description',
         'is_active',
+        'is_popular'
     ];
 
     protected $casts = [
         'features' => 'array',
         'price' => 'decimal:2',
         'is_active' => 'boolean',
+        'is_popular' => 'boolean',
     ];
 
     // Scopes

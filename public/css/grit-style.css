@@ -445,225 +445,291 @@ h6 { font-size: 18px; }
 /* ============================================
    MEMBERSHIP CARDS
    ============================================ */
-.membership-card {
-    border: 2px solid var(--grit-border);
-    border-radius: var(--grit-radius-lg);
-    padding: 32px;
-    transition: all 0.3s ease;
+.membership-card-v2 {
     background: var(--grit-white);
-}
-
-.membership-card:hover {
-    border-color: var(--grit-primary);
-    box-shadow: var(--grit-shadow-lg);
-    transform: translateY(-8px);
-}
-
-.membership-card.featured {
-    border-color: var(--grit-accent);
+    border: 1.5px solid var(--grit-border);
+    border-radius: var(--grit-radius-lg);
+    padding: 28px 24px;
     position: relative;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
-.membership-card.featured::before {
-    content: 'TERPOPULER';
+.membership-card-v2:hover {
+    border-color: var(--grit-primary);
+    box-shadow: 0 12px 32px rgba(43, 50, 130, 0.15);
+    transform: translateY(-6px);
+}
+
+/* Recommended/Popular Badge */
+.membership-card-v2.recommended {
+    border-color: var(--grit-accent);
+}
+
+.recommended-badge {
     position: absolute;
     top: -12px;
-    right: 24px;
-    background-color: var(--grit-accent);
-    color: var(--grit-white);
-    padding: 4px 16px;
-    border-radius: var(--grit-radius-full);
-    font-size: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, var(--grit-accent), var(--grit-accent-dark));
+    color: white;
+    padding: 6px 18px;
+    border-radius: 20px;
+    font-size: 13px;
     font-weight: 600;
+    white-space: nowrap;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(229, 27, 131, 0.3);
 }
 
-.membership-price {
+/* Package Section Header */
+.package-header {
+    margin-bottom: 32px;
+}
+
+.package-icon {
     font-size: 48px;
-    font-weight: 700;
-    color: var(--grit-primary);
+    line-height: 1;
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(43, 50, 130, 0.1), rgba(229, 27, 131, 0.1));
+    border-radius: 16px;
 }
 
-.membership-feature {
-    padding: 12px 0;
+.package-header h2 {
+    color: var(--grit-text);
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.package-header p {
+    color: var(--grit-text-light);
+    font-size: 15px;
+    margin-bottom: 0;
+}
+
+/* Package Duration Badge */
+.package-duration {
+    text-align: center;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--grit-text-light);
+    padding-bottom: 12px;
     border-bottom: 1px solid var(--grit-border);
 }
 
-.membership-feature:last-child {
-    border-bottom: none;
+/* Package Price Display */
+.package-price {
+    text-align: center;
+    padding: 20px 0 16px;
 }
 
-.membership-feature i {
+.price-amount {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--grit-text);
+    line-height: 1.2;
+    margin-bottom: 4px;
+}
+
+.price-period {
+    font-size: 14px;
+    color: var(--grit-text-light);
+    margin-top: 4px;
+}
+
+/* Package Features List */
+.package-features {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+}
+
+.package-features li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 9px 0;
+    font-size: 14px;
+    color: var(--grit-text);
+    line-height: 1.5;
+}
+
+.package-features li i {
+    font-size: 16px;
+    flex-shrink: 0;
+    margin-top: 2px;
     color: var(--grit-success);
-    margin-right: 8px;
+}
+
+.package-features li span {
+    flex: 1;
+    line-height: 1.6;
+}
+
+/* Button Sizing for Membership */
+.membership-card-v2 .btn-lg {
+    padding: 14px 24px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.membership-card-v2 .btn-primary:hover {
+    background-color: var(--grit-primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(43, 50, 130, 0.3);
+}
+
+.membership-card-v2 .btn-accent:hover {
+    background-color: var(--grit-accent-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(229, 27, 131, 0.3);
+}
+
+/* Package Section Spacing */
+.package-section {
+    margin-bottom: 80px;
+}
+
+.package-section:last-child {
+    margin-bottom: 0;
 }
 
 /* ============================================
-   UTILITY CLASSES
+   RESPONSIVE DESIGN
    ============================================ */
-.shadow-sm { box-shadow: var(--grit-shadow-sm) !important; }
-.shadow-md { box-shadow: var(--grit-shadow-md) !important; }
-.shadow-lg { box-shadow: var(--grit-shadow-lg) !important; }
 
-.rounded-sm { border-radius: var(--grit-radius-sm) !important; }
-.rounded-md { border-radius: var(--grit-radius-md) !important; }
-.rounded-lg { border-radius: var(--grit-radius-lg) !important; }
-
-.hover-accent:hover {
-    color: var(--grit-accent) !important;
-}
-
-.hover-primary:hover {
-    color: var(--grit-primary) !important;
-}
-
-/* ============================================
-   RESPONSIVE UTILITIES
-   ============================================ */
-@media (max-width: 768px) {
-    h1 { font-size: 36px; }
-    h2 { font-size: 28px; }
-    h3 { font-size: 24px; }
-    
-    .hero-section {
-        min-height: 400px;
+@media (max-width: 992px) {
+    .package-icon {
+        font-size: 40px;
+        width: 56px;
+        height: 56px;
     }
     
-    .btn {
-        padding: 10px 20px;
+    .package-header h2 {
+        font-size: 28px;
+    }
+    
+    .package-header p {
         font-size: 14px;
     }
+}
+
+@media (max-width: 768px) {
+    .price-amount {
+        font-size: 24px;
+    }
     
-    .membership-price {
+    .membership-card-v2 {
+        padding: 24px 20px;
+    }
+    
+    .package-header {
+        margin-bottom: 24px;
+    }
+    
+    .package-header h2 {
+        font-size: 24px;
+    }
+    
+    .package-icon {
         font-size: 36px;
+        width: 48px;
+        height: 48px;
+    }
+    
+    .recommended-badge {
+        font-size: 12px;
+        padding: 5px 14px;
+        top: -10px;
+    }
+    
+    .package-section {
+        margin-bottom: 48px;
+    }
+}
+
+@media (max-width: 576px) {
+    .package-header .d-flex {
+        flex-direction: column;
+        text-align: center;
+        align-items: center !important;
+    }
+    
+    .package-header p {
+        text-align: center;
+    }
+    
+    .package-features li {
+        font-size: 13px;
+    }
+    
+    .membership-card-v2 .btn-lg {
+        padding: 12px 20px;
+        font-size: 14px;
     }
 }
 
 /* ============================================
-   LOADING SPINNER
+   ANIMATION ENHANCEMENTS
    ============================================ */
-.loading-spinner {
-    border: 4px solid var(--grit-border);
-    border-top: 4px solid var(--grit-primary);
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    animation: spin 1s linear infinite;
-}
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* ============================================
-   EMPTY STATE
-   ============================================ */
-.empty-state {
-    text-align: center;
-    padding: 48px 24px;
-}
-
-.empty-state-icon {
-    font-size: 64px;
-    color: var(--grit-text-light);
-    margin-bottom: 16px;
-}
-
-.empty-state-text {
-    color: var(--grit-text-light);
-    font-size: 18px;
-}
-
-/* ============================================
-   ADMIN SIDEBAR
-   ============================================ */
-.admin-sidebar {
-    background-color: var(--grit-primary);
-    min-height: 100vh;
-    width: 280px;
-}
-
-.admin-sidebar .nav-link {
-    color: rgba(255, 255, 255, 0.8);
-    padding: 12px 16px;
-    border-radius: var(--grit-radius-sm);
-    margin-bottom: 4px;
-    transition: all 0.3s ease;
-}
-
-.admin-sidebar .nav-link:hover,
-.admin-sidebar .nav-link.active {
-    background-color: rgba(255, 255, 255, 0.1);
-    color: var(--grit-white);
-}
-
-/* ============================================
-   FILE UPLOAD
-   ============================================ */
-.file-upload-wrapper {
-    position: relative;
-    overflow: hidden;
-    display: inline-block;
-}
-
-.file-upload-input {
-    position: absolute;
-    left: -9999px;
-}
-
-.file-upload-label {
-    display: inline-block;
-    padding: 12px 24px;
-    cursor: pointer;
-    background-color: var(--grit-primary);
-    color: var(--grit-white);
-    border-radius: var(--grit-radius-sm);
-    transition: all 0.3s ease;
-}
-
-.file-upload-label:hover {
-    background-color: var(--grit-primary-dark);
-}
-
-/* ============================================
-   TRANSITIONS
-   ============================================ */
-.fade-in {
-    animation: fadeIn 0.5s ease-in;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-.slide-up {
-    animation: slideUp 0.5s ease-out;
-}
-
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
+@keyframes cardHover {
+    0% {
         transform: translateY(0);
     }
+    100% {
+        transform: translateY(-6px);
+    }
+}
+
+.membership-card-v2:hover {
+    animation: cardHover 0.3s ease forwards;
+}
+
+/* Badge pulse animation for recommended */
+@keyframes badgePulse {
+    0%, 100% {
+        box-shadow: 0 4px 12px rgba(229, 27, 131, 0.3);
+    }
+    50% {
+        box-shadow: 0 4px 20px rgba(229, 27, 131, 0.5);
+    }
+}
+
+.recommended-badge {
+    animation: badgePulse 2s ease-in-out infinite;
 }
 
 /* ============================================
-   PRINT STYLES
+   PRINT STYLES FOR MEMBERSHIP
    ============================================ */
+
 @media print {
-    .navbar,
-    .footer,
-    .btn,
-    .admin-sidebar {
-        display: none !important;
+    .recommended-badge {
+        background: #E51B83 !important;
+        color: white !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
     
-    body {
-        background-color: var(--grit-white);
+    .membership-card-v2 {
+        page-break-inside: avoid;
+        border: 1px solid #E0E0E0 !important;
+    }
+    
+    .package-features li i {
+        color: #28A745 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
 }

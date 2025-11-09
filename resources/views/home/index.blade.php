@@ -110,6 +110,51 @@
         </div>
     </section>
 
+    {{-- Popular Packages Section --}}
+    @if(isset($popularPackages) && $popularPackages->isNotEmpty())
+    <section class="bg-light-custom py-5 mt-5">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="mb-3 fw-bold" style="color: var(--grit-primary);">Paket Terpopuler</h2>
+                <p class="text-muted mx-auto" style="max-width: 700px;">
+                    Pilihan terbaik yang paling banyak diminati oleh member kami.
+                </p>
+            </div>
+            <div class="row g-4 justify-content-center">
+                @foreach($popularPackages as $package)
+                    <div class="col-12 col-md-6 col-lg-4 d-flex align-items-stretch">
+                        <div class="card membership-card h-100 {{ $package->is_popular ? 'featured' : '' }}">
+                            <div class="card-body d-flex flex-column text-center">
+                                <h3 class="mb-3" style="color: {{ $package->type == 'student' ? 'var(--grit-accent)' : 'var(--grit-primary)' }};">{{ $package->name }}</h3>
+                                <h1 class="display-5 fw-bold mb-2 membership-price" style="color: {{ $package->type == 'student' ? 'var(--grit-accent)' : 'var(--grit-primary)' }};">
+                                    {{ $package->getFormattedPrice() }}
+                                </h1>
+                                <p class="text-muted mb-4">{{ $package->duration_months }} Bulan</p>
+
+                                <ul class="list-unstyled text-start mb-4 flex-grow-1">
+                                    @if(is_array($package->features))
+                                        @foreach($package->features as $feature)
+                                            <li class="mb-2 membership-feature">
+                                                <i class="bi bi-check-circle-fill text-success me-2"></i>{{ $feature }}
+                                            </li>
+                                        @endforeach
+                                    @endif
+                                </ul>
+
+                                <div class="mt-auto">
+                                    <a href="{{ route('membership') }}" class="btn {{ $package->type == 'student' ? 'btn-accent' : 'btn-primary' }} w-100 btn-lg">
+                                        Lihat Detail
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
+    @endif
+
     {{-- Testimonials Section --}}
     <section class="bg-light-custom py-5 mt-5">
         <div class="container">
