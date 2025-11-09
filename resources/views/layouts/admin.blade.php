@@ -269,10 +269,12 @@
                         @php
                             $isDataMasterActive = request()->routeIs('admin.trainers.*') || 
                                                   request()->routeIs('admin.homepage.*') || 
-                                                  request()->routeIs('admin.notifications.*');
+                                                  request()->routeIs('admin.notifications.*') ||
+                                                  request()->routeIs('admin.memberships.*') ||
+                                                  request()->routeIs('admin.facilities.*');
                         @endphp
                         <a class="nav-link {{ $isDataMasterActive ? 'active' : '' }}" 
-                           href="{{ route('admin.trainers.index') }}">
+                           href="{{ route('admin.memberships.index') }}">
                             <i class="bi bi-layers-fill"></i>
                             Data Master
                         </a>
