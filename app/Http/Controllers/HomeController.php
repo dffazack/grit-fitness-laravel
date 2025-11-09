@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Facility;
 use App\Models\HomepageContent;
 use App\Models\Notification;
+use App\Models\MembershipPackage;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -49,13 +51,20 @@ class HomeController extends Controller
             'rating' => 5,
         ]);
 
-        // 7. Kirim SEMUA data ke view
+        // 7. Ambil paket membership populer
+        $popularPackages = MembershipPackage::where('is_active', true)
+            ->where('is_popular', true)
+            ->orderBy('price')
+            ->get();
+
+        // 8. Kirim SEMUA data ke view
         return view('home.index', compact(
             'homepage', 
             'notifications',
             'stats',
             'benefits',
-            'testimonials'
+            'testimonials',
+            'popularPackages'
         ));
     }
 }

@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\MemberController as AdminMemberController;
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\ScheduleController as AdminScheduleController;
+use App\Http\Controllers\Admin\MembershipPackageController;
 use App\Http\Controllers\Admin\TrainerController as AdminTrainerController;
 use App\Http\Controllers\Admin\HomepageController as AdminHomepageController;
 use App\Http\Controllers\Admin\NotificationController as AdminNotificationController;
@@ -148,4 +149,43 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::put('homepage/testimonials', [AdminHomepageController::class, 'updateTestimonials'])->name('homepage.testimonials');
     });
     
+    // Members
+    Route::get('members', [AdminMemberController::class, 'index'])->name('members.index');
+    Route::post('members', [AdminMemberController::class, 'store'])->name('members.store');
+    Route::get('members/{member}', [AdminMemberController::class, 'show'])->name('members.show');
+    Route::get('members/{member}/edit', [AdminMemberController::class, 'edit'])->name('members.edit');
+    Route::put('members/{member}', [AdminMemberController::class, 'update'])->name('members.update');
+    Route::delete('members/{member}', [AdminMemberController::class, 'destroy'])->name('members.destroy');
+    
+    // Schedules
+    Route::resource('schedules', AdminScheduleController::class);
+
+    // Facilities
+    Route::resource('facilities', \App\Http\Controllers\Admin\FacilityController::class);
+
+    // Memberships
+    Route::resource('memberships', MembershipPackageController::class);
+    
+    // Trainers
+    Route::resource('trainers', AdminTrainerController::class)->middleware(\App\Http\Middleware\RejectLargeUploads::class);
+    
+    // Payments
+    Route::get('payments', [AdminPaymentController::class, 'index'])->name('payments.index');
+    Route::post('payments/approve/{transaction}', [AdminPaymentController::class, 'approve'])->name('payments.approve');
+    Route::post('payments/reject/{transaction}', [AdminPaymentController::class, 'reject'])->name('payments.reject');
+    
+    // Notifications
+    Route::post('notifications/{notification}/toggle', [AdminNotificationController::class, 'toggleStatus'])->name('notifications.toggle');
+    Route::resource('notifications', AdminNotificationController::class);
+    
+    // Homepage Management
+    Route::get('homepage', [AdminHomepageController::class, 'index'])->name('homepage.index');
+    Route::get('homepage/edit', [AdminHomepageController::class, 'edit'])->name('homepage.edit');
+    Route::put('homepage/hero', [AdminHomepageController::class, 'updateHero'])->name('homepage.hero');
+    Route::put('homepage/stats', [AdminHomepageController::class, 'updateStats'])->name('homepage.stats');
+    Route::put('homepage/benefits', [AdminHomepageController::class, 'updateBenefits'])->name('homepage.benefits');
+    Route::put('homepage/testimonials', [AdminHomepageController::class, 'updateTestimonials'])->name('homepage.testimonials');
+    
+    // Logout
+    Route::post('logout', [AdminLoginController::class, 'logout'])->name('logout');
 });

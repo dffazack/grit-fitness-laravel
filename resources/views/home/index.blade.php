@@ -114,70 +114,53 @@
         </div>
     </section>
 
-    {{-- About Us Section - NEW --}}
-    <section class="py-5 mt-5 bg-white">
+    {{-- Popular Packages Section --}}
+    @if(isset($popularPackages) && $popularPackages->isNotEmpty())
+    <section class="bg-light-custom py-5 mt-5">
         <div class="container">
-            <div class="row align-items-center g-5">
-                {{-- Text Content (Kiri di Desktop, Atas di Mobile) --}}
-                <div class="col-12 col-lg-6 order-2 order-lg-1">
-                    {{-- Section Label --}}
-                    <div class="d-flex align-items-center gap-3 mb-4">
-                        <div style="width: 50px; height: 3px; background-color: var(--grit-accent);"></div>
-                        <h6 class="text-uppercase fw-bold mb-0" style="color: var(--grit-accent); letter-spacing: 2px;">
-                            TENTANG KAMI
-                        </h6>
-                    </div>
-                    
-                    {{-- Main Heading --}}
-                    <h2 class="display-5 fw-bold mb-4" style="color: var(--grit-primary);">
-                        Pusat Kebugaran Modern di Jantung Kota Malang
-                    </h2>
-                    
-                    {{-- Description --}}
-                    <p class="lead mb-4" style="line-height: 1.8; opacity: 0.9;">
-                        Terletak strategis di Plaza Begawan, Tlogomas, Grit Fitness Malang hadir sebagai pusat kebugaran modern yang menawarkan lebih dari sekadar gym.
-                    </p>
-                    
-                    <p class="mb-4" style="line-height: 1.8; opacity: 0.85;">
-                        Kami menyediakan berbagai fasilitas seperti kelas olahraga, layanan pemulihan, pelatihan pribadi, hingga healthy bar untuk mendukung gaya hidup sehat Anda.
-                    </p>
-                    
-                    <p class="mb-4" style="line-height: 1.8; opacity: 0.85;">
-                        Buka setiap hari, kami siap membantu Anda mencapai tujuan kebugaran dengan dukungan instruktur berpengalaman dan lingkungan yang nyaman.
-                    </p>
-                    
-                    <p class="fw-semibold mb-0" style="font-size: 1.1rem; opacity: 0.95;">
-                        <i class="bi bi-quote"></i>
-                        Grit Fitness bukan sekadar tempat latihan—ini adalah komunitas untuk berkembang dan menjadi versi terbaik dari diri Anda.
-                    </p>
-                </div>
-                
-                {{-- Image (Kanan di Desktop, Atas di Mobile) --}}
-                <div class="col-12 col-lg-6 order-1 order-lg-2">
-                    <div class="position-relative">
-                        {{-- Decorative Element --}}
-                        <div class="position-absolute top-0 end-0 bg-accent" 
-                             style="width: 100px; height: 100px; border-radius: 20px; transform: translate(20px, -20px); opacity: 0.5; z-index: 1;">
-                        </div>
-                        
-                        {{-- Main Image --}}
-                        <img src="{{ asset('images/gym-about.jpg') }}" 
-                             alt="GRIT Fitness Gym" 
-                             class="img-fluid rounded-3 shadow-lg position-relative" 
-                             style="z-index: 2; border: 5px solid rgba(229, 27, 131, 0.2);">
-                        
-                        {{-- Decorative Element 2 --}}
-                        <div class="position-absolute bottom-0 start-0 bg-primary" 
-                             style="width: 80px; height: 80px; border-radius: 20px; transform: translate(-20px, 20px); opacity: 0.5; z-index: 1;">
+            <div class="text-center mb-5">
+                <h2 class="mb-3 fw-bold" style="color: var(--grit-primary);">Paket Terpopuler</h2>
+                <p class="text-muted mx-auto" style="max-width: 700px;">
+                    Pilihan terbaik yang paling banyak diminati oleh member kami.
+                </p>
+            </div>
+            <div class="row g-4 justify-content-center">
+                @foreach($popularPackages as $package)
+                    <div class="col-12 col-md-6 col-lg-4 d-flex align-items-stretch">
+                        <div class="card membership-card h-100 {{ $package->is_popular ? 'featured' : '' }}">
+                            <div class="card-body d-flex flex-column text-center">
+                                <h3 class="mb-3" style="color: {{ $package->type == 'student' ? 'var(--grit-accent)' : 'var(--grit-primary)' }};">{{ $package->name }}</h3>
+                                <h1 class="display-5 fw-bold mb-2 membership-price" style="color: {{ $package->type == 'student' ? 'var(--grit-accent)' : 'var(--grit-primary)' }};">
+                                    {{ $package->getFormattedPrice() }}
+                                </h1>
+                                <p class="text-muted mb-4">{{ $package->duration_months }} Bulan</p>
+
+                                <ul class="list-unstyled text-start mb-4 flex-grow-1">
+                                    @if(is_array($package->features))
+                                        @foreach($package->features as $feature)
+                                            <li class="mb-2 membership-feature">
+                                                <i class="bi bi-check-circle-fill text-success me-2"></i>{{ $feature }}
+                                            </li>
+                                        @endforeach
+                                    @endif
+                                </ul>
+
+                                <div class="mt-auto">
+                                    <a href="{{ route('membership') }}" class="btn {{ $package->type == 'student' ? 'btn-accent' : 'btn-primary' }} w-100 btn-lg">
+                                        Lihat Detail
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
+                @endforeach
             </div>
         </div>
     </section>
+    @endif
 
-    {{-- Testimonials Section - FIXED --}}
-    <section class="bg-light-custom py-5 mt-4">
+    {{-- Testimonials Section --}}
+    <section class="bg-light-custom py-5 mt-5">
         <div class="container">
             <div class="text-center mb-5">
                 <h2 class="mb-3 fw-bold" style="color: var(--grit-primary);">Apa Kata Mereka?</h2>
@@ -272,43 +255,4 @@
         opacity: 1;
     }
 }
-
-/* About Section Styling */
-.bg-dark {
-    background-color: #1a1a1a !important;
-}
-
-/* Responsive Adjustments */
-@media (max-width: 767px) {
-    .display-4 {
-        font-size: 2rem;
-    }
-    .lead {
-        font-size: 1rem;
-    }
-}
-
-/* About Section Responsive */
-@media (max-width: 991px) {
-    .display-5 {
-        font-size: 1.75rem;
-    }
-    
-    /* Hide decorative elements on mobile */
-    .position-absolute.bg-accent,
-    .position-absolute.bg-primary {
-        display: none;
-    }
-}
-
-/* Ensure equal card heights */
-.h-100 {
-    height: 100% !important;
-}
-
-/* Icon consistency */
-.bi {
-    line-height: 1;
-}
 </style>
-@endpush
