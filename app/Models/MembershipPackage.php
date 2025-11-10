@@ -1,59 +1,101 @@
 <?php
-namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+namespace App\Http\Controllers\Admin;
 
-class MembershipPackage extends Model
+use App\Http\Controllers\Controller;
+use App\Models\MembershipPackage; // Pastikan ini benar
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule; // Untuk validasi 'type'
+
+class MembershipPackageController extends Controller
 {
-    protected $table = 'membership_packages';
-
-    public const TYPES = [
-        'regular' => 'Regular',
-        'student' => 'Student',
-    ];
-    
-    protected $fillable = [
-        'type',
-        'name',
-        'price',
-        'duration_months',
-        'features',
-        'description',
-        'is_active',
-        'is_popular'
-    ];
-
-    protected $casts = [
-        'features' => 'array',
-        'price' => 'decimal:2',
-        'is_active' => 'boolean',
-        'is_popular' => 'boolean',
-    ];
-
-    // Scopes
-    public function scopeActive($query)
+    /**
+     * Menampilkan halaman index (daftar paket)
+     */
+    public function index()
     {
-        return $query->where('is_active', true);
+        $packages = MembershipPackage::orderBy('price', 'asc')->get();
+        
+        // Data ini kita kirim ke modal
+        $types = MembershipPackage::TYPES; 
+
+        return view('admin.membership.index', compact('packages', 'types'));
     }
 
-    // Helpers
-    public function getFormattedPrice()
+    /**
+     * Menyimpan paket baru dari modal 'Tambah'.
+     */
+    public function store(Request $request)
     {
-        return 'Rp ' . number_format($this->price, 0, ',', '.');
+        $validated = $request->validate([
+            'type' => ['required', Rule::in(array_keys(MembershipPackage::TYPES))],
+            'name' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0|max:99999999.99',
+            'duration_months' => 'required|integer|min:1',
+            'features' => 'required|string', // Ambil sebagai string
+            'description' => 'nullable|string',
+            'is_active' => 'nullable', // Checkbox
+            'is_popular' => 'nullable', // Jika Anda menambahkan kolom ini
+        ]);
+
+        // Ubah string 'features' (dipisah koma) menjadi array
+        $validated['features'] = array_map('trim', explode(',', $validated['features']));
+        
+        // Handle checkbox
+        $validated['is_active'] = $request->has('is_active');
+        $validated['is_popular'] = $request->has('is_popular');
+
+        MembershipPackage::create($validated);
+        
+        return redirect()->route('admin.memberships.index')
+            ->with('success', 'Paket membership berhasil ditambahkan.');
     }
 
-    public function isBasic()
+
+    /**
+     * Mengupdate paket yang ada dari modal 'Edit'.
+     */
+    public function update(Request $request, $id)
     {
-        return $this->type === 'basic';
+        $package = MembershipPackage::findOrFail($id);
+
+        $validated = $request->validate([
+            'type' => ['required', Rule::in(array_keys(MembershipPackage::TYPES))],
+            'name' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0|max:9999999.99',
+            'duration_months' => 'required|integer|min:1',
+            'features' => 'required|string', // Ambil sebagai string
+            'description' => 'nullable|string',
+            'is_active' => 'nullable',
+            'is_popular' => 'nullable',
+        ]);
+
+        // Ubah string 'features' (dipisah koma) menjadi array
+        $validated['features'] = array_map('trim', explode(',', $validated['features']));
+        
+        // Handle checkbox
+        $validated['is_active'] = $request->has('is_active');
+        $validated['is_popular'] = $request->has('is_popular');
+
+        $package->update($validated);
+        
+        return redirect()->route('admin.memberships.index')
+            ->with('success', 'Paket membership berhasil diperbarui.');
     }
 
-    public function isPremium()
+    /**
+     * Menghapus paket membership.
+     */
+    public function destroy($id)
     {
-        return $this->type === 'premium';
-    }
+        $package = MembershipPackage::findOrFail($id);
+        
+        // TODO: Cek dulu apakah ada member yang sedang pakai paket ini?
+        // Jika ya, mungkin jangan dihapus, tapi di 'is_active' = false
 
-    public function isVip()
-    {
-        return $this->type === 'vip';
+        $package->delete();
+        
+        return redirect()->route('admin.memberships.index')
+            ->with('success', 'Paket membership berhasil dihapus.');
     }
 }
