@@ -1,19 +1,5 @@
 {{-- File: resources/views/components/notification-banner.blade.php --}}
-@php
-    // NOTE: lebih baik memindahkan query ke View Composer / Controller.
-    // Untuk compatibility jika belum dipindahkan, gunakan try/catch seperti sebelumnya.
-    try {
-        $activeNotifications = $activeNotifications ?? \App\Models\Notification::where('is_active', true)
-            ->where('start_date', '<=', now())
-            ->where('end_date', '>=', now())
-            ->orderBy('created_at', 'desc')
-            ->get();
-    } catch (\Exception $e) {
-        $activeNotifications = collect();
-    }
 
-    // Ambil array id yang sudah ditutup user (dari localStorage via JS) - server-side hanya placeholder.
-@endphp
 
 @if ($activeNotifications->isNotEmpty())
     <div id="notification-rotator" class="notification-rotator fixed-top" 
