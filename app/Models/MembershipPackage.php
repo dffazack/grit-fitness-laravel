@@ -42,6 +42,7 @@ class MembershipPackage extends Model
         return 'Rp ' . number_format($this->price, 0, ',', '.');
     }
 
+<<<<<<< HEAD
     public function isBasic()
     {
         return $this->type === 'basic';
@@ -50,6 +51,16 @@ class MembershipPackage extends Model
     public function isPremium()
     {
         return $this->type === 'premium';
+=======
+    public function isRegular()
+    {
+        return $this->type === 'regular';
+    }
+
+    public function isStudent()
+    {
+        return $this->type === 'student';
+>>>>>>> origin/admin-features
     }
 
     public function isVip()
