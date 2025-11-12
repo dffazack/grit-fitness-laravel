@@ -28,3 +28,4 @@
 <span class="badge rounded-pill {{ $colorClass }}" style="font-size: 0.8rem; padding: 0.4em 0.8em;">
     {{ ucfirst($text) }}
 </span>
+{{-- Modified by: User-Interfaced Team -- }}
