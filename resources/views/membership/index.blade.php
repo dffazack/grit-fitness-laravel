@@ -99,7 +99,11 @@
                     </div>
                     <div>
                         <h2 class="mb-1 fw-bold">Paket Reguler</h2>
+<<<<<<< Updated upstream
                         <p class="text-muted mb-0">Untuk umum dengan fasilitas lengkap dan personal trainer</p>
+=======
+                        <p class="text-muted mb-0">Untuk umum dengan fasilitas lengkap</p>
+>>>>>>> Stashed changes
                     </div>
                 </div>
             </div>
