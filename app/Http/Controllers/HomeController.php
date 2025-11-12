@@ -23,28 +23,28 @@ class HomeController extends Controller
 
         // 3. Siapkan data 'homepage' (untuk hero)
         // Gunakan 'true' untuk mengubah JSON jadi ARRAY, BUKAN object
-        $homepage = $content->get('hero') ? json_decode($content->get('hero')->content, true) : [
+        $homepage = $content->get('hero') ? $content->get('hero')->content : [
             'title' => 'Transform Your Body, Transform Your Life',
             'subtitle' => 'Bergabunglah dengan GRIT Fitness dan mulai perjalanan transformasi Anda.',
             'image' => asset('images/hero-bg.jpg'), // Sediakan gambar default
         ];
 
         // 4. Siapkan data 'stats'
-        $stats = $content->get('stats') ? json_decode($content->get('stats')->content, true) : array_fill(0, 4, [
+        $stats = $content->get('stats') ? $content->get('stats')->content : array_fill(0, 4, [
             'value' => 'N/A',
             'label' => 'Statistik',
         ]);
         
         // 5. Siapkan data 'benefits'
         // [PERBAIKAN]: Mengganti 'iconName' menjadi 'icon' agar cocok dengan form
-        $benefits = $content->get('benefits') ? json_decode($content->get('benefits')->content, true) : array_fill(0, 4, [
+        $benefits = $content->get('benefits') ? $content->get('benefits')->content : array_fill(0, 4, [
             'icon' => 'dumbbell', // <-- SUDAH DIGANTI
             'title' => 'Benefit',
             'description' => 'Deskripsi benefit belum diatur.',
         ]);
         
         // 6. Siapkan data 'testimonials'
-        $testimonials = $content->get('testimonials') ? json_decode($content->get('testimonials')->content, true) : array_fill(0, 3, [
+        $testimonials = $content->get('testimonials') ? $content->get('testimonials')->content : array_fill(0, 3, [
             'name' => 'Member',
             'role' => 'Member GRIT',
             'text' => 'Testimoni belum diatur.',

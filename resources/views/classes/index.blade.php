@@ -68,7 +68,7 @@
                             <div class="card h-100 border-0 shadow-sm">
                                 <div class="card-body d-flex flex-column">
                                     <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <h5 class="card-title text-primary">{{ $schedule->name }}</h5>
+                                        <h5 class="card-title text-primary">{{ $schedule->custom_class_name ?? ($schedule->classList->name ?? 'Nama Tidak Tersedia') }}</h5>
                                         <span class="badge {{ $schedule->quota < $schedule->max_quota ? ($schedule->quota / $schedule->max_quota < 0.5 ? 'bg-success' : 'bg-warning') : 'bg-danger' }}">
                                             Sisa {{ $schedule->max_quota - $schedule->quota }}
                                         </span>
