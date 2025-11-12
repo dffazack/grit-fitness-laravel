@@ -11,8 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('membership_packages', function (Blueprint $table) {
-            $table->boolean('is_popular')->default(false)->after('is_active');
+        Schema::create('class_lists', function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->unique();
+            $table->timestamps();
         });
     }
 
@@ -21,8 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('membership_packages', function (Blueprint $table) {
-            $table->dropColumn('is_popular');
-        });
+        Schema::dropIfExists('class_lists');
     }
 };

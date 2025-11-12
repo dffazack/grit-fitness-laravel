@@ -4,9 +4,6 @@
 
 @section('content')
 
-    {{-- Notification Banner (Jika ada notifikasi aktif) --}}
-    @include('components.notification-banner')
-
     {{-- Hero Section --}}
     <section class="hero-section position-relative d-flex align-items-center justify-content-center text-white" style="min-height: 600px; background: linear-gradient(rgba(43, 50, 130, 0.7), rgba(43, 50, 130, 0.7)), url('{{ $homepage['image'] ?? asset('images/hero-bg.jpg') }}') center/cover no-repeat;">
         <div class="container text-center animate-fade-in">
