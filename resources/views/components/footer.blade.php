@@ -3,7 +3,7 @@
         <div class="row g-4">
             <!-- Brand -->
             <div class="col-lg-4">
-                <h3 class="fw-bold mb-3">GRIT <span class="text-accent">Fitness</span></h3>
+                <h3 class="fw-bold mb-3">GRIT <span class="text-accent">FITNESS</span></h3>
                 <p class="text-white-50">
                     Transformasikan tubuh dan pikiranmu bersama GRIT Fitness. Fasilitas modern, 
                     trainer profesional, dan komunitas yang supportif.
@@ -37,10 +37,10 @@
                 <h5 class="fw-semibold mb-3">Kontak</h5>
                 <ul class="list-unstyled text-white-50">
                     <li class="mb-2">
-                        <i class="bi bi-geo-alt"></i> Jl. Fitness No. 123, Jakarta
+                        <i class="bi bi-geo-alt"></i> Plaza Begawan, Tlogomas, Kota Malang, Jawa Timur
                     </li>
                     <li class="mb-2">
-                        <i class="bi bi-telephone"></i> +62 812 3456 7890
+                        <i class="bi bi-telephone"></i> +62 881 036 062 600
                     </li>
                     <li class="mb-2">
                         <i class="bi bi-envelope"></i> info@gritfitness.com
@@ -49,21 +49,33 @@
             </div>
             
             <!-- Social Media -->
-            <div class="col-lg-3 col-md-4">
-                <h5 class="fw-semibold mb-3">Ikuti Kami</h5>
-                <div class="d-flex gap-2">
-                    <a href="#" class="btn btn-outline-light btn-sm rounded-circle" style="width: 40px; height: 40px;">
-                        <i class="bi bi-instagram"></i>
-                    </a>
-                    <a href="#" class="btn btn-outline-light btn-sm rounded-circle" style="width: 40px; height: 40px;">
-                        <i class="bi bi-facebook"></i>
-                    </a>
-                    <a href="#" class="btn btn-outline-light btn-sm rounded-circle" style="width: 40px; height: 40px;">
-                        <i class="bi bi-twitter"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
+<div class="col-lg-3 col-md-4">
+    <h5 class="fw-semibold mb-3">Ikuti Kami</h5>
+
+    <div class="d-flex gap-2 align-items-center">
+        <!-- Instagram -->
+        <a href="https://www.instagram.com/gritfitness.mlg/" target="_blank" rel="noopener noreferrer"
+           class="btn btn-outline-light btn-sm rounded-circle d-flex align-items-center justify-content-center"
+           style="width: 40px; height: 40px;" aria-label="Instagram GRIT Fitness">
+            <i class="bi bi-instagram" aria-hidden="true"></i>
+        </a>
+
+        <!-- TikTok -->
+        <a href="https://www.tiktok.com/@gritfitnessmlg" target="_blank" rel="noopener noreferrer"
+           class="btn btn-outline-light btn-sm rounded-circle d-flex align-items-center justify-content-center"
+           style="width: 40px; height: 40px;" aria-label="TikTok GRIT Fitness">
+            <i class="bi bi-tiktok" aria-hidden="true"></i>
+        </a>
+
+        <!-- Facebook -->
+        <a href="https://www.facebook.com/Gritfitnessmalang/" target="_blank" rel="noopener noreferrer"
+           class="btn btn-outline-light btn-sm rounded-circle d-flex align-items-center justify-content-center"
+           style="width: 40px; height: 40px;" aria-label="Facebook GRIT Fitness">
+            <i class="bi bi-facebook" aria-hidden="true"></i>
+        </a>
+    </div>
+</div>
+
         
         <hr class="my-4 border-white-50">
         
@@ -72,3 +84,4 @@
         </div>
     </div>
 </footer>
+{{-- Modified by: User-Interfaced Team -- }}

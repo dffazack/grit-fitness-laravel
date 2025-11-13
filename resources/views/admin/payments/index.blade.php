@@ -1,6 +1,13 @@
+{{-- ========================================================================= --}}
+{{-- 6. resources/views/admin/payments/index.blade.php --}}
+{{-- ========================================================================= --}}
+
 @extends('layouts.admin')
 
 @section('title', 'Validasi Pembayaran')
+
+@section('page-title', 'Validasi Pembayaran')
+@section('page-subtitle', 'Kelola operasional gym dengan mudah dan efisien')
 
 @section('content')
 
@@ -11,60 +18,62 @@
     </div>
 
     
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
 
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="card-title-custom">Validasi Pembayaran</h5>
-            {{-- Anda bisa tambahkan filter di sini jika mau --}}
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 py-3">
+            <h5 class="card-title-custom mb-0">
+                <i class="bi bi-credit-card me-2 d-none d-sm-inline"></i>
+                Validasi Pembayaran
+            </h5>
         </div>
         <div class="card-body p-0">
             @if($transactions->isEmpty())
                 <div class="text-center p-5">
-                    <p class="text-muted">Tidak ada pembayaran yang menunggu validasi.</p>
+                    <i class="bi bi-check-circle fs-1 text-success mb-3"></i>
+                    <p class="text-muted mb-0">Tidak ada pembayaran yang menunggu validasi.</p>
                 </div>
             @else
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead>
+                {{-- Desktop Table --}}
+                <div class="table-responsive d-none d-lg-block">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead class="table-light">
                             <tr>
-                                <th>Tanggal</th>
-                                <th>Member</th>
-                                <th>Paket</th>
-                                <th>Jumlah</th>
-                                <th>Status</th>
-                                <th class="text-end">Aksi</th>
+                                <th class="border-0">Tanggal</th>
+                                <th class="border-0">Member</th>
+                                <th class="border-0">Paket</th>
+                                <th class="border-0">Jumlah</th>
+                                <th class="border-0">Status</th>
+                                <th class="border-0 text-end">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($transactions as $tx)
                             <tr>
+                                <td>{{ $tx->created_at->format('d M Y') }}</td>
                                 <td>
-                                    {{-- Asumsi 'created_at' adalah tanggal pengajuan --}}
-                                    {{ $tx->created_at->format('d Okt Y') }}
-                                </td>
-                                <td>
-                                    <strong>{{ $tx->user->name ?? 'User Dihapus' }}</strong><br>
-                                    <small class="text-muted">{{ $tx->user->email ?? '-' }}</small>
+                                    <div>
+                                        <strong>{{ $tx->user->name ?? 'User Dihapus' }}</strong><br>
+                                        <small class="text-muted">{{ $tx->user->email ?? '-' }}</small>
+                                    </div>
                                 </td>
                                 <td>
                                     {{ $tx->membership->name ?? $tx->package }}
                                     @if($tx->membership)
-                                        <br>
-                                        <small class="text-muted">{{ $tx->membership->duration_months }} Bulan</small>
+                                        <br><small class="text-muted">{{ $tx->membership->duration_months }} Bulan</small>
                                     @endif
                                 </td>
-                                <td>{{ $tx->getFormattedAmount() }}</td>
-                                <td>
-                                    <span class="badge rounded-pill bg-pending fw-semibold">
-                                        {{ $tx->getStatusLabel() }}
-                                    </span>
-                                </td>
+                                <td><span class="fw-semibold">{{ $tx->getFormattedAmount() }}</span></td>
+                                <td><span class="badge rounded-pill bg-pending">{{ $tx->getStatusLabel() }}</span></td>
                                 <td class="text-end">
-                                    {{-- Tombol "Validasi" ini sebenarnya adalah 2 tombol: Approve & Reject --}}
-                                    {{-- Kita akan gunakan Modal untuk ini agar lebih rapi --}}
-                                    
                                     <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#validateModal-{{ $tx->id }}">
-                                        Validasi
+                                        <i class="bi bi-check2-circle me-1"></i>Validasi
                                     </button>
                                 </td>
                             </tr>
@@ -72,46 +81,84 @@
                         </tbody>
                     </table>
                 </div>
+
+                {{-- Mobile/Tablet Card View --}}
+                <div class="d-lg-none p-3">
+                    @foreach($transactions as $tx)
+                    <div class="card mb-3 border">
+                        <div class="card-body p-3">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <h6 class="mb-1 fw-semibold">{{ $tx->user->name ?? 'User Dihapus' }}</h6>
+                                    <small class="text-muted">{{ $tx->user->email ?? '-' }}</small>
+                                </div>
+                                <span class="badge rounded-pill bg-pending">Pending</span>
+                            </div>
+                            
+                            <div class="row g-2 mb-3">
+                                <div class="col-6">
+                                    <small class="text-muted d-block">Tanggal</small>
+                                    <span class="small fw-semibold">{{ $tx->created_at->format('d M Y') }}</span>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted d-block">Jumlah</small>
+                                    <span class="small fw-semibold">{{ $tx->getFormattedAmount() }}</span>
+                                </div>
+                                <div class="col-12">
+                                    <small class="text-muted d-block">Paket</small>
+                                    <span class="small fw-semibold">
+                                        {{ $tx->membership->name ?? $tx->package }}
+                                        @if($tx->membership)
+                                            ({{ $tx->membership->duration_months }} Bulan)
+                                        @endif
+                                    </span>
+                                </div>
+                            </div>
+
+                            <button type="button" class="btn btn-primary btn-sm w-100" data-bs-toggle="modal" data-bs-target="#validateModal-{{ $tx->id }}">
+                                <i class="bi bi-check2-circle me-1"></i> Validasi Pembayaran
+                            </button>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
             @endif
         </div>
         
         @if($transactions->hasPages())
-            <div class="card-footer">
+            <div class="card-footer bg-white border-0 py-3">
                 {{ $transactions->withQueryString()->links() }}
             </div>
         @endif
     </div>
 
-    <!-- =================================================================================== -->
-    <!--                                   MODAL VALIDASI                                  -->
-    <!-- =================================================================================== -->
+    {{-- Modals --}}
     @foreach($transactions as $tx)
-    <div class="modal fade" id="validateModal-{{ $tx->id }}" tabindex="-1" aria-labelledby="validateModalLabel-{{ $tx->id }}" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content" style="border-radius: 12px;">
+    <div class="modal fade" id="validateModal-{{ $tx->id }}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 12px;">
                 <div class="modal-header border-0">
-                    <h5 class="modal-title" id="validateModalLabel-{{ $tx->id }}">Validasi Pembayaran</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title">Validasi Pembayaran</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body p-4">
-                    <p>Harap periksa bukti pembayaran sebelum menyetujui atau menolak.</p>
+                <div class="modal-body p-3 p-md-4">
+                    <p class="mb-3">Harap periksa bukti pembayaran sebelum menyetujui atau menolak.</p>
                     
                     <ul class="list-group list-group-flush mb-3">
-                        <li class="list-group-item d-flex justify-content-between px-0">
+                        <li class="list-group-item d-flex justify-content-between px-0 py-2">
                             <span class="text-muted">Member</span>
                             <span class="fw-semibold">{{ $tx->user->name ?? 'N/A' }}</span>
                         </li>
-                        <li class="list-group-item d-flex justify-content-between px-0">
+                        <li class="list-group-item d-flex justify-content-between px-0 py-2">
                             <span class="text-muted">Paket</span>
                             <span class="fw-semibold">{{ $tx->membership->name ?? $tx->package }}</span>
                         </li>
-                        <li class="list-group-item d-flex justify-content-between px-0">
+                        <li class="list-group-item d-flex justify-content-between px-0 py-2">
                             <span class="text-muted">Jumlah</span>
                             <span class="fw-semibold">{{ $tx->getFormattedAmount() }}</span>
                         </li>
                     </ul>
 
-                    {{-- Bukti Pembayaran (jika ada) --}}
                     @if($tx->proof_url)
                         <div class="mb-3">
                             <a href="{{ $tx->proof_url }}" target="_blank" class="btn btn-outline-primary w-100">
@@ -119,22 +166,25 @@
                             </a>
                         </div>
                     @else
-                        <div class="alert alert-warning text-center">
+                        <div class="alert alert-warning text-center mb-3">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
                             Member belum mengunggah bukti pembayaran.
                         </div>
                     @endif
 
-                    <div class="d-flex justify-content-end gap-2 mt-4">
-                        <!-- Tombol Tolak (Reject) -->
-                        <form action="{{ route('admin.payments.reject', $tx->id) }}" method="POST" onsubmit="return confirm('Anda yakin ingin MENOLAK pembayaran ini?');">
-                            @csrf
-                            <button type="submit" class="btn btn-danger">Tolak</button>
-                        </form>
-                        
-                        <!-- Tombol Setujui (Approve) -->
+                    <div class="d-grid gap-2">
                         <form action="{{ route('admin.payments.approve', $tx->id) }}" method="POST" onsubmit="return confirm('Anda yakin ingin MENYETUJUI pembayaran ini?');">
                             @csrf
-                            <button type="submit" class="btn btn-success">Setujui</button>
+                            <button type="submit" class="btn btn-success w-100">
+                                <i class="bi bi-check-circle me-1"></i> Setujui
+                            </button>
+                        </form>
+                        
+                        <form action="{{ route('admin.payments.reject', $tx->id) }}" method="POST" onsubmit="return confirm('Anda yakin ingin MENOLAK pembayaran ini?');">
+                            @csrf
+                            <button type="submit" class="btn btn-outline-danger w-100">
+                                <i class="bi bi-x-circle me-1"></i> Tolak
+                            </button>
                         </form>
                     </div>
                 </div>
@@ -144,3 +194,4 @@
     @endforeach
 
 @endsection
+{{-- Modified by: User-Interfaced Team -- }}

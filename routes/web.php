@@ -62,14 +62,7 @@ Route::middleware(['auth', 'role:member'])->prefix('member')->name('member.')->g
     Route::get('/dashboard', [MemberDashboardController::class, 'index'])->name('dashboard');
     Route::get('/profile', [MemberProfileController::class, 'index'])->name('profile');
     Route::post('/profile/update', [MemberProfileController::class, 'update'])->name('profile.update');
-    Route::get('/payment', [MemberPaymentController::class, 'index'])->name('payment');
-    Route::post('/payment/submit', [MemberPaymentController::class, 'submitPayment'])->name('payment.submit')->middleware(\App\Http\Middleware\RejectLargeUploads::class);
-    Route::get('/schedule', [ClassController::class, 'schedule'])->name('schedule');
-    Route::post('/class/book/{schedule}', [ClassController::class, 'book'])->name('class.book');
-    Route::post('/class/cancel/{schedule}', [ClassController::class, 'cancel'])->name('class.cancel');
- 
-// Rute yang BISA diakses GUEST (setelah login)
-Route::middleware(['auth'])->prefix('member')->name('member.')->group(function () {
+>>>>>>>>> Temporary merge branch 2
 
     // Payment (Guest harus bisa akses ini)
     Route::get('/payment', [MemberPaymentController::class, 'index'])
