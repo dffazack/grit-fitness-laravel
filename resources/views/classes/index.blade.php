@@ -58,7 +58,7 @@
                             <div class="card h-100 border-0 shadow-sm">
                                 <div class="card-body d-flex flex-column p-3 p-md-4">
                                     <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <h5 class="card-title text-primary mb-0">{{ $schedule->name }}</h5>
+                                        <h5 class="card-title text-primary mb-0">{{ $schedule->custom_class_name ?? $schedule->classList->name ?? 'N/A' }}</h5>
 
                                         @php
                                             $remaining = max(0, ($schedule->max_quota ?? 0) - ($schedule->quota ?? 0));

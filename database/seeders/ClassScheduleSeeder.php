@@ -18,21 +18,21 @@ class ClassScheduleSeeder extends Seeder
         $hiit = ClassList::where('name', 'HIIT')->first();
         $strength = ClassList::where('name', 'Strength')->first();
         $boxing = ClassList::where('name', 'Boxing')->first();
-        $pilates = ClassList::where('name', 'Pilates')->first();
-
-        // --- INI ADALAH PERBAIKAN ("THE FIX") ---
-        // Error Anda adalah "ClassListFactory not found".
-        // Itu karena kita memanggil ::factory() untuk jaring pengaman.
-        // Kita ganti dengan ::create() untuk menghindari error tersebut.
-        // Ini aman karena ClassListSeeder Anda (yang jalan sebelumnya)
-        // pasti sudah membuat model ini fillable.
-        if (!$yoga) $yoga = ClassList::create(['name' => 'Yoga']);
-        if (!$hiit) $hiit = ClassList::create(['name' => 'HIIT']);
-        if (!$strength) $strength = ClassList::create(['name' => 'Strength']);
-        if (!$boxing) $boxing = ClassList::create(['name' => 'Boxing']);
-        if (!$pilates) $pilates = ClassList::create(['name' => 'Pilates']);
-        // --- AKHIR PERBAIKAN ---
-
+        $pilates = ClassList::where('name', 'Pilates')->first();        if (!$yoga) {
+            $yoga = ClassList::factory()->create(['name' => 'Yoga']);
+        }
+        if (!$hiit) {
+            $hiit = ClassList::factory()->create(['name' => 'HIIT']);
+        }
+        if (!$strength) {
+            $strength = ClassList::factory()->create(['name' => 'Strength']);
+        }
+        if (!$boxing) {
+            $boxing = ClassList::factory()->create(['name' => 'Boxing']);
+        }
+        if (!$pilates) {
+            $pilates = ClassList::factory()->create(['name' => 'Pilates']);
+        }
         $schedules = [
             // Senin
             [
