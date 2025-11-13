@@ -12,11 +12,7 @@ use Illuminate\Support\Str;
 
 class PaymentController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-    
+
     public function index()
     {
         $packages = MembershipPackage::where('is_active', true)->get();
