@@ -125,10 +125,7 @@
                                 <label for="add_features" class="form-label">Fitur (Pisahkan dengan koma)</label>
                                 <textarea class="form-control" id="add_features" name="features" rows="3" placeholder="Contoh: Akses gym 24/7, Loker pribadi, ...">{{ old('features') }}</textarea>
                             </div>
-                            <div class="col-12">
-                                <label for="add_description" class="form-label">Deskripsi (Opsional)</label>
-                                <textarea class="form-control" id="add_description" name="description" rows="2">{{ old('description') }}</textarea>
-                            </div>
+
                             <div class="col-12">
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" role="switch" id="add_is_active" name="is_active" value="1" checked>
@@ -193,10 +190,6 @@
                                 <label for="edit_features-{{ $package->id }}" class="form-label">Fitur (Pisahkan dengan koma)</label>
                                 {{-- Ubah array 'features' kembali menjadi string --}}
                                 <textarea class="form-control" id="edit_features-{{ $package->id }}" name="features" rows="3" required>{{ old('features', is_array($package->features) ? implode(', ', $package->features) : '') }}</textarea>
-                            </div>
-                            <div class="col-12">
-                                <label for="edit_description-{{ $package->id }}" class="form-label">Deskripsi (Opsional)</label>
-                                <textarea class="form-control" id="edit_description-{{ $package->id }}" name="description" rows="2">{{ old('description', $package->description) }}</textarea>
                             </div>
                             <div class="col-12">
                                 <div class="form-check form-switch">

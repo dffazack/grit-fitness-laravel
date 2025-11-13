@@ -3,102 +3,124 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ClassList;
 use App\Models\ClassSchedule;
-use App\Models\Trainer; // <-- [PERBAIKAN] Pastikan baris ini ada
+use App\Models\Trainer;
 use Illuminate\Http\Request;
 
 class ScheduleController extends Controller
 {
+    public function index(Request $request)
+    {
+        $trainers = Trainer::where('is_active', true)->get();
+        $classLists = ClassList::all();
 
-    
-    public function index()
-    {
-        // [PERBAIKAN] Ambil juga data trainers untuk mengisi form modal
-        $trainers = Trainer::where('is_active', true)->get();
-        
-        $schedules = ClassSchedule::with('trainer')
-                        ->withCount('bookings') // Menghitung jumlah booking
-                        ->orderBy('day', 'asc') // Urutkan berdasarkan hari
-                        ->orderBy('start_time', 'asc') // Lalu urutkan berdasarkan jam
-                        ->paginate(15);
-        
-        // [PERBAIKAN] Kirimkan $schedules DAN $trainers ke view
-        return view('admin.schedules.index', compact('schedules', 'trainers'));
+        $schedules = ClassSchedule::with('trainer', 'classList')
+            ->withCount('bookings')
+            ->orderBy('day', 'asc')
+            ->orderBy('start_time', 'asc')
+            ->paginate(15);
+
+        // Kirim sinyal untuk membuka modal jika ada (dari create/edit redirect)
+        $modal = $request->session()->get('modal');
+
+        return view('admin.schedules.index', compact('schedules', 'trainers', 'classLists', 'modal'));
     }
-    
-    public function create()
+
+    public function create(Request $request)
     {
-        // Method ini tidak lagi digunakan oleh modal, tapi tidak masalah
-        $trainers = Trainer::where('is_active', true)->get();
-        return view('admin.schedules.create', compact('trainers'));
+        // Redirect ke index dengan sinyal untuk buka modal create
+        return redirect()->route('admin.schedules.index')->with('modal', 'add');
     }
-    
+
     public function store(Request $request)
     {
-        // [PERBAIKAN] Validasi yang lebih baik menggunakan konstanta dari Model
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'day' => 'required|in:'.implode(',', \App\Models\ClassSchedule::DAYS),
+        // Validasi field umum
+        $request->validate([
+            'day' => 'required|in:' . implode(',', ClassSchedule::DAYS),
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i|after:start_time',
             'trainer_id' => 'required|exists:trainers,id',
             'max_quota' => 'required|integer|min:1',
-            'type' => 'required|in:'.implode(',', \App\Models\ClassSchedule::CLASS_TYPES),
+            'type' => 'required|in:' . implode(',', ClassSchedule::CLASS_TYPES),
             'description' => 'nullable|string',
         ]);
-        
-        // [PERBAIKAN] Tambahkan ini untuk error handling di modal
-        $request->merge(['form_type' => 'add']);
+
+        // Validasi kondisional untuk class_list_id dan custom_class_name
+        $classListIdInput = $request->input('class_list_id');
+        if ($classListIdInput === 'other') {
+            $request->validate(['custom_class_name' => 'required|string|max:255']);
+            $validated['class_list_id'] = null;
+            $validated['custom_class_name'] = $request->custom_class_name;
+        } else {
+            $request->validate(['class_list_id' => 'required|exists:class_lists,id']);
+            $validated['class_list_id'] = $classListIdInput;
+            $validated['custom_class_name'] = null;
+        }
+
+        // Gabungkan semua validated data
+        $validated = array_merge($validated, $request->only([
+            'day', 'start_time', 'end_time', 'trainer_id', 'max_quota', 'type', 'description'
+        ]));
 
         ClassSchedule::create($validated);
-        
+
         return redirect()->route('admin.schedules.index')
             ->with('success', 'Jadwal kelas berhasil ditambahkan');
     }
-    
-    public function edit($id)
+
+    public function edit(Request $request, $id)
     {
-        // Method ini tidak lagi digunakan oleh modal, tapi tidak masalah
-        $schedule = ClassSchedule::findOrFail($id);
-        $trainers = Trainer::where('is_active', true)->get();
-        return view('admin.schedules.edit', compact('schedule', 'trainers'));
+        // Redirect ke index dengan sinyal untuk buka modal edit
+        return redirect()->route('admin.schedules.index')
+            ->with('modal', 'edit')
+            ->with('edit_schedule_id', $id);
     }
-    
+
     public function update(Request $request, $id)
     {
         $schedule = ClassSchedule::findOrFail($id);
-        
-        // [PERBAIKAN] Validasi yang lebih baik menggunakan konstanta dari Model
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'day' => 'required|in:'.implode(',', \App\Models\ClassSchedule::DAYS),
+
+        // Validasi field umum
+        $request->validate([
+            'day' => 'required|in:' . implode(',', ClassSchedule::DAYS),
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i|after:start_time',
             'trainer_id' => 'required|exists:trainers,id',
             'max_quota' => 'required|integer|min:1',
-            'type' => 'required|in:'.implode(',', \App\Models\ClassSchedule::CLASS_TYPES),
+            'type' => 'required|in:' . implode(',', ClassSchedule::CLASS_TYPES),
             'description' => 'nullable|string',
         ]);
-        
-        // [PERBAIKAN] Tambahkan ini untuk error handling di modal
-        $request->merge([
-            'form_type' => 'edit',
-            'schedule_id' => $id
-        ]);
+
+        // Validasi kondisional untuk class_list_id dan custom_class_name
+        $classListIdInput = $request->input('class_list_id');
+        if ($classListIdInput === 'other') {
+            $request->validate(['custom_class_name' => 'required|string|max:255']);
+            $validated['class_list_id'] = null;
+            $validated['custom_class_name'] = $request->custom_class_name;
+        } else {
+            $request->validate(['class_list_id' => 'required|exists:class_lists,id']);
+            $validated['class_list_id'] = $classListIdInput;
+            $validated['custom_class_name'] = null;
+        }
+
+        // Gabungkan semua validated data
+        $validated = array_merge($validated, $request->only([
+            'day', 'start_time', 'end_time', 'trainer_id', 'max_quota', 'type', 'description'
+        ]));
 
         $schedule->update($validated);
-        
+
         return redirect()->route('admin.schedules.index')
             ->with('success', 'Jadwal kelas berhasil diperbarui');
     }
-    
+
     public function destroy($id)
     {
         $schedule = ClassSchedule::findOrFail($id);
         $schedule->delete();
-        
+
         return redirect()->route('admin.schedules.index')
             ->with('success', 'Jadwal kelas berhasil dihapus');
     }
 }
-

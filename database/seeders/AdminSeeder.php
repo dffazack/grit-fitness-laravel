@@ -3,8 +3,8 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\Admin; // 1. Panggil Model Admin
-use Illuminate\Support\Facades\Hash; // 2. Panggil fitur Hash
+use App\Models\Admin;
+use Illuminate\Support\Facades\Hash;
 
 class AdminSeeder extends Seeder
 {
@@ -13,14 +13,11 @@ class AdminSeeder extends Seeder
      */
     public function run(): void
     {
-        // 3. Ini adalah kode yang sama persis dengan di tinker!
-        // Dia akan mencari admin dengan email ini,
-        // jika belum ada, dia akan membuatnya.
         Admin::firstOrCreate(
-            ['email' => 'admin@grit.com'], // Cari berdasarkan email ini
+            ['email' => 'admin@gritfitness.com'], // Email dalam satu baris
             [
                 'name' => 'Hazqi Ganteng',
-                'password' => Hash::make('admin123') // Isi data ini jika belum ada
+                'password' => Hash::make('admin123')
             ]
         );
     }

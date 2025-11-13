@@ -11,7 +11,7 @@ class HomepageController extends Controller
     /**
      * Menampilkan halaman ringkasan (sesuai desain).
      */
-    public function index()
+    public function index()$sche
     {
         // Method ini hanya menampilkan view ringkasan
         return view('admin.homepage.index');
@@ -28,24 +28,24 @@ class HomepageController extends Controller
         // 2. Siapkan data untuk view, sesuai yang diharapkan
         // Gunakan data dari database, atau sediakan data kosong jika belum ada
         
-        $hero = $content->get('hero') ? json_decode($content->get('hero')->content) : (object)[
+        $hero = $content->get('hero') ? (object)$content->get('hero')->content : (object)[
             'title' => '',
             'subtitle' => '',
             'image' => '',
         ];
         
-        $stats = $content->get('stats') ? json_decode($content->get('stats')->content) : array_fill(0, 4, (object)[
+        $stats = $content->get('stats') ? array_map(fn($item) => (object)$item, $content->get('stats')->content) : array_fill(0, 4, (object)[
             'value' => '',
             'label' => '',
         ]);
         
-        $benefits = $content->get('benefits') ? json_decode($content->get('benefits')->content) : array_fill(0, 4, (object)[
+        $benefits = $content->get('benefits') ? array_map(fn($item) => (object)$item, $content->get('benefits')->content) : array_fill(0, 4, (object)[
             'icon' => 'dumbbell',
             'title' => '',
             'description' => '',
         ]);
         
-        $testimonials = $content->get('testimonials') ? json_decode($content->get('testimonials')->content) : array_fill(0, 3, (object)[
+        $testimonials = $content->get('testimonials') ? array_map(fn($item) => (object)$item, $content->get('testimonials')->content) : array_fill(0, 3, (object)[
             'name' => '',
             'role' => '',
             'text' => '',

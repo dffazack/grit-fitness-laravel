@@ -16,16 +16,18 @@ class CheckRole
      */
     public function handle(Request $request, Closure $next, string $role): Response
     {
-        // Check if user is authenticated
-        $user = Auth::user();
-
-        // Jika guard admin aktif, lewati pengecekan role member
-        if (Auth::guard('admin')->check()) {
-            return $next($request);
+        // This middleware is for the 'web' guard.
+        // It should only check the currently authenticated user on this guard.
+        if (!Auth::check()) {
+            // If no user is authenticated on the web guard, redirect to login.
+            return redirect()->route('login');
         }
 
-        // Jika user bukan member, tolak akses
-        if (!$user || $user->role !== $role) {
+        $user = Auth::user();
+
+        // Check if the user has the required role.
+        if ($user->role !== $role) {
+            // If not, forbid access.
             abort(403, 'Unauthorized');
         }
 

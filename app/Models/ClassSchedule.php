@@ -30,13 +30,14 @@ class ClassSchedule extends Model
         'Pilates',
         'Boxing',
         'Zumba',
-        'Other'
     ];
     
     protected $table = 'class_schedules';
 
     protected $fillable = [
         'name',
+        'class_list_id',
+        'custom_class_name',
         'day',
         'start_time',
         'end_time',
@@ -57,6 +58,11 @@ class ClassSchedule extends Model
     ];
 
     // --- RELASI ---
+
+    public function classList(): BelongsTo
+    {
+        return $this->belongsTo(ClassList::class);
+    }
 
     public function bookings(): HasMany
     {

@@ -53,7 +53,7 @@
                             @foreach($schedules as $schedule)
                             <tr>
                                 <td>
-                                    <strong>{{ $schedule->name }}</strong><br>
+                                    <strong>{{ $schedule->custom_class_name ?? $schedule->classList->name ?? 'N/A' }}</strong><br>
                                     <small class="text-muted">{{ $schedule->type }}</small>
                                 </td>
                                 <td>{{ $schedule->day }}</td>
@@ -64,7 +64,7 @@
                                 </td>
                                 <td class="text-end">
                                     {{-- Tombol Edit: Memicu Modal 'editScheduleModal' --}}
-                                    <button type.button" class="btn btn-sm btn-primary btn-edit"
+                                    <button type="button" class="btn btn-sm btn-primary btn-edit"
                                             data-bs-toggle="modal" 
                                             data-bs-target="#editScheduleModal"
                                             data-id="{{ $schedule->id }}"
@@ -113,13 +113,33 @@
                 {{-- Form ini memanggil route 'admin.schedules.store' --}}
                 <form action="{{ route('admin.schedules.store') }}" method="POST">
                     @csrf
+                    <input type="hidden" name="form_type" value="add">
                     <div class="modal-body p-4">
+                        {{-- Tambahkan ini untuk debug error spesifik --}}
+                        @if ($errors->any())
+                            @dump($errors->all())
+                        @endif
                         <div class="row g-3">
-                            {{-- Nama Kelas --}}
+                            {{-- Nama Kelas (Select for existing, input for 'Other') --}}
                             <div class="col-12">
-                                <label for="add_name" class="form-label">Nama Kelas</label>
-                                <input type="text" class="form-control @error('name') is-invalid @enderror" id="add_name" name="name" value="{{ old('name') }}" required>
-                                @error('name')
+                                <label for="add_class_list_id" class="form-label">Nama Kelas</label>
+                                <select class="form-select @error('class_list_id') is-invalid @enderror" id="add_class_list_id" name="class_list_id" required>
+                                    <option value="" disabled selected>Pilih nama kelas...</option>
+                                    @foreach($classLists as $classList)
+                                        <option value="{{ $classList->id }}" {{ old('class_list_id') == $classList->id ? 'selected' : '' }}>{{ $classList->name }}</option>
+                                    @endforeach
+                                    <option value="other" {{ old('class_list_id') == 'other' ? 'selected' : '' }}>Other (Specify New Class)</option>
+                                </select>
+                                @error('class_list_id')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            {{-- Custom Class Name Input (hidden by default) --}}
+                            <div class="col-12" id="add_custom_class_name_group" style="display: none;">
+                                <label for="add_custom_class_name" class="form-label">Nama Kelas Baru</label>
+                                <input type="text" class="form-control @error('custom_class_name') is-invalid @enderror" id="add_custom_class_name" name="custom_class_name" value="{{ old('custom_class_name') }}" placeholder="Enter new class name">
+                                @error('custom_class_name')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -228,13 +248,34 @@
                 <form id="editScheduleForm" method="POST">
                     @csrf
                     @method('PUT')
+                    <input type="hidden" name="form_type" value="edit">
+                    <input type="hidden" name="schedule_id" id="edit_schedule_id">
                     <div class="modal-body p-4">
+                        {{-- Tambahkan ini untuk debug error spesifik --}}
+                        @if ($errors->any())
+                            @dump($errors->all())
+                        @endif
                         <div class="row g-3">
-                            {{-- Nama Kelas --}}
+                            {{-- Nama Kelas (Select for existing, input for 'Other') --}}
                             <div class="col-12">
-                                <label for="edit_name" class="form-label">Nama Kelas</label>
-                                <input type="text" class="form-control @error('name') is-invalid @enderror" id="edit_name" name="name" required>
-                                @error('name')
+                                <label for="edit_class_list_id" class="form-label">Nama Kelas</label>
+                                <select class="form-select @error('class_list_id') is-invalid @enderror" id="edit_class_list_id" name="class_list_id" required>
+                                    <option value="" disabled selected>Pilih nama kelas...</option>
+                                    @foreach($classLists as $classList)
+                                        <option value="{{ $classList->id }}">{{ $classList->name }}</option>
+                                    @endforeach
+                                    <option value="other">Other (Specify New Class)</option>
+                                </select>
+                                @error('class_list_id')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            {{-- Custom Class Name Input (hidden by default) --}}
+                            <div class="col-12" id="edit_custom_class_name_group" style="display: none;">
+                                <label for="edit_custom_class_name" class="form-label">Nama Kelas Baru</label>
+                                <input type="text" class="form-control @error('custom_class_name') is-invalid @enderror" id="edit_custom_class_name" name="custom_class_name" placeholder="Enter new class name">
+                                @error('custom_class_name')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -339,15 +380,17 @@
             // Ambil data dari atribut 'data-*' di tombol
             const action = button.getAttribute('data-action');
             const schedule = JSON.parse(button.getAttribute('data-schedule'));
+            const scheduleId = button.getAttribute('data-id');
 
             // Ambil form di dalam modal
             const form = document.getElementById('editScheduleForm');
             
-            // Set URL action untuk form
+            // Set URL action dan schedule_id untuk form
             form.action = action;
+            form.querySelector('#edit_schedule_id').value = scheduleId;
             
             // Isi semua field di form dengan data schedule
-            form.querySelector('#edit_name').value = schedule.name;
+            form.querySelector('#edit_class_list_id').value = schedule.class_list_id || '';  
             form.querySelector('#edit_day').value = schedule.day;
             form.querySelector('#edit_type').value = schedule.type;
             form.querySelector('#edit_start_time').value = schedule.start_time ? schedule.start_time.substring(0, 5) : '';
@@ -355,9 +398,36 @@
             form.querySelector('#edit_trainer_id').value = schedule.trainer_id;
             form.querySelector('#edit_max_quota').value = schedule.max_quota;
             form.querySelector('#edit_description').value = schedule.description;
+
+            // Handle 'Other' option for edit modal
+            const editClassListSelect = form.querySelector('#edit_class_list_id');
+            const editCustomClassNameGroup = form.querySelector('#edit_custom_class_name_group');
+            const editCustomClassNameInput = form.querySelector('#edit_custom_class_name');
+
+            let isPredefined = false;
+            for (let i = 0; i < editClassListSelect.options.length; i++) {
+                if (editClassListSelect.options[i].value == schedule.class_list_id && editClassListSelect.options[i].value !== 'other') {
+                    isPredefined = true;
+                    break;
+                }
+            }
+            
+            if (!isPredefined || schedule.class_list_id === null) {  // Jika custom (class_list_id null)
+                editClassListSelect.value = 'other';
+                editCustomClassNameGroup.style.display = 'block';
+                editCustomClassNameInput.value = schedule.custom_class_name || '';  // Gunakan custom_class_name
+                editCustomClassNameInput.setAttribute('required', 'required');
+            } else {
+                editClassListSelect.value = schedule.class_list_id;
+                editCustomClassNameGroup.style.display = 'none';
+                editCustomClassNameInput.removeAttribute('required');
+                editCustomClassNameInput.value = '';
+            }
+
+            editClassListSelect.dispatchEvent(new Event('change')); // Trigger change to apply logic
         });
 
-        // --- SCRIPT UNTUK MENANGANI ERROR VALIDASI ---
+        // --- SCRIPT UNTUK MENANGANI ERROR VALIDASI DAN AUTO-OPEN MODAL ---
         // Jika ada error validasi di form TAMBAH, buka kembali modal-nya
         @if ($errors->any() && old('form_type') === 'add')
             const addModal = new bootstrap.Modal(document.getElementById('addScheduleModal'));
@@ -365,7 +435,6 @@
         @endif
         
         // Jika ada error validasi di form EDIT, buka kembali modal-nya
-        // (Ini lebih kompleks, kita harus tahu ID mana yang diedit)
         @if ($errors->any() && old('form_type') === 'edit' && old('schedule_id'))
             // Dapatkan tombol edit yang sesuai
             const editButton = document.querySelector(`.btn-edit[data-id="${{ old('schedule_id') }}"]`);
@@ -373,12 +442,13 @@
                 // Tampilkan modal edit
                 const editModal = new bootstrap.Modal(document.getElementById('editScheduleModal'));
                 
-                // Set action (karena field mungkin tidak ter-isi)
+                // Set action dan schedule_id
                 const form = document.getElementById('editScheduleForm');
                 form.action = editButton.getAttribute('data-action');
+                form.querySelector('#edit_schedule_id').value = "{{ old('schedule_id') }}";
 
                 // Isi field dengan old data
-                form.querySelector('#edit_name').value = "{{ old('name') }}";
+                form.querySelector('#edit_class_list_id').value = "{{ old('class_list_id') }}";
                 form.querySelector('#edit_day').value = "{{ old('day') }}";
                 form.querySelector('#edit_type').value = "{{ old('type') }}";
                 form.querySelector('#edit_start_time').value = "{{ old('start_time') }}";
@@ -387,10 +457,69 @@
                 form.querySelector('#edit_max_quota').value = "{{ old('max_quota') }}";
                 form.querySelector('#edit_description').value = "{{ old('description') }}";
 
+                // Handle 'Other' option for old input
+                const editClassListSelect = form.querySelector('#edit_class_list_id');
+                const editCustomClassNameGroup = form.querySelector('#edit_custom_class_name_group');
+                const editCustomClassNameInput = form.querySelector('#edit_custom_class_name');
+
+                if ("{{ old('class_list_id') }}" === 'other') {
+                    editCustomClassNameGroup.style.display = 'block';
+                    editCustomClassNameInput.value = "{{ old('custom_class_name') }}";
+                    editCustomClassNameInput.setAttribute('required', 'required');
+                } else {
+                    editCustomClassNameGroup.style.display = 'none';
+                    editCustomClassNameInput.removeAttribute('required');
+                    editCustomClassNameInput.value = '';
+                }
+
                 editModal.show();
             }
         @endif
+
+        // Auto-open modal berdasarkan flash data dari controller
+        @if (session('modal') === 'add')
+            const addModal = new bootstrap.Modal(document.getElementById('addScheduleModal'));
+            addModal.show();
+        @elseif (session('modal') === 'edit' && session('edit_schedule_id'))
+            const editButton = document.querySelector(`.btn-edit[data-id="${{ session('edit_schedule_id') }}"]`);
+            if (editButton) {
+                editButton.click(); // Simulasi klik tombol edit untuk buka modal
+            }
+        @endif
+
+        // --- JAVASCRIPT UNTUK MENANGANI PILIHAN 'OTHER' PADA NAMA KELAS ---
+        function setupOtherOptionLogic(selectId, inputGroupId, inputId) {
+            const selectElement = document.getElementById(selectId);
+            const inputGroupElement = document.getElementById(inputGroupId);
+            const inputElement = document.getElementById(inputId);
+
+            if (!selectElement || !inputGroupElement || !inputElement) {
+                console.warn(`Elements not found for setupOtherOptionLogic: ${selectId}, ${inputGroupId}, ${inputId}`);
+                return;
+            }
+
+            function toggleInput() {
+                if (selectElement.value === 'other') {
+                    inputGroupElement.style.display = 'block';
+                    inputElement.setAttribute('required', 'required');
+                } else {
+                    inputGroupElement.style.display = 'none';
+                    inputElement.removeAttribute('required');
+                    inputElement.value = ''; // Clear value when hidden
+                }
+            }
+
+            selectElement.addEventListener('change', toggleInput);
+
+            // Initial check in case 'other' was pre-selected (e.g., due to old input)
+            toggleInput();
+        }
+
+        // Setup for Add Schedule Modal
+        setupOtherOptionLogic('add_class_list_id', 'add_custom_class_name_group', 'add_custom_class_name');
+
+        // Setup for Edit Schedule Modal
+        setupOtherOptionLogic('edit_class_list_id', 'edit_custom_class_name_group', 'edit_custom_class_name');
     });
 </script>
 @endpush
-
