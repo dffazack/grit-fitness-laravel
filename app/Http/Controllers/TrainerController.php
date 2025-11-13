@@ -2,18 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Trainer;
+use Illuminate\Http\Request;
 
 class TrainerController extends Controller
 {
     public function index()
     {
-        $trainers = Trainer::with(['classSchedules'])
-            ->where('is_active', true)
-            ->orderBy('experience_years', 'desc')
-            ->get();
+        $trainers = Trainer::where('is_active', true)
+            ->orderBy('name')
+            ->paginate(9);
         
-        return view('trainers', compact('trainers'));
+        return view('trainers.index', compact('trainers'));
     }
 }

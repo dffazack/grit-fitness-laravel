@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\MemberController as AdminMemberController;
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\ScheduleController as AdminScheduleController;
 use App\Http\Controllers\Admin\MembershipPackageController;
+use App\Http\Controllers\TrainerController;
 use App\Http\Controllers\Admin\TrainerController as AdminTrainerController;
 use App\Http\Controllers\Admin\HomepageController as AdminHomepageController;
 use App\Http\Controllers\Admin\NotificationController as AdminNotificationController;
@@ -31,7 +32,7 @@ use App\Http\Controllers\Auth\AdminLoginController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/classes', [ClassController::class, 'index'])->name('classes');
-Route::get('/trainers', [AdminTrainerController::class, 'index'])->name('trainers');
+Route::get('/trainers', [TrainerController::class, 'index'])->name('trainers');
 Route::get('/membership', [MembershipController::class, 'index'])->name('membership');
 
 /*
@@ -62,6 +63,7 @@ Route::middleware(['auth', 'role:member'])->prefix('member')->name('member.')->g
     Route::get('/dashboard', [MemberDashboardController::class, 'index'])->name('dashboard');
     Route::get('/profile', [MemberProfileController::class, 'index'])->name('profile');
     Route::post('/profile/update', [MemberProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/password', [MemberProfileController::class, 'updatePassword'])->name('profile.updatePassword');
 
     // Payment (Guest harus bisa akses ini)
     Route::get('/payment', [MemberPaymentController::class, 'index'])
@@ -69,35 +71,6 @@ Route::middleware(['auth', 'role:member'])->prefix('member')->name('member.')->g
 
     Route::post('/payment', [MemberPaymentController::class, 'store'])
         ->name('payment.store');
-});
-
-/*
-|--------------------------------------------------------------------------
-| Admin Login Routes
-|--------------------------------------------------------------------------
-*/
-// TIDAK pakai middleware guest:admin karena ada bug
-// Kita handle manual di controller
-Route::get('admin/login', [AdminLoginController::class, 'showLoginForm'])->name('admin.login');
-Route::post('admin/login', [AdminLoginController::class, 'login'])->name('admin.login.submit');
-
-// Rute yang HANYA BISA diakses oleh ROLE 'MEMBER' AKTIF
-Route::middleware(['auth', 'role:member'])->prefix('member')->name('member.')->group(function () {
-
-    Route::get('/dashboard', [MemberDashboardController::class, 'index'])
-        ->name('dashboard');
-
-    Route::get('/profile', [MemberProfileController::class, 'index']) // <-- GUNAKAN ALIAS INI
-        ->name('profile');
-
-    Route::post('/profile', [MemberProfileController::class, 'update']) // <-- GUNAKAN ALIAS INI JUGA
-        ->name('profile.update');
-
-        // TAMBAHKAN BARIS INI:
-    Route::post('/profile/password', [MemberProfileController::class, 'updatePassword'])->name('profile.updatePassword');
-
-    // Tambahkan rute lain yang khusus member di sini
-    // (Contoh: Booking kelas)
 });
 
 /*
