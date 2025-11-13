@@ -6,12 +6,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes; // Tambahkan ini jika Anda punya kolom deleted_at
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ClassSchedule extends Model
 {
-    use HasFactory, SoftDeletes; // Tambahkan SoftDeletes jika Anda punya kolom deleted_at
-     public const DAYS = [
+    use HasFactory, SoftDeletes;
+
+    public const DAYS = [
         'Senin', 
         'Selasa', 
         'Rabu', 
@@ -33,8 +34,13 @@ class ClassSchedule extends Model
     
     protected $table = 'class_schedules';
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
-        'name',
+        // 'name' DIHAPUS karena migrasi Anda menghapusnya.
         'class_list_id',
         'custom_class_name',
         'day',
@@ -50,6 +56,8 @@ class ClassSchedule extends Model
 
     /**
      * Atribut yang harus di-cast ke tipe data tertentu.
+     *
+     * @var array<string, string>
      */
     protected $casts = [
         'start_time' => 'datetime:H:i', // Format Jam:Menit
@@ -61,75 +69,90 @@ class ClassSchedule extends Model
 
     // --- RELASI ---
 
+    /**
+     * Mendapatkan daftar kelas (ClassList) yang terkait dengan jadwal ini.
+     */
     public function classList(): BelongsTo
     {
         return $this->belongsTo(ClassList::class);
     }
 
-    public function bookings(): HasMany
-    {
-        return $this->hasMany(Booking::class);
-    }
-
-    public function trainer(): BelongsTo
-    {
-        return $this->belongsTo(Trainer::class);
-    }
-
-    // Scopes
-    public function scopeActive($query)
-    {
-        return $query->where('is_active', true);
-    }
-
-    public function scopeDay($query, $day)
-    {
-        return $query->where('day', $day);
-    }
-
-    // Helpers
-    public function getFormattedTime()
-    {
-        return $this->start_time->format('H:i') . ' - ' . $this->end_time->format('H:i');
-    }
-
-    public function isFull()
-    {
-        return $this->quota >= $this->max_quota;
-    }
-
-    public function hasAvailableSlots()
-    {
-        return $this->quota < $this->max_quota;
-    }
-
-    public function getAvailableSlots()
-    {
-        return $this->max_quota - $this->quota;
-    }
-
-    public function getQuotaPercentage()
-    {
-        if ($this->max_quota == 0) return 0;
-        return round(($this->quota / $this->max_quota) * 100);
-    }
     /**
      * Mendapatkan semua booking untuk jadwal kelas ini.
-     * (INI YANG MEMPERBAIKI ERROR ANDA)
      */
     public function bookings(): HasMany
     {
-        // Satu ClassSchedule 'hasMany' (memiliki banyak) Booking
         return $this->hasMany(Booking::class);
     }
 
     /**
      * Mendapatkan trainer yang mengajar kelas ini.
-     * (Ini diperlukan oleh ->with('trainer') di controller)
      */
     public function trainer(): BelongsTo
     {
-        // Satu ClassSchedule 'belongsTo' (dimiliki oleh) satu Trainer
         return $this->belongsTo(Trainer::class);
     }
+
+    // --- SCOPES ---
+
+    /**
+     * Scope untuk mengambil hanya jadwal yang aktif.
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    /**
+     * Scope untuk mengambil jadwal berdasarkan hari.
+     */
+    public function scopeDay($query, $day)
+    {
+        return $query->where('day', $day);
+    }
+
+    // --- HELPERS ---
+
+    /**
+     * Mendapatkan format waktu H:i - H:i
+     */
+    public function getFormattedTime()
+    {
+        return $this->start_time->format('H:i') . ' - ' . $this->end_time->format('H:i');
+    }
+
+    /**
+     * Cek apakah kelas sudah penuh.
+     */
+    public function isFull()
+    {
+        return $this->quota >= $this->max_quota;
+    }
+
+    /**
+     * Cek apakah masih ada slot.
+     */
+    public function hasAvailableSlots()
+    {
+        return $this->quota < $this->max_quota;
+    }
+
+    /**
+     * Dapatkan jumlah slot yang tersedia.
+     */
+    public function getAvailableSlots()
+    {
+        return $this->max_quota - $this->quota;
+    }
+
+    /**
+     * Dapatkan persentase kuota.
+     */
+    public function getQuotaPercentage()
+    {
+        if ($this->max_quota == 0) return 0;
+        return round(($this->quota / $this->max_quota) * 100);
+    }
+
+    // DUPLIKAT FUNGSI DAN KOMENTAR SISA MERGE DIHAPUS DARI SINI
 }

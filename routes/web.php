@@ -69,7 +69,6 @@ Route::middleware(['auth', 'role:member'])->prefix('member')->name('member.')->g
 
     Route::post('/payment', [MemberPaymentController::class, 'store'])
         ->name('payment.store');
-  85aa68d7e34d38b2c4fde502a208b3a92bd6d18f
 });
 
 /*
