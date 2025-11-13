@@ -1,484 +1,572 @@
-# Panduan Lengkap Proyek Laravel: Grit Fitness
+# Panduan Lengkap Proyek Grit Fitness
 
-Dokumen ini adalah panduan lengkap untuk memahami, memelihara, dan mengembangkan proyek **Grit Fitness** yang dibangun menggunakan Framework Laravel.
-
----
-
-## Daftar Isi
-1.  [Struktur Folder Proyek](#1-struktur-folder-proyek)
-2.  [Alur Kerja & Routing](#2-alur-kerja--routing)
-3.  [Controller: Logika Aplikasi](#3-controller-logika-aplikasi)
-4.  [Database & Migration](#4-database--migration)
-5.  [Model & Eloquent ORM](#5-model--eloquent-orm)
-6.  [Blade: Template Engine](#6-blade-template-engine)
-7.  [Blade Components](#7-blade-components)
-8.  [Database Seeder & Factory](#8-database-seeder--factory)
-9.  [Pagination](#9-pagination)
+Selamat datang di proyek Grit Fitness! Dokumen ini adalah panduan utama untuk developer, berisi semua informasi yang dibutuhkan mulai dari instalasi lokal, pemahaman arsitektur, hingga cara melakukan berbagai jenis pengujian.
 
 ---
 
-## 1. Struktur Folder Proyek
+## 1. Setup & Instalasi Lokal
 
-Laravel memiliki struktur folder yang terorganisir untuk memudahkan pengembangan. Berikut adalah direktori-direktori paling penting dalam proyek Grit Fitness:
+Bagian ini menjelaskan cara menjalankan proyek Grit Fitness di lingkungan pengembangan lokal Anda.
 
--   `app/`: Ini adalah jantung dari aplikasi Anda.
-    -   `Http/Controllers/`: Berisi semua controller yang menangani logika untuk setiap permintaan HTTP. Contoh: `MembershipController.php`, `Admin/DashboardController.php`.
-    -   `Models/`: Berisi semua model Eloquent yang merepresentasikan tabel dalam database Anda. Contoh: `User.php`, `Trainer.php`, `MembershipPackage.php`.
-    -   `Providers/`: Tempat mendaftarkan service-service penting untuk aplikasi.
-    -   `Http/Middleware/`: Berisi class-class yang dapat memfilter permintaan HTTP, seperti otentikasi dan otorisasi. Contoh: `CheckRole.php`.
+### Prasyarat
 
--   `config/`: Berisi semua file konfigurasi aplikasi, seperti koneksi database (`database.php`), aplikasi (`app.php`), dll.
+Pastikan perangkat Anda telah terinstal:
 
--   `database/`: Semua yang berkaitan dengan database ada di sini.
-    -   `migrations/`: Berisi file-file migrasi untuk membangun dan memodifikasi skema database Anda secara bertahap.
-    -   `seeders/`: Berisi class untuk mengisi data awal (dummy data) ke dalam database.
-    -   `factories/`: Berisi "pabrik" model untuk menghasilkan data palsu dalam jumlah besar, biasanya digunakan dalam seeder atau testing.
+-   PHP 8.2+
+-   Composer
+-   Node.js & NPM
+-   Database (misalnya, MySQL, MariaDB, atau SQLite)
 
--   `public/`: Ini adalah satu-satunya direktori yang dapat diakses secara publik dari browser. Berisi file seperti `index.php` (titik masuk semua permintaan), aset (CSS, JS, gambar), dll.
+### Langkah-langkah Instalasi
 
--   `resources/`: Berisi seluruh aset "mentah" yang akan dikompilasi.
-    -   `views/`: Berisi semua file Blade template (tampilan HTML).
-    -   `css/` & `js/`: Berisi file CSS dan JavaScript mentah sebelum diproses oleh Vite/Mix.
+1.  **Clone Repository**
 
--   `routes/`: Berisi semua definisi rute (URL) aplikasi.
-    -   `web.php`: Untuk rute berbasis web (yang Anda lihat di browser).
-    -   `api.php`: Untuk rute API.
+    ```bash
+    git clone https://github.com/dffazack/grit-fitness-laravel.git
+    cd grit-fitness-laravel
+    ```
 
--   `storage/`: Berisi file-file yang dihasilkan oleh framework, seperti cache, session, log, dan file yang di-upload oleh pengguna.
+2.  **Install Dependensi PHP**
 
--   `vendor/`: Berisi semua dependensi (paket) dari Composer. Anda tidak seharusnya mengubah apapun di direktori ini.
+    ```bash
+    composer install
+    ```
+
+3.  **Install Dependensi JavaScript**
+
+    ```bash
+    npm install
+    ```
+
+4.  **Setup File Environment**
+    Salin file `.env.example` menjadi `.env`. File ini berisi semua konfigurasi untuk lingkungan Anda.
+
+    ```bash
+    cp .env.example .env
+    ```
+
+5.  **Konfigurasi Database**
+    Buka file `.env` dan sesuaikan pengaturan database sesuai dengan konfigurasi lokal Anda (nama database, username, password).
+
+    ```ini
+    DB_CONNECTION=mysql
+    DB_HOST=127.0.0.1
+    DB_PORT=3306
+    DB_DATABASE=grit_fitness
+    DB_USERNAME=root
+    DB_PASSWORD=
+    ```
+
+6.  **Generate Application Key**
+    Perintah ini akan mengisi variabel `APP_KEY` di file `.env` Anda.
+
+    ```bash
+    php artisan key:generate
+    ```
+
+7.  **Migrasi & Seeding Database**
+    Perintah ini akan membuat semua tabel database dan mengisinya dengan data awal (termasuk akun admin dan member).
+
+    ```bash
+    php artisan migrate --seed
+    ```
+
+8.  **Jalankan Development Server**
+    Proyek ini dilengkapi dengan script `composer run dev` yang akan menjalankan server PHP, Vite, antrian (queue), dan log secara bersamaan.
+
+    ```bash
+    composer run dev
+    ```
+
+9.  **Akses Aplikasi**
+    -   **Aplikasi Utama:** [http://127.0.0.1:8000](http://127.0.0.1:8000)
+    -   **Login Admin:** [http://127.0.0.1:8000/admin/login](http://127.0.0.1:8000/admin/login)
+        -   **Email:** `admin@gritfitness.com`
+        -   **Password:** `admin123`
+    -   **Login Member (Contoh):** [http://127.0.0.1:8000/login](http://127.0.0.1:8000/login)
+        -   **Email:** `member@gritfitness.com`
+        -   **Password:** `password`
 
 ---
 
-## 2. Alur Kerja & Routing
+## 2. Arsitektur & Konsep Inti
 
-Routing adalah proses mendefinisikan bagaimana aplikasi merespons permintaan URL dari pengguna. Semua rute web didefinisikan di `routes/web.php`.
+Memahami struktur proyek akan membantu Anda berkontribusi dengan lebih efektif.
 
-**Contoh Dasar Route:**
+### Model-View-Controller (MVC)
 
-```php
-// routes/web.php
+Proyek ini mengikuti pola arsitektur MVC standar Laravel:
 
-use App\Http\Controllers\HomeController;
+-   **Models (`app/Models`):** Merepresentasikan data dan logika bisnis. Setiap file model terhubung ke satu tabel di database (misal, `User.php` ke tabel `users`). Di sinilah relasi antar tabel (seperti `User` memiliki banyak `Transaction`) didefinisikan.
+-   **Views (`resources/views`):** Bertanggung jawab untuk menampilkan data (UI). Proyek ini menggunakan Blade, templating engine dari Laravel.
+-   **Controllers (`app/Http/Controllers`):** Bertindak sebagai perantara antara Model dan View. Controller menerima request dari pengguna, mengambil data dari Model, dan mengirimkan data tersebut ke View yang sesuai untuk ditampilkan.
 
-// Menampilkan halaman utama
-Route::get('/', [HomeController::class, 'index']);
+### Routing (`routes/web.php`)
+
+Semua URL atau "rute" yang dapat diakses oleh pengguna didefinisikan di file ini. Setiap rute memetakan sebuah URL ke sebuah method di dalam Controller. Proyek ini memisahkan rute untuk publik, member, dan admin menggunakan _middleware_ untuk keamanan.
+
+### Blade Templates & Components
+
+-   **Layouts (`resources/views/layouts`):** File `app.blade.php` (untuk publik/member) dan `admin.blade.php` (untuk admin) berfungsi sebagai template utama. Halaman lain akan `@extends` layout ini.
+-   **Components (`resources/views/components`):** Proyek ini menggunakan komponen Blade untuk elemen UI yang dapat digunakan kembali, seperti `<x-form-input />`. Ini membantu menjaga kode tetap bersih dan konsisten.
+
+### Autentikasi Multi-Guard
+
+Proyek ini memiliki dua sistem login yang terpisah:
+
+1.  **Guard `web`:** Untuk pengguna biasa (member). Menggunakan tabel `users`.
+2.  **Guard `admin`:** Untuk administrator. Menggunakan tabel `admins`.
+    Pemisahan ini memberikan lapisan keamanan ekstra antara panel admin dan area member.
+
+---
+
+## 3. Panduan Testing
+
+Testing adalah bagian krusial untuk menjaga kualitas kode. Proyek ini menggunakan tiga jenis testing utama.
+
+### A. Testing Otomatis (Cypress)
+
+Cypress digunakan untuk menguji aplikasi dari sudut pandang pengguna akhir di dalam browser.
+
+#### End-to-End (E2E) Testing
+
+Tes ini mensimulasikan alur pengguna lengkap dari awal hingga akhir (misal, dari login, booking kelas, hingga logout).
+
+-   **Lokasi File:** `cypress/e2e/`
+-   **Cara Menjalankan:**
+    ```bash
+    npx cypress open --e2e
+    ```
+    Pilih browser, lalu klik pada file tes yang ingin dijalankan.
+
+#### Component Testing
+
+Tes ini menguji komponen Blade secara terisolasi untuk memverifikasi tampilannya dengan properti yang berbeda.
+
+-   **Lokasi File:** `cypress/component/`
+-   **Setup (Penting!):** Karena tes komponen perlu me-boot Laravel, prosesnya bisa lambat. Untuk mempercepat, jalankan perintah optimasi Laravel **sebelum** memulai tes:
+    ```bash
+    php artisan config:cache
+    php artisan route:cache
+    ```
+-   **Cara Menjalankan:**
+    ```bash
+    npx cypress open --component
+    ```
+    Pilih browser dan jalankan tes yang tersedia.
+
+### B. Testing Otomatis (Laravel/PHPUnit)
+
+Ini adalah tes internal di level kode PHP, sangat cepat dan ideal untuk menguji logika bisnis dan endpoint API.
+
+#### Feature vs. Unit Testing
+
+-   **Feature Tests (`tests/Feature`):** Menguji satu alur HTTP request. Misalnya, mengirim request `POST` ke `/admin/schedules` dan memastikan data tersimpan di database.
+-   **Unit Tests (`tests/Unit`):** Menguji satu "unit" kode (misalnya, satu method di dalam Model) secara terisolasi tanpa me-boot seluruh framework.
+
+#### Cara Menjalankan
+
+-   **Menjalankan Semua Tes:**
+    ```bash
+    php artisan test
+    ```
+-   **Menjalankan Satu File Tertentu:**
+    ```bash
+    php artisan test --filter=AdminDashboardTest
+    ```
+-   **Menjalankan Satu Method Tertentu:**
+    ```bash
+    php artisan test --filter=AdminDashboardTest::test_admin_can_access_dashboard
+    ```
+
+### C. Testing Manual
+
+Meskipun ada tes otomatis, pengujian manual tetap penting untuk merasakan pengalaman pengguna secara langsung.
+
+#### Checklist Skenario Manual
+
+-   [ ] **Alur Admin:** Coba semua fitur CRUD di panel admin (tambah, lihat, edit, hapus) untuk setiap modul Data Master. Pastikan validasi form berfungsi.
+-   [ ] **Alur Member:** Lakukan registrasi, login, update profil, dan coba lakukan booking kelas.
+-   [ ] **Responsivitas:** Ubah ukuran window browser atau gunakan DevTools untuk memastikan tampilan tidak rusak di layar mobile, tablet, dan desktop.
+-   [ ] **Interaksi UI:** Pastikan semua tombol, modal, dan dropdown berfungsi seperti yang diharapkan.
+
+# 📖 Buku Panduan Proyek: Grit Fitness (Laravel)
+
+## Pendahuluan
+
+Selamat datang di buku panduan teknis untuk proyek **Grit Fitness**. Dokumen ini bertujuan untuk memberikan pemahaman yang mendalam tentang arsitektur, komponen, dan alur kerja dari aplikasi web ini. Panduan ini dirancang untuk developer baru maupun yang sudah ada agar dapat memahami dan melanjutkan pengembangan proyek dengan lebih mudah dan efisien.
+
+Aplikasi ini dibangun menggunakan framework **Laravel** dan berfungsi sebagai sistem manajemen untuk pusat kebugaran, mencakup fungsionalitas untuk publik, anggota (member), dan administrator.
+
+---
+
+## 1. Konfigurasi Proyek
+
+Konfigurasi utama proyek Laravel berada di dalam direktori `config` dan file `.env` di root proyek.
+
+### File `.env`
+
+File ini berisi konfigurasi yang spesifik untuk lingkungan (environment) tempat aplikasi berjalan. Ini adalah tempat untuk menyimpan kredensial, kunci API, dan pengaturan lainnya yang sensitif atau bervariasi antar lingkungan (development, staging, production).
+
+**Pengaturan Kunci:**
+
+-   `APP_NAME`: Nama aplikasi (Contoh: "Grit Fitness").
+-   `APP_URL`: URL utama aplikasi (Contoh: `http://localhost:8000`).
+-   `DB_CONNECTION`: Jenis database yang digunakan (Contoh: `mysql`).
+-   `DB_HOST`: Alamat host database (Contoh: `127.0.0.1`).
+-   `DB_PORT`: Port database (Contoh: `3306`).
+-   `DB_DATABASE`: Nama database (Contoh: `grit_fitness_db`).
+-   `DB_USERNAME`: Username untuk koneksi database (Contoh: `root`).
+-   `DB_PASSWORD`: Password untuk koneksi database.
+
+### File Konfigurasi Penting
+
+-   **`config/app.php`**: Berisi konfigurasi inti aplikasi seperti `timezone` (zona waktu, misal: `Asia/Jakarta`) dan `locale` (bahasa, misal: `id`).
+-   **`config/database.php`**: Mendefinisikan semua koneksi database yang bisa digunakan oleh aplikasi. Pengaturan di file `.env` akan menimpa nilai default di sini.
+-   **`config/auth.php`**: Mengatur sistem autentikasi. Di proyek ini, kita mendefinisikan dua **guards**:
+    -   `web`: Untuk autentikasi pengguna/member biasa (menggunakan model `App\Models\User`).
+    -   `admin`: Untuk autentikasi administrator (menggunakan model `App\Models\Admin`).
+
+---
+
+## 2. Struktur Folder
+
+Proyek ini mengikuti struktur folder standar Laravel dengan beberapa penyesuaian untuk kebutuhan aplikasi.
+
+-   **`app/Http/Controllers`**: Berisi semua controller yang menangani request HTTP.
+
+    -   **`Admin/`**: Sub-folder khusus untuk controller yang menangani logika di panel admin (misal: `Admin/TrainerController.php`).
+    -   **`Member/`**: Sub-folder untuk controller yang menangani logika di dashboard member (misal: `Member/DashboardController.php`).
+    -   **`Auth/`**: Controller untuk proses autentikasi (login, register), termasuk `AdminLoginController.php` yang terpisah.
+
+-   **`app/Models`**: Berisi semua kelas [Eloquent ORM](#5-model--eloquent-orm) yang merepresentasikan tabel di database (misal: `User.php`, `Trainer.php`, `ClassSchedule.php`).
+
+-   **`database/migrations`**: Berisi file-file migrasi yang mendefinisikan skema (struktur) database. Setiap file merepresentasikan satu perubahan pada database.
+
+-   **`database/seeders`**: Berisi kelas-kelas untuk mengisi data awal (dummy data) ke dalam database, sangat berguna untuk development.
+
+-   **`resources/views`**: Berisi semua file [Blade](#3-blade-templating-engine) (template HTML).
+
+    -   **`admin/`**: Tampilan khusus untuk panel admin.
+    -   **`member/`**: Tampilan khusus untuk dashboard member.
+    -   **`layouts/`**: Template layout utama (`app.blade.php` untuk publik & member, `admin.blade.php` untuk admin).
+    -   **`components/`**: Potongan-potongan UI yang dapat digunakan kembali (reusable) seperti `navbar.blade.php` dan `footer.blade.php`.
+
+-   **`routes/web.php`**: File utama untuk mendefinisikan semua URL (rute) aplikasi web.
+
+---
+
+## 3. Blade Templating Engine
+
+Blade adalah templating engine bawaan Laravel yang simpel namun powerful.
+
+### Layouts
+
+Layouts adalah template dasar dari sebuah halaman. Proyek ini menggunakan dua layout utama:
+
+1.  **`resources/views/layouts/app.blade.php`**: Layout untuk halaman publik dan dashboard member.
+2.  **`resources/views/layouts/admin.blade.php`**: Layout untuk semua halaman di panel admin.
+
+Sebuah view dapat "mewarisi" sebuah layout menggunakan direktif `@extends`.
+
+```blade
+{{-- Contoh di resources/views/classes/index.blade.php --}}
+@extends('layouts.app')
 ```
 
-**Route dengan Middleware:**
+### Sections & Yield
 
-Middleware digunakan untuk memproteksi rute. Misalnya, hanya user yang sudah login dan memiliki role 'admin' yang bisa mengakses dashboard admin.
+Konten spesifik dari sebuah halaman didefinisikan di dalam `@section` dan disisipkan ke dalam layout di posisi `@yield`.
 
-```php
-// routes/web.php
+**Di Layout (`layouts/app.blade.php`):**
 
-use App\Http\Controllers\Admin\DashboardController;
-
-Route::middleware(['auth', 'role:admin'])->group(function () {
-    Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
-});
+```blade
+<main>
+    @yield('content')
+</main>
 ```
 
--   `middleware(['auth', 'role:admin'])`: Memastikan hanya user terotentikasi dengan peran 'admin' yang bisa lewat.
--   `group()`: Mengelompokkan beberapa rute di bawah satu aturan middleware yang sama.
--   `name('admin.dashboard')`: Memberi nama pada rute agar mudah dipanggil di view atau controller.
+**Di View Halaman (`classes/index.blade.php`):**
+
+```blade
+@section('content')
+    {{-- Seluruh konten HTML halaman ini ada di sini --}}
+    <h1>Jadwal Kelas & Trainer</h1>
+    ...
+@endsection
+```
+
+### Components
+
+Komponen adalah file Blade yang dapat disisipkan ke dalam view lain menggunakan `@include`. Ini membantu menjaga kode tetap DRY (Don't Repeat Yourself).
+
+```blade
+{{-- Contoh di layouts/app.blade.php --}}
+@include('components.navbar')
+...
+@include('components.footer')
+```
 
 ---
 
-## 3. Controller: Logika Aplikasi
+## 4. Menampilkan Data di View
 
-Controller bertugas untuk menerima permintaan dari route, berinteraksi dengan Model untuk mengambil data, dan mengirimkan data tersebut ke View.
+Data dari database atau logika bisnis diproses di **Controller** dan kemudian dikirim ke **View** untuk ditampilkan.
 
-**Contoh Controller (`MembershipController.php`):**
+**Contoh Alur:**
 
-```php
-// app/Http/Controllers/MembershipController.php
+1.  **Controller (`app/Http/Controllers/ClassController.php`)** mengambil data dari database.
 
-namespace App\Http\Controllers;
-
-use App\Models\MembershipPackage;
-use Illuminate\Http\Request;
-
-class MembershipController extends Controller
-{
-    /**
-     * Menampilkan daftar semua paket membership.
-     */
+    ```php
     public function index()
     {
-        // 1. Mengambil semua data dari model MembershipPackage
-        $packages = MembershipPackage::where('active', true)->get();
+        $schedules = ClassSchedule::with('trainer')->get();
+        $trainers = Trainer::where('is_active', true)->get();
 
-        // 2. Mengirim data 'packages' ke view
-        return view('membership.index', [
-            'packages' => $packages
-        ]);
+        // Mengirim variabel $schedules dan $trainers ke view
+        return view('classes.index', compact('schedules', 'trainers'));
     }
-}
-```
+    ```
 
-**Penjelasan:**
-1.  Method `index()` dipanggil oleh route yang sesuai.
-2.  `MembershipPackage::where('active', true)->get()` adalah query Eloquent untuk mengambil semua paket yang aktif dari database.
-3.  `return view('membership.index', ['packages' => $packages]);` merender file `resources/views/membership/index.blade.php` dan menyisipkan variabel `$packages` ke dalamnya.
-
----
-
-## 4. Database & Migration
-
-Migration adalah sistem kontrol versi untuk database Anda. Ini memungkinkan Anda untuk mendefinisikan dan memodifikasi skema database dalam file PHP.
-
-**Contoh File Migrasi:**
-
-Ini adalah contoh file migrasi untuk membuat tabel `trainers`.
-`database/migrations/2025_10_27_122700_create_trainers_table.php`
-
-```php
-// database/migrations/xxxx_xx_xx_xxxxxx_create_trainers_table.php
-
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
-
-return new class extends Migration
-{
-    public function up(): void
-    {
-        Schema::create('trainers', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('specialization');
-            $table->text('description')->nullable();
-            $table->string('photo_path')->nullable();
-            $table->timestamps(); // Membuat kolom created_at dan updated_at
-        });
-    }
-
-    public function down(): void
-    {
-        Schema::dropIfExists('trainers');
-    }
-};
-```
--   Method `up()`: Berisi logika untuk **membuat** atau **mengubah** tabel.
--   `Schema::create('trainers', ...)`: Perintah untuk membuat tabel baru bernama `trainers`.
--   Method `down()`: Berisi logika untuk **membatalkan** apa yang dilakukan di `up()`. Ini digunakan saat rollback.
-
-**Perintah Artisan untuk Migrasi:**
--   `php artisan migrate`: Menjalankan semua migrasi yang belum dijalankan.
--   `php artisan migrate:rollback`: Membatalkan migrasi terakhir.
--   `php artisan make:migration create_nama_tabel_table`: Membuat file migrasi baru.
+2.  **View (`resources/views/classes/index.blade.php`)** menerima data tersebut dan menampilkannya menggunakan sintaks Blade.
+    ```blade
+    @forelse($schedules as $day => $daySchedules)
+        <h3>{{ $day }}</h3>
+        @foreach($daySchedules as $schedule)
+            <h5>{{ $schedule->name }}</h5>
+            <p>Trainer: {{ $schedule->trainer->name ?? 'N/A' }}</p>
+        @endforeach
+    @empty
+        <p>Belum ada jadwal kelas.</p>
+    @endforelse
+    ```
 
 ---
 
 ## 5. Model & Eloquent ORM
 
-Model Eloquent adalah representasi dari sebuah tabel di database. Melalui model, Anda bisa berinteraksi dengan data di tabel tersebut menggunakan sintaks PHP yang ekspresif.
+Eloquent adalah Object-Relational Mapper (ORM) bawaan Laravel. Setiap tabel database memiliki "Model" yang digunakan untuk berinteraksi dengan tabel tersebut.
 
-**Contoh Model (`Trainer.php`):**
+-   **Lokasi Model**: `app/Models/`
+-   **Konvensi**: Nama model dalam bentuk tunggal (singular) dan PascalCase (misal: `Trainer`), sedangkan nama tabel dalam bentuk jamak (plural) dan snake_case (misal: `trainers`).
+
+### Contoh Model: `Trainer.php`
 
 ```php
-// app/Models/Trainer.php
-
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Trainer extends Model
 {
-    use HasFactory;
-
-    /**
-     * Nama tabel yang terhubung dengan model ini.
-     * Jika nama model adalah 'Trainer', Laravel akan otomatis mencari tabel 'trainers'.
-     */
-    // protected $table = 'my_trainers'; // Tidak perlu jika nama tabel sudah sesuai standar
-
-    /**
-     * Kolom yang boleh diisi secara massal (mass assignment).
-     */
+    // Atribut yang boleh diisi secara massal
     protected $fillable = [
         'name',
         'specialization',
-        'description',
-        'photo_path',
+        'experience',
+        'bio',
+        'image',
+        'email',
+        'is_active',
     ];
-}
-```
 
-**Operasi Dasar Eloquent:**
-```php
-// Mengambil semua data trainer
-$trainers = Trainer::all();
+    // Mengubah tipe data atribut secara otomatis
+    protected $casts = [
+        'certifications' => 'array', // Kolom JSON akan di-cast menjadi array PHP
+        'is_active' => 'boolean',    // Kolom tinyint(1) akan di-cast menjadi true/false
+    ];
 
-// Mencari trainer dengan ID = 1
-$trainer = Trainer::find(1);
-
-// Mencari trainer dengan spesialisasi 'Yoga'
-$yogaTrainers = Trainer::where('specialization', 'Yoga')->get();
-
-// Membuat data baru
-$newTrainer = Trainer::create([
-    'name' => 'Budi',
-    'specialization' => 'Kardio',
-]);
-
-// Mengupdate data
-$trainer = Trainer::find(1);
-$trainer->name = 'Budi Santoso';
-$trainer->save();
-
-// Menghapus data
-$trainer = Trainer::find(2);
-$trainer->delete();
-```
-
-### Relasi Eloquent
-Eloquent memungkinkan Anda mendefinisikan hubungan antar model.
-
-**Contoh: `User` dan `MembershipPackage` (Relasi One-to-Many - Invers)**
-
-Seorang `User` memiliki satu `MembershipPackage`.
-```php
-// app/Models/User.php
-
-public function membershipPackage()
-{
-    // User ini 'milik' sebuah MembershipPackage
-    return $this->belongsTo(MembershipPackage::class, 'membership_package_id');
-}
-```
-Sebuah `MembershipPackage` bisa dimiliki oleh banyak `User`.
-```php
-// app/Models/MembershipPackage.php
-
-public function users()
-{
-    // MembershipPackage ini 'memiliki banyak' User
-    return $this->hasMany(User::class, 'membership_package_id');
-}
-```
-*Catatan: Contoh ini mengasumsikan Anda telah memperbaiki skema database untuk menggunakan `membership_package_id` sebagai foreign key.*
-
----
-
-## 6. Blade: Template Engine
-
-Blade adalah template engine dari Laravel. Blade memungkinkan Anda menggunakan sintaks PHP di dalam HTML dengan lebih rapi dan menyediakan fitur-fitur seperti *template inheritance* dan *components*.
-
-**Dasar-dasar Blade:**
--   **Menampilkan Data:** Gunakan kurung kurawal ganda. Sintaks ini sudah otomatis melindungi dari serangan XSS.
-    ```blade
-    <h1>Halo, {{ $user->name }}</h1>
-    ```
-
--   **Layout & Section:** Anda bisa membuat satu file layout utama dan view lain bisa "mewarisi" layout tersebut.
-
-    **File Layout (`resources/views/layouts/admin.blade.php`):**
-    ```blade
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Grit Fitness Admin - @yield('title')</title>
-    </head>
-    <body>
-        @include('components.admin-sidebar')
-
-        <div class="content">
-            @yield('content')
-        </div>
-    </body>
-    </html>
-    ```
-    -   `@yield('title')` dan `@yield('content')` adalah "slot" yang akan diisi oleh child view.
-    -   `@include('components.admin-sidebar')` menyisipkan view lain (parsial).
-
-    **File Child View (`resources/views/admin/dashboard.blade.php`):**
-    ```blade
-    @extends('layouts.admin')
-
-    @section('title', 'Dashboard')
-
-    @section('content')
-        <h1>Selamat Datang di Dashboard Admin</h1>
-        <p>Ini adalah halaman utama panel admin.</p>
-    @endsection
-    ```
-    -   `@extends('layouts.admin')`: Memberitahu Blade untuk menggunakan layout `admin`.
-    -   `@section('title', 'Dashboard')`: Mengisi `@yield('title')` di layout.
-    -   `@section('content') ... @endsection`: Mengisi `@yield('content')` di layout.
-
--   **Struktur Kontrol:**
-    ```blade
-    @if($user->isAdmin())
-        <p>Anda adalah admin.</p>
-    @else
-        <p>Anda adalah member.</p>
-    @endif
-
-    <ul>
-        @foreach($trainers as $trainer)
-            <li>{{ $trainer->name }} - {{ $trainer->specialization }}</li>
-        @endforeach
-    </ul>
-    ```
-
----
-
-## 7. Blade Components
-
-Komponen adalah bagian dari view yang dapat digunakan kembali, seperti tombol, input form, atau card. Proyek ini sudah memiliki beberapa komponen di `resources/views/components/`.
-
-**Contoh Komponen (`form-input.blade.php`):**
-
-Proyek Anda memiliki komponen `form-input` yang kemungkinan digunakan untuk membuat elemen input form standar.
-
-**Cara Menggunakan Komponen:**
-
-Untuk menggunakan komponen, Anda bisa memanggilnya dengan tag `x-` diikuti nama komponen.
-
-```blade
-{{-- di dalam sebuah form --}}
-
-<form method="POST" action="/register">
-    @csrf
-
-    {{-- Menggunakan komponen form-input --}}
-    <x-form-input
-        name="name"
-        label="Nama Lengkap"
-        type="text"
-        placeholder="Masukkan nama Anda"
-        required="true"
-    />
-
-    <x-form-input
-        name="email"
-        label="Alamat Email"
-        type="email"
-        placeholder="email@example.com"
-        required="true"
-    />
-
-    <x-primary-button>
-        Daftar
-    </x-primary-button>
-</form>
-```
-Dengan cara ini, Anda tidak perlu menulis kode HTML untuk input form berulang kali. Cukup panggil komponennya.
-
----
-
-## 8. Database Seeder & Factory
-
-Seeder digunakan untuk mengisi database dengan data awal. Factory digunakan oleh seeder untuk menghasilkan data palsu dalam jumlah besar.
-
-**Contoh Factory (`UserFactory.php`):**
-```php
-// database/factories/UserFactory.php
-
-namespace Database\Factories;
-
-use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
-
-class UserFactory extends Factory
-{
-    public function definition(): array
+    // Mendefinisikan relasi
+    public function classSchedules()
     {
-        return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
-            'role' => 'member', // Default role adalah member
-            'membership_package_id' => \App\Models\MembershipPackage::inRandomOrder()->first()->id, // Contoh
-            'remember_token' => Str::random(10),
-        ];
+        return $this->hasMany(ClassSchedule::class);
     }
 }
 ```
--   `definition()`: Mendefinisikan atribut-atribut dari model `User` dengan data palsu (`fake()`).
 
-**Contoh Seeder (`UserSeeder.php`):**
+---
+
+## 6. Database & Migrations
+
+Migrations berfungsi seperti sistem kontrol versi (version control) untuk database Anda. Mereka memungkinkan tim untuk mendefinisikan dan membagikan skema database aplikasi.
+
+-   **Lokasi Migrations**: `database/migrations/`
+-   **Perintah Artisan**:
+    -   `php artisan migrate`: Menjalankan semua migrasi yang belum dijalankan.
+    -   `php artisan make:migration create_nama_tabel_table`: Membuat file migrasi baru.
+
+### Contoh Migrasi: `create_trainers_table.php`
+
+File ini mendefinisikan struktur tabel `trainers`.
+
 ```php
-// database/seeders/UserSeeder.php
-
-namespace Database\Seeders;
-
-use App\Models\User;
-use Illuminate\Database\Seeder;
-
-class UserSeeder extends Seeder
+public function up(): void
 {
+    Schema::create('trainers', function (Blueprint $table) {
+        $table->id(); // Primary key auto-increment
+        $table->string('name');
+        $table->string('specialization');
+        $table->json('certifications'); // Kolom untuk menyimpan data JSON
+        $table->text('bio');
+        $table->string('image')->nullable(); // Kolom boleh kosong
+        $table->boolean('is_active')->default(true); // Default value true
+        $table->timestamps(); // Membuat kolom created_at dan updated_at
+        $table->softDeletes(); // Membuat kolom deleted_at untuk soft delete
+    });
+}
+```
+
+---
+
+## 7. Eloquent Relationships
+
+Eloquent memungkinkan Anda untuk mendefinisikan relasi antar model, membuat query menjadi lebih mudah dan intuitif.
+
+### One-to-Many (Satu ke Banyak)
+
+Satu `Trainer` dapat memiliki banyak `ClassSchedule`.
+
+-   **Di Model `Trainer.php`:**
+    ```php
+    public function classSchedules()
+    {
+        return $this->hasMany(ClassSchedule::class);
+    }
+    ```
+
+### Many-to-One (Banyak ke Satu / `belongsTo`)
+
+Satu `ClassSchedule` dimiliki oleh satu `Trainer`.
+
+-   **Di Model `ClassSchedule.php`:**
+    ```php
+    public function trainer(): BelongsTo
+    {
+        return $this->belongsTo(Trainer::class);
+    }
+    ```
+-   **Penggunaan**:
+    ```php
+    // Mengambil jadwal beserta data trainernya dalam satu query (Eager Loading)
+    $schedule = ClassSchedule::with('trainer')->find(1);
+    echo $schedule->trainer->name;
+    ```
+
+---
+
+## 8. Database Seeding
+
+Seeder digunakan untuk mengisi database dengan data awal atau data dummy. Ini sangat penting untuk proses development dan testing.
+
+-   **Lokasi Seeder**: `database/seeders/`
+-   **File Utama**: `DatabaseSeeder.php` adalah file utama yang akan dieksekusi. File ini memanggil seeder-seeder lain.
+    ```php
+    // Di DatabaseSeeder.php
     public function run(): void
     {
-        // Membuat 10 user palsu menggunakan factory
-        User::factory(10)->create();
+        $this->call([
+            UserSeeder::class,
+            TrainerSeeder::class,
+            ClassScheduleSeeder::class,
+            // ... seeder lainnya
+        ]);
     }
+    ```
+-   **Perintah Artisan**: `php artisan db:seed`
+
+### Contoh Seeder: `TrainerSeeder.php`
+
+```php
+// Di TrainerSeeder.php
+public function run(): void
+{
+    Trainer::create([
+        'name' => 'Michael Chen',
+        'specialization' => 'Strength & Conditioning',
+        'certifications' => ['NSCA-CPT', 'ACE Certified'],
+        // ... data lainnya
+    ]);
+    // ... data trainer lainnya
 }
 ```
-
-Untuk menjalankan seeder, gunakan perintah: `php artisan db:seed` atau `php artisan db:seed --class=UserSeeder`.
 
 ---
 
 ## 9. Pagination
 
-Pagination sangat penting saat menampilkan data dalam jumlah besar agar halaman tidak lambat. Laravel membuat ini sangat mudah.
+Laravel menyediakan cara yang sangat mudah untuk membagi kumpulan data yang besar menjadi beberapa halaman.
 
-**Di Controller:**
+1.  **Di Controller**: Gunakan method `paginate()` daripada `get()`.
 
-Ganti method `get()` atau `all()` dengan `paginate()`.
+    ```php
+    // Di Admin/TrainerController.php
+    public function index()
+    {
+        // Mengambil data trainer, 9 data per halaman
+        $trainers = Trainer::latest()->paginate(9);
+        return view('admin.trainers.index', compact('trainers'));
+    }
+    ```
 
-```php
-// app/Http/Controllers/Admin/MembersController.php (Contoh)
-
-public function index()
-{
-    // Ambil semua user dengan role 'member' dan tampilkan 15 per halaman
-    $members = User::where('role', 'member')->paginate(15);
-
-    return view('admin.members.index', ['members' => $members]);
-}
-```
-
-**Di View Blade:**
-
-Untuk menampilkan link pagination (e.g., "1, 2, 3, Next"), cukup tambahkan ini di bawah perulangan data Anda.
-
-```blade
-{{-- resources/views/admin/members/index.blade.php --}}
-
-<table>
-    {{-- THeader --}}
-    <thead>
-        <tr>
-            <th>Nama</th>
-            <th>Email</th>
-        </tr>
-    </thead>
-    {{-- TBody --}}
-    <tbody>
-        @foreach($members as $member)
-            <tr>
-                <td>{{ $member->name }}</td>
-                <td>{{ $member->email }}</td>
-            </tr>
-        @endforeach
-    </tbody>
-</table>
-
-{{-- Menampilkan link pagination --}}
-<div class="mt-4">
-    {{ $members->links() }}
-</div>
-```
-Laravel akan otomatis menghasilkan HTML untuk navigasi halaman berdasarkan data `$members`.
+2.  **Di View (Blade)**: Tampilkan link navigasi paginasi dengan method `links()`.
+    ```blade
+    {{-- Di admin/trainers/index.blade.php --}}
+    <div class="card-body">
+        {{-- ... loop untuk menampilkan data trainer ... --}}
+    </div>
+    <div class="card-footer">
+        {{ $trainers->links() }}
+    </div>
+    ```
 
 ---
-## Kesimpulan
 
-Panduan ini mencakup dasar-dasar dan konsep inti dari proyek Laravel "Grit Fitness" Anda. Dengan pemahaman ini, Anda seharusnya dapat menavigasi codebase, memperbaiki bug, dan menambahkan fitur baru dengan lebih percaya diri. Selalu rujuk ke [Dokumentasi Resmi Laravel](https://laravel.com/docs) untuk penjelasan yang lebih mendalam.
+## 10. Logika Alur Aplikasi
+
+Memahami alur dari sebuah request sangat penting.
+
+1.  **Routing (`routes/web.php`)**
+    URL yang diakses pengguna pertama kali dicocokkan di file ini. Rute mendefinisikan Controller dan method mana yang akan menangani request tersebut. Proyek ini menggunakan **Route Grouping** secara ekstensif.
+
+    ```php
+    // Grup untuk semua rute admin
+    Route::prefix('admin')->name('admin.')->group(function () {
+        // Rute di dalam sini akan memiliki URL berawalan /admin
+        // dan nama berawalan admin.
+        // Contoh: Route::get('/dashboard', ...) -> URL: /admin/dashboard, Nama: admin.dashboard
+    });
+    ```
+
+2.  **Middleware**
+    Middleware adalah "filter" yang dijalankan sebelum request mencapai Controller. Ini digunakan untuk proteksi dan validasi.
+
+    -   `auth`: Memastikan pengguna sudah login.
+    -   `auth:admin`: Memastikan pengguna sudah login menggunakan _guard_ 'admin'.
+    -   `role:member`: Middleware kustom (`app/Http/Middleware/CheckRole.php`) yang memeriksa apakah pengguna memiliki peran 'member'.
+
+    ```php
+    // Rute ini hanya bisa diakses oleh pengguna yang login dengan guard 'admin'
+    Route::middleware('auth:admin')->group(function () {
+        Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+    });
+    ```
+
+3.  **Controller**
+    Setelah melewati middleware, request ditangani oleh method di dalam Controller. Controller berisi logika utama, berinteraksi dengan Model, dan akhirnya mengembalikan sebuah View.
+
+4.  **View**
+    Controller mengembalikan View yang sudah diisi dengan data yang diperlukan. Blade engine akan me-render HTML final yang dikirimkan ke browser pengguna.
+
+### Alur Autentikasi Ganda (User & Admin)
+
+Proyek ini memiliki dua sistem login yang terpisah:
+
+-   **Login Member**: Di-handle oleh `Auth/LoginController.php`, menggunakan guard `web` dan model `User`.
+-   **Login Admin**: Di-handle oleh `Auth/AdminLoginController.php`, menggunakan guard `admin` dan model `Admin`.
+
+Pemisahan ini memberikan lapisan keamanan yang lebih baik karena tabel dan logika untuk pengguna biasa dan administrator sepenuhnya terisolasi.
+
+```
+
+Saya akan menulis file ini sekarang.
+```
