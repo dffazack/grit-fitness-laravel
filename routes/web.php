@@ -62,7 +62,6 @@ Route::middleware(['auth', 'role:member'])->prefix('member')->name('member.')->g
     Route::get('/dashboard', [MemberDashboardController::class, 'index'])->name('dashboard');
     Route::get('/profile', [MemberProfileController::class, 'index'])->name('profile');
     Route::post('/profile/update', [MemberProfileController::class, 'update'])->name('profile.update');
->>>>>>>>> Temporary merge branch 2
 
     // Payment (Guest harus bisa akses ini)
     Route::get('/payment', [MemberPaymentController::class, 'index'])
