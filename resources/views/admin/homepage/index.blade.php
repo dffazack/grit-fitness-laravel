@@ -17,7 +17,7 @@
                     <h5 class="card-title-custom">Hero Banner</h5>
                     <p class="text-muted mb-0 small">Headline, subheadline, dan gambar utama di halaman depan.</p>
                 </div>
-                <a href="{{ route('admin.homepage.edit') }}#hero" class="btn btn-outline-primary">
+                <a href="{{ route('admin.masterdata.homepage.edit') }}#hero" class="btn btn-outline-primary">
                     <i class="bi bi-pencil-fill me-1"></i> Edit Banner
                 </a>
             </div>
@@ -30,7 +30,7 @@
                     <h5 class="card-title-custom">Features & Benefits</h5>
                     <p class="text-muted mb-0 small">4 poin keunggulan (misal: Expert Trainers, Modern Equipment).</p>
                 </div>
-                <a href="{{ route('admin.homepage.edit') }}#benefits" class="btn btn-outline-primary">
+                <a href="{{ route('admin.masterdata.homepage.edit') }}#benefits" class="btn btn-outline-primary">
                     <i class="bi bi-pencil-fill me-1"></i> Edit Features
                 </a>
             </div>
@@ -43,7 +43,7 @@
                     <h5 class="card-title-custom">Statistics</h5>
                     <p class="text-muted mb-0 small">4 poin statistik (misal: Member Aktif, Tahun Berdiri).</p>
                 </div>
-                <a href="{{ route('admin.homepage.edit') }}#stats" class="btn btn-outline-primary">
+                <a href="{{ route('admin.masterdata.homepage.edit') }}#stats" class="btn btn-outline-primary">
                     <i class="bi bi-pencil-fill me-1"></i> Edit Stats
                 </a>
             </div>
@@ -56,7 +56,7 @@
                     <h5 class="card-title-custom">Testimonials</h5>
                     <p class="text-muted mb-0 small">3 testimoni dari member.</p>
                 </div>
-                <a href="{{ route('admin.homepage.edit') }}#testimonials" class="btn btn-outline-primary">
+                <a href="{{ route('admin.masterdata.homepage.edit') }}#testimonials" class="btn btn-outline-primary">
                     <i class="bi bi-pencil-fill me-1"></i> Edit Testimonials
                 </a>
             </div>

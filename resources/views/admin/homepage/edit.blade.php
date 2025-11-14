@@ -8,7 +8,7 @@
             <h1 class="h3 fw-bold" style="color: var(--admin-primary);">Edit Homepage Content</h1>
             <p class="text-muted">Kelola konten homepage secara real-time</p>
         </div>
-        <a href="{{ route('admin.homepage.index') }}" class="btn btn-outline-primary">
+        <a href="{{ route('admin.masterdata.homepage.index') }}" class="btn btn-outline-primary">
             <i class="bi bi-arrow-left me-1"></i>
             Kembali
         </a>
@@ -54,7 +54,7 @@
                 <div class="card-header">
                     <h5 class="card-title-custom">Edit Hero Section</h5>
                 </div>
-                <form action="{{ route('admin.homepage.hero') }}" method="POST">
+                <form action="{{ route('admin.masterdata.homepage.hero') }}" method="POST">
                     <div class="card-body">
                         @csrf
                         @method('PUT')
@@ -106,7 +106,7 @@
                 <div class="card-header">
                     <h5 class="card-title-custom">Edit Statistics Section</h5>
                 </div>
-                <form action="{{ route('admin.homepage.stats') }}" method="POST">
+                <form action="{{ route('admin.masterdata.homepage.stats') }}" method="POST">
                     <div class="card-body">
                         @csrf
                         @method('PUT')
@@ -149,7 +149,7 @@
                 <div class="card-header">
                     <h5 class="card-title-custom">Edit Benefits Section</h5>
                 </div>
-                <form action="{{ route('admin.homepage.benefits') }}" method="POST">
+                <form action="{{ route('admin.masterdata.homepage.benefits') }}" method="POST">
                     <div class="card-body">
                         @csrf
                         @method('PUT')
@@ -221,7 +221,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="card-header">
                     <h5 class="card-title-custom">Edit Testimonials Section</h5>
                 </div>
-                <form action="{{ route('admin.homepage.testimonials') }}" method="POST">
+                <form action="{{ route('admin.masterdata.homepage.testimonials') }}" method="POST">
                     <div class="card-body">
                         @csrf
                         @method('PUT')
