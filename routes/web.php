@@ -53,7 +53,7 @@ Route::post('logout', [LoginController::class, 'logout'])->name('logout')->middl
 | Member Routes
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'role:member'])->prefix('member')->name('member.')->group(function () {
+Route::middleware(['auth', 'role:member', \App\Http\Middleware\CheckMembershipStatus::class])->prefix('member')->name('member.')->group(function () {
     Route::get('/dashboard', [MemberDashboardController::class, 'index'])->name('dashboard');
     Route::get('/profile', [MemberProfileController::class, 'index'])->name('profile');
     Route::post('/profile/update', [MemberProfileController::class, 'update'])->name('profile.update');
@@ -102,25 +102,28 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
     // Memberships
     Route::resource('memberships', MembershipPackageController::class);
     
-    // Trainers
-    Route::resource('trainers', AdminTrainerController::class)->middleware(\App\Http\Middleware\RejectLargeUploads::class);
+    // Master Data
+    Route::prefix('masterdata')->name('masterdata.')->group(function () {
+        // Trainers
+        Route::resource('trainers', AdminTrainerController::class)->middleware(\App\Http\Middleware\RejectLargeUploads::class);
+        
+        // Notifications
+        Route::post('notifications/{notification}/toggle', [AdminNotificationController::class, 'toggleStatus'])->name('notifications.toggle');
+        Route::resource('notifications', AdminNotificationController::class);
+        
+        // Homepage Management
+        Route::get('homepage', [AdminHomepageController::class, 'index'])->name('homepage.index');
+        Route::get('homepage/edit', [AdminHomepageController::class, 'edit'])->name('homepage.edit');
+        Route::put('homepage/hero', [AdminHomepageController::class, 'updateHero'])->name('homepage.hero');
+        Route::put('homepage/stats', [AdminHomepageController::class, 'updateStats'])->name('homepage.stats');
+        Route::put('homepage/benefits', [AdminHomepageController::class, 'updateBenefits'])->name('homepage.benefits');
+        Route::put('homepage/testimonials', [AdminHomepageController::class, 'updateTestimonials'])->name('homepage.testimonials');
+    });
     
     // Payments
     Route::get('payments', [AdminPaymentController::class, 'index'])->name('payments.index');
     Route::post('payments/approve/{transaction}', [AdminPaymentController::class, 'approve'])->name('payments.approve');
     Route::post('payments/reject/{transaction}', [AdminPaymentController::class, 'reject'])->name('payments.reject');
-    
-    // Notifications
-    Route::post('notifications/{notification}/toggle', [AdminNotificationController::class, 'toggleStatus'])->name('notifications.toggle');
-    Route::resource('notifications', AdminNotificationController::class);
-    
-    // Homepage Management
-    Route::get('homepage', [AdminHomepageController::class, 'index'])->name('homepage.index');
-    Route::get('homepage/edit', [AdminHomepageController::class, 'edit'])->name('homepage.edit');
-    Route::put('homepage/hero', [AdminHomepageController::class, 'updateHero'])->name('homepage.hero');
-    Route::put('homepage/stats', [AdminHomepageController::class, 'updateStats'])->name('homepage.stats');
-    Route::put('homepage/benefits', [AdminHomepageController::class, 'updateBenefits'])->name('homepage.benefits');
-    Route::put('homepage/testimonials', [AdminHomepageController::class, 'updateTestimonials'])->name('homepage.testimonials');
     
     // Logout
     Route::post('logout', [AdminLoginController::class, 'logout'])->name('logout');

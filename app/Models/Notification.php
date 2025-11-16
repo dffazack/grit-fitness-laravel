@@ -13,9 +13,9 @@ class Notification extends Model
      * Tipe notifikasi untuk dropdown.
      */
     public const TYPES = [
-        'Promo',
-        'Event',
-        'Info'
+        'promo',
+        'event',
+        'announcement'
     ];
 
     /**

@@ -33,8 +33,7 @@ class FacilityController extends Controller
 
         // Handle image upload
         if ($request->hasFile('image')) {
-            $filename = time() . '.' . $request->image->extension();
-            $path = $request->file('image')->storeAs('trainers', $filename, 'public');
+            $path = $request->file('image')->store('facilities', 'public');
             $validated['image'] = $path;
         }
 

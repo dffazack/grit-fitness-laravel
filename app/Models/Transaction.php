@@ -13,7 +13,7 @@ class Transaction extends Model
     protected $fillable = [
         'user_id',
         'transaction_code',
-        'package', // <-- Kunci relasi (string)
+        'membership_package_id',
         'amount',
         'proof_url',
         'status',
@@ -38,21 +38,10 @@ class Transaction extends Model
         return $this->belongsTo(User::class, 'approved_by');
     }
 
-    // ==============================================================
-    //  TAMBAHKAN FUNGSI INI (INI UNTUK FIX ERROR DI CONTROLLER)
-    // ==============================================================
-    /**
-     * Mendapatkan paket membership yang dibeli dalam transaksi ini.
-     * Relasi ini mencocokkan kolom string 'package' di tabel 'transactions'
-     * dengan kolom string 'name' di tabel 'membership_packages'.
-     */
-    public function membership(): BelongsTo
+    public function membershipPackage(): BelongsTo
     {
-        // Pastikan nama modelnya 'MembershipPackage'
-        return $this->belongsTo(MembershipPackage::class, 'package', 'name');
+        return $this->belongsTo(MembershipPackage::class);
     }
-    // ==============================================================
-
 
     // Scopes
     public function scopePending($query)
@@ -112,4 +101,3 @@ class Transaction extends Model
         return $this->status === 'rejected';
     }
 }
-

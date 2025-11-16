@@ -11,7 +11,7 @@ class TrainerController extends Controller
     {
         $trainers = Trainer::with(['classSchedules'])
             ->where('is_active', true)
-            ->orderBy('experience_years', 'desc')
+            ->orderBy('name', 'asc')
             ->get();
         
         return view('trainers', compact('trainers'));

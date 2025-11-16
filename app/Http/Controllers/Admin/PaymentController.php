@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Transaction;
 use App\Models\User; // Pastikan ini ada
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class PaymentController extends Controller
 {
@@ -17,7 +19,7 @@ class PaymentController extends Controller
     {
         // Modifikasi query: Hanya ambil yang statusnya 'pending'
         $query = Transaction::where('status', 'pending')
-                            ->with(['user', 'membership']); // Muat relasi user & membership
+                            ->with(['user', 'membershipPackage']); // Muat relasi user & membership
 
         // Logika filter (opsional, tapi bagus untuk masa depan)
         if ($request->filled('search')) {
@@ -37,27 +39,36 @@ class PaymentController extends Controller
      */
     public function approve(Transaction $transaction)
     {
-        // 1. Ubah status transaksi
-        $transaction->update([
-            'status' => 'approved',
-            'approved_at' => now(),
-            'approved_by' => auth('admin')->id(), // Catat siapa admin yang approve
-        ]);
-
-        // 2. Perbarui status member di tabel 'users'
-        $user = $transaction->user;
-        if ($user && $transaction->membership) {
-            $duration = $transaction->membership->duration_months;
-            
-            $user->update([
-                'membership_status' => 'active',
-                'membership_package' => $transaction->package,
-                // Hitung tanggal kedaluwarsa dari SEKARANG
-                'membership_expiry' => now()->addMonths($duration), 
+        DB::beginTransaction();
+        try {
+            // 1. Ubah status transaksi
+            $transaction->update([
+                'status' => 'approved',
+                'approved_at' => now(),
+                'approved_by' => auth('admin')->id(), // Catat siapa admin yang approve
             ]);
-        }
 
-        return back()->with('success', 'Pembayaran berhasil disetujui.');
+            // 2. Perbarui status member di tabel 'users'
+            $user = $transaction->user;
+            if ($user && $transaction->membershipPackage) {
+                $duration = $transaction->membershipPackage->duration_months;
+                
+                $user->update([
+                    'membership_status' => 'active',
+                    'membership_package_id' => $transaction->membership_package_id,
+                    // Hitung tanggal kedaluwarsa dari SEKARANG
+                    'membership_expiry' => now()->addMonths($duration), 
+                ]);
+            }
+            
+            DB::commit();
+
+            return back()->with('success', 'Pembayaran berhasil disetujui.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Payment approval failed: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan saat menyetujui pembayaran. Silakan coba lagi.');
+        }
     }
 
     /**

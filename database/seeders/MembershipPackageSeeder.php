@@ -82,7 +82,7 @@ class MembershipPackageSeeder extends Seeder
             // REGULAR PACKAGES
             [
                 'type' => 'regular',
-                'name' => '1 Bulan',
+                'name' => 'basic',
                 'price' => 325000,
                 'duration_months' => 1,
                 'features' => [
@@ -99,7 +99,7 @@ class MembershipPackageSeeder extends Seeder
             ],
             [
                 'type' => 'regular',
-                'name' => '3 Bulan',
+                'name' => 'premium',
                 'price' => 877500,
                 'duration_months' => 3,
                 'features' => [
@@ -117,7 +117,7 @@ class MembershipPackageSeeder extends Seeder
             ],
             [
                 'type' => 'regular',
-                'name' => '6 Bulan',
+                'name' => 'vip',
                 'price' => 1657500,
                 'duration_months' => 6,
                 'features' => [

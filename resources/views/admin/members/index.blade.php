@@ -10,6 +10,13 @@
         <p class="text-muted">Kelola operasional gym dengan mudah dan efisien</p>
     </div>
 
+    @if (session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="card-title-custom">Manajemen Member</h5>
@@ -47,7 +54,7 @@
                             <tr>
                                 <td><strong>{{ $member->name }}</strong></td>
                                 <td>{{ $member->email }}</td>
-                                <td>{{ $member->membership->name ?? 'N/A' }}</td>
+                                <td>{{ $member->membershipPackage->name ?? 'N/A' }}</td>
                                 <td>
                                     {{-- Menggunakan badge kustom dari CSS --}}
                                     @if($member->membership_status == 'active')
@@ -131,7 +138,7 @@
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                                 <span class="text-muted">Paket</span>
-                                <span class="fw-semibold">{{ $member->membership->name ?? 'N/A' }}</span>
+                                <span class="fw-semibold">{{ $member->membershipPackage->name ?? 'N/A' }}</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                                 <span class="text-muted">Bergabung</span>
@@ -154,7 +161,7 @@
                         <div style="max-height: 150px; overflow-y: auto;">
                             @forelse($member->transactions as $tx)
                                 <div class="d-flex justify-content-between p-2 border-bottom">
-                                    <small>{{ $tx->package ?? 'N/A' }} ({{ $tx->created_at->format('d M Y') }})</small>
+                                    <small>{{ $tx->membershipPackage->name ?? 'N/A' }} ({{ $tx->created_at->format('d M Y') }})</small>
                                     <small class="fw-semibold">{{ $tx->getFormattedAmount() }}</small>
                                 </div>
                             @empty

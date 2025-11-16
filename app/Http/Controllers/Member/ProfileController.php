@@ -9,11 +9,6 @@ use Illuminate\Support\Facades\Hash;
 
 class ProfileController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-    
     public function index()
     {
         $user = Auth::user();
@@ -49,4 +44,3 @@ class ProfileController extends Controller
         return back()->with('success', 'Profil berhasil diperbarui');
     }
 }
-

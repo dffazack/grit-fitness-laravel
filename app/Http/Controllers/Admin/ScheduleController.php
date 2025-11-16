@@ -117,7 +117,13 @@ class ScheduleController extends Controller
 
     public function destroy($id)
     {
-        $schedule = ClassSchedule::findOrFail($id);
+        $schedule = ClassSchedule::withCount('bookings')->findOrFail($id);
+
+        if ($schedule->bookings_count > 0) {
+            return redirect()->route('admin.schedules.index')
+                ->with('error', 'Jadwal tidak dapat dihapus karena masih ada booking.');
+        }
+
         $schedule->delete();
 
         return redirect()->route('admin.schedules.index')

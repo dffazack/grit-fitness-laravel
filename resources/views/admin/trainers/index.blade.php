@@ -22,6 +22,13 @@
         </div>
     @endif
 
+    @if (session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     {{-- Menampilkan error upload ketika handler fallback menggunakan query param --}}
     @if(request()->query('upload_error'))
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -83,7 +90,7 @@
                                 <i class="bi bi-pencil-fill"></i> Edit
                             </button>
                             
-                            <form action="{{ route('admin.trainers.destroy', $trainer->id) }}" method="POST" class="d-inline-block w-100" onsubmit="return confirm('Anda yakin ingin menghapus trainer ini?');">
+                            <form action="{{ route('admin.masterdata.trainers.destroy', $trainer->id) }}" method="POST" class="d-inline-block w-100" onsubmit="return confirm('Anda yakin ingin menghapus trainer ini?');">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-sm btn-danger w-100">
@@ -119,7 +126,7 @@
     <div class="modal fade" id="addTrainerModal" tabindex="-1" aria-labelledby="addTrainerModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content" style="border-radius: 12px;">
-                <form action="{{ route('admin.trainers.store') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('admin.masterdata.trainers.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-header border-0">
                         <h5 class="modal-title" id="addTrainerModalLabel">Tambah Trainer Baru</h5>
@@ -203,7 +210,7 @@
     <div class="modal fade" id="editModal-{{ $trainer->id }}" tabindex="-1" aria-labelledby="editModalLabel-{{ $trainer->id }}" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content" style="border-radius: 12px;">
-                <form id="editForm-{{ $trainer->id }}" action="{{ route('admin.trainers.update', $trainer->id) }}" method="POST" enctype="multipart/form-data">
+                <form id="editForm-{{ $trainer->id }}" action="{{ route('admin.masterdata.trainers.update', $trainer->id) }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
                     <div class="modal-header border-0">

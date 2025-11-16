@@ -51,7 +51,7 @@
                                class="nav-link text-white ps-4 {{ request()->routeIs('admin.masterdata.trainers.*') ? 'bg-white bg-opacity-10 rounded' : '' }}">
                                 <i class="bi bi-award me-2"></i> Trainers
                             </a>
-                            <a href="{{ route('admin.masterdata.homepage.index') }}" 
+                            <a href="{{ route('admin.masterdata.homepage.edit') }}" 
                                class="nav-link text-white ps-4 {{ request()->routeIs('admin.masterdata.homepage.*') ? 'bg-white bg-opacity-10 rounded' : '' }}">
                                 <i class="bi bi-megaphone me-2"></i> Homepage
                             </a>

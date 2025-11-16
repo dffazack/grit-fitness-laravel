@@ -11,7 +11,7 @@ class HomepageController extends Controller
     /**
      * Menampilkan halaman ringkasan (sesuai desain).
      */
-    public function index()$sche
+    public function index()
     {
         // Method ini hanya menampilkan view ringkasan
         return view('admin.homepage.index');
@@ -73,10 +73,10 @@ class HomepageController extends Controller
 
         HomepageContent::updateOrCreate(
             ['section' => 'hero'],
-            ['content' => json_encode($data)]
+            ['content' => $data]
         );
 
-        return redirect()->route('admin.homepage.edit')->with('success', 'Hero section updated successfully!')->withFragment('hero');
+        return redirect()->route('admin.masterdata.homepage.edit')->with('success', 'Hero section updated successfully!')->withFragment('hero');
     }
 
     // Method untuk handle update 'stats'
@@ -90,10 +90,10 @@ class HomepageController extends Controller
 
         HomepageContent::updateOrCreate(
             ['section' => 'stats'],
-            ['content' => json_encode($data['stats'])]
+            ['content' => $data['stats']]
         );
 
-        return redirect()->route('admin.homepage.edit')->with('success', 'Statistics section updated successfully!')->withFragment('stats');
+        return redirect()->route('admin.masterdata.homepage.edit')->with('success', 'Statistics section updated successfully!')->withFragment('stats');
     }
 
     // Method untuk handle update 'benefits'
@@ -108,10 +108,10 @@ class HomepageController extends Controller
 
         HomepageContent::updateOrCreate(
             ['section' => 'benefits'],
-            ['content' => json_encode($data['benefits'])]
+            ['content' => $data['benefits']]
         );
 
-        return redirect()->route('admin.homepage.edit')->with('success', 'Benefits section updated successfully!')->withFragment('benefits');
+        return redirect()->route('admin.masterdata.homepage.edit')->with('success', 'Benefits section updated successfully!')->withFragment('benefits');
     }
 
     // Method untuk handle update 'testimonials'
@@ -127,9 +127,9 @@ class HomepageController extends Controller
 
         HomepageContent::updateOrCreate(
             ['section' => 'testimonials'],
-            ['content' => json_encode($data['testimonials'])]
+            ['content' => $data['testimonials']]
         );
 
-        return redirect()->route('admin.homepage.edit')->with('success', 'Testimonials section updated successfully!')->withFragment('testimonials');
+        return redirect()->route('admin.masterdata.homepage.edit')->with('success', 'Testimonials section updated successfully!')->withFragment('testimonials');
     }
 }

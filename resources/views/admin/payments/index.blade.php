@@ -47,10 +47,10 @@
                                     <small class="text-muted">{{ $tx->user->email ?? '-' }}</small>
                                 </td>
                                 <td>
-                                    {{ $tx->membership->name ?? $tx->package }}
-                                    @if($tx->membership)
+                                    {{ $tx->membershipPackage->name ?? '' }}
+                                    @if($tx->membershipPackage)
                                         <br>
-                                        <small class="text-muted">{{ $tx->membership->duration_months }} Bulan</small>
+                                        <small class="text-muted">{{ $tx->membershipPackage->duration_months }} Bulan</small>
                                     @endif
                                 </td>
                                 <td>{{ $tx->getFormattedAmount() }}</td>
@@ -103,7 +103,7 @@
                         </li>
                         <li class="list-group-item d-flex justify-content-between px-0">
                             <span class="text-muted">Paket</span>
-                            <span class="fw-semibold">{{ $tx->membership->name ?? $tx->package }}</span>
+                            <span class="fw-semibold">{{ $tx->membershipPackage->name ?? '' }}</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between px-0">
                             <span class="text-muted">Jumlah</span>

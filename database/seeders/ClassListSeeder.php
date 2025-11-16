@@ -4,8 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\ClassList;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 
 class ClassListSeeder extends Seeder
 {
@@ -24,14 +22,13 @@ class ClassListSeeder extends Seeder
         // 2. Hapus duplikat jika ada
         $uniqueClassNames = array_unique($classNames);
 
-        // 3. Matikan foreign key check, truncate, lalu nyalakan lagi
-        Schema::disableForeignKeyConstraints();
-        DB::table('class_lists')->truncate();
-        Schema::enableForeignKeyConstraints();
-
-        // 4. Looping dan masukkan data ke tabel
+        // 3. Prepare data for upsert
+        $data = [];
         foreach ($uniqueClassNames as $className) {
-            ClassList::create(['name' => $className]);
+            $data[] = ['name' => $className];
         }
+
+        // 4. Use upsert to efficiently insert or update records
+        ClassList::upsert($data, ['name'], ['name']);
     }
 }

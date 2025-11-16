@@ -35,8 +35,7 @@ class TrainerController extends Controller
 
         // Simpan gambar jika ada
         if ($request->hasFile('image')) {
-            $filename = time() . '.' . $request->image->extension();
-            $path = $request->file('image')->storeAs('trainers', $filename, 'public');
+            $path = $request->file('image')->store('trainers', 'public');
             $validated['image'] = $path;
         }
 
@@ -93,8 +92,7 @@ class TrainerController extends Controller
                 Storage::disk('public')->delete($trainer->image);
             }
 
-            $filename = time() . '.' . $request->image->extension();
-            $path = $request->file('image')->storeAs('trainers', $filename, 'public');
+            $path = $request->file('image')->store('trainers', 'public');
             $validatedData['image'] = $path;
         }
 
@@ -106,7 +104,12 @@ class TrainerController extends Controller
 
     public function destroy($id)
     {
-        $trainer = Trainer::findOrFail($id);
+        $trainer = Trainer::withCount('classSchedules')->findOrFail($id);
+
+        if ($trainer->class_schedules_count > 0) {
+            return redirect()->route('admin.trainers.index')
+                ->with('error', 'Trainer tidak dapat dihapus karena masih memiliki jadwal kelas.');
+        }
 
         if ($trainer->image && Storage::disk('public')->exists($trainer->image)) {
             Storage::disk('public')->delete($trainer->image);

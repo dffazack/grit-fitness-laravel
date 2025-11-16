@@ -22,23 +22,24 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {{ request()->routeIs('admin.trainers.*') ? 'active' : '' }}"
-               href="{{ route('admin.trainers.index') }}"
-               style="{{ request()->routeIs('admin.trainers.*') ? 'color: var(--admin-primary); border-bottom: 2px solid var(--admin-primary);' : 'color: var(--admin-text-light);' }}">
+            <a class="nav-link {{ request()->routeIs('admin.masterdata.trainers.*') ? 'active' : '' }}"
+               href="{{ route('admin.masterdata.trainers.index') }}"
+               style="{{ request()->routeIs('admin.masterdata.trainers.*') ? 'color: var(--admin-primary); border-bottom: 2px solid var(--admin-primary);' : 'color: var(--admin-text-light);' }}">
                 Trainers
             </a>
         </li>
+        {{-- Special case for homepage, it only has an edit page --}}
         <li class="nav-item">
-            <a class="nav-link {{ request()->routeIs('admin.homepage.*') ? 'active' : '' }}"
-               href="{{ route('admin.homepage.index') }}"
-               style="{{ request()->routeIs('admin.homepage.*') ? 'color: var(--admin-primary); border-bottom: 2px solid var(--admin-primary);' : 'color: var(--admin-text-light);' }}">
+            <a class="nav-link {{ request()->routeIs('admin.masterdata.homepage.*') ? 'active' : '' }}"
+               href="{{ route('admin.masterdata.homepage.edit') }}"
+               style="{{ request()->routeIs('admin.masterdata.homepage.*') ? 'color: var(--admin-primary); border-bottom: 2px solid var(--admin-primary);' : 'color: var(--admin-text-light);' }}">
                 Homepage
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {{ request()->routeIs('admin.notifications.*') ? 'active' : '' }}"
-               href="{{ route('admin.notifications.index') }}" 
-               style="{{ request()->routeIs('admin.notifications.*') ? 'color: var(--admin-primary); border-bottom: 2px solid var(--admin-primary);' : 'color: var(--admin-text-light);' }}">
+            <a class="nav-link {{ request()->routeIs('admin.masterdata.notifications.*') ? 'active' : '' }}"
+               href="{{ route('admin.masterdata.notifications.index') }}" 
+               style="{{ request()->routeIs('admin.masterdata.notifications.*') ? 'color: var(--admin-primary); border-bottom: 2px solid var(--admin-primary);' : 'color: var(--admin-text-light);' }}">
                 Notifikasi
             </a>
         </li>

@@ -26,6 +26,11 @@ class LoginController extends Controller
             $user = Auth::user();
             
             // Check membership status for members
+            if ($user->hasActiveMembership()) {
+                return redirect()->route('member.dashboard')
+                    ->with('success', 'Selamat datang kembali, ' . $user->name . '!');
+            }
+            
             if ($user->membership_status === 'non-member') {
                 return redirect()->route('membership')
                     ->with('info', 'Silakan pilih paket membership untuk melanjutkan.');
@@ -36,9 +41,8 @@ class LoginController extends Controller
                     ->with('info', 'Pembayaran Anda sedang diproses. Kami akan menghubungi Anda segera.');
             }
             
-            // Default redirect for active members
-            return redirect()->route('member.dashboard')
-                ->with('success', 'Selamat datang kembali, ' . $user->name . '!');
+            // Default redirect for other cases
+            return redirect()->route('member.dashboard');
         }
         
         return back()->withErrors([

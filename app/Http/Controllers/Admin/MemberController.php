@@ -29,44 +29,11 @@ class MemberController extends Controller
         // Tambahkan with('membership') dan with('transactions')
         // 'membership' untuk info paket di tabel
         // 'transactions' untuk riwayat di modal
-        $members = $query->with(['membership', 'transactions'])
+        $members = $query->with(['membershipPackage', 'transactions', 'bookings'])
                          ->latest()
                          ->paginate(15);
         
         return view('admin.members.index', compact('members'));
-    }
-
-    public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
-
-        User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
-
-        return redirect()->route('admin.members.index')
-            ->with('success', 'Member berhasil ditambahkan');
-    }
-
-    public function update(Request $request, $id)
-    {
-        $user = User::findOrFail($id);
-
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-        ]);
-
-        $user->update($request->only('name', 'email'));
-
-        return redirect()->route('admin.members.index')
-            ->with('success', 'Member berhasil diperbarui');
     }
     
     public function show($id)
@@ -79,7 +46,13 @@ class MemberController extends Controller
     
     public function destroy($id)
     {
-        $member = User::findOrFail($id);
+        $member = User::withCount('bookings')->findOrFail($id);
+
+        if ($member->bookings_count > 0) {
+            return redirect()->route('admin.members.index')
+                ->with('error', 'Member tidak dapat dihapus karena masih memiliki booking.');
+        }
+        
         $member->delete();
         
         return redirect()->route('admin.members.index')

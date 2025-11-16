@@ -3,6 +3,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\User;
+use App\Models\MembershipPackage;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 
@@ -20,6 +21,10 @@ class UserSeeder extends Seeder
             'membership_status' => 'non-member',
         ]);
 
+        $premiumPackage = MembershipPackage::where('name', 'premium')->first();
+        $vipPackage = MembershipPackage::where('name', 'vip')->first();
+        $basicPackage = MembershipPackage::where('name', 'basic')->first();
+
         // Active Member (Premium)
         User::create([
             'name' => 'John Doe',
@@ -28,7 +33,7 @@ class UserSeeder extends Seeder
             'phone' => '+62 812 1111 2222',
             'role' => 'member',
             'membership_status' => 'active',
-            'membership_package' => 'premium',
+            'membership_package_id' => $premiumPackage->id,
             'membership_expiry' => Carbon::now()->addMonths(12),
             'joined_date' => Carbon::now(),
         ]);
@@ -41,7 +46,7 @@ class UserSeeder extends Seeder
             'phone' => '+62 813 2222 3333',
             'role' => 'member',
             'membership_status' => 'active',
-            'membership_package' => 'vip',
+            'membership_package_id' => $vipPackage->id,
             'membership_expiry' => Carbon::now()->addMonths(12),
             'joined_date' => Carbon::now()->subMonths(2),
         ]);
@@ -54,7 +59,7 @@ class UserSeeder extends Seeder
             'phone' => '+62 814 3333 4444',
             'role' => 'guest',
             'membership_status' => 'pending',
-            'membership_package' => 'basic',
+            'membership_package_id' => $basicPackage->id,
             'joined_date' => Carbon::now(),
         ]);
 

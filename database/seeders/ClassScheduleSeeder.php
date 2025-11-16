@@ -3,16 +3,19 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\ClassSchedule;
+use App\Models\Trainer;
 use Carbon\Carbon;
 
 class ClassScheduleSeeder extends Seeder
 {
     public function run(): void
     {
+        $availableTrainers = Trainer::pluck('id')->toArray();
+
         $schedules = [
             // Senin
             [
-                'name' => 'Morning Yoga Flow',
+                'custom_class_name' => 'Morning Yoga Flow',
                 'day' => 'Senin',
                 'start_time' => '06:00',
                 'end_time' => '07:00',
@@ -24,7 +27,7 @@ class ClassScheduleSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'name' => 'HIIT Bootcamp',
+                'custom_class_name' => 'HIIT Bootcamp',
                 'day' => 'Senin',
                 'start_time' => '18:00',
                 'end_time' => '19:00',
@@ -38,7 +41,7 @@ class ClassScheduleSeeder extends Seeder
             
             // Selasa
             [
-                'name' => 'Strength Training',
+                'custom_class_name' => 'Strength Training',
                 'day' => 'Selasa',
                 'start_time' => '07:00',
                 'end_time' => '08:00',
@@ -50,7 +53,7 @@ class ClassScheduleSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'name' => 'Boxing Basics',
+                'custom_class_name' => 'Boxing Basics',
                 'day' => 'Selasa',
                 'start_time' => '19:00',
                 'end_time' => '20:00',
@@ -64,7 +67,7 @@ class ClassScheduleSeeder extends Seeder
             
             // Rabu
             [
-                'name' => 'Pilates Core',
+                'custom_class_name' => 'Pilates Core',
                 'day' => 'Rabu',
                 'start_time' => '06:30',
                 'end_time' => '07:30',
@@ -76,7 +79,7 @@ class ClassScheduleSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'name' => 'Functional Training',
+                'custom_class_name' => 'Functional Training',
                 'day' => 'Rabu',
                 'start_time' => '18:30',
                 'end_time' => '19:30',
@@ -90,7 +93,7 @@ class ClassScheduleSeeder extends Seeder
             
             // Kamis
             [
-                'name' => 'Cardio Blast',
+                'custom_class_name' => 'Cardio Blast',
                 'day' => 'Kamis',
                 'start_time' => '07:00',
                 'end_time' => '08:00',
@@ -104,7 +107,7 @@ class ClassScheduleSeeder extends Seeder
             
             // Jumat
             [
-                'name' => 'Power Yoga',
+                'custom_class_name' => 'Power Yoga',
                 'day' => 'Jumat',
                 'start_time' => '06:00',
                 'end_time' => '07:00',
@@ -116,7 +119,7 @@ class ClassScheduleSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'name' => 'CrossFit Fundamentals',
+                'custom_class_name' => 'CrossFit Fundamentals',
                 'day' => 'Jumat',
                 'start_time' => '18:00',
                 'end_time' => '19:00',
@@ -130,7 +133,7 @@ class ClassScheduleSeeder extends Seeder
             
             // Sabtu
             [
-                'name' => 'Weekend Warriors',
+                'custom_class_name' => 'Weekend Warriors',
                 'day' => 'Sabtu',
                 'start_time' => '08:00',
                 'end_time' => '09:00',
@@ -142,7 +145,7 @@ class ClassScheduleSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'name' => 'Boxing & Cardio',
+                'custom_class_name' => 'Boxing & Cardio',
                 'day' => 'Sabtu',
                 'start_time' => '10:00',
                 'end_time' => '11:00',
@@ -156,7 +159,7 @@ class ClassScheduleSeeder extends Seeder
             
             // Minggu
             [
-                'name' => 'Restorative Yoga',
+                'custom_class_name' => 'Restorative Yoga',
                 'day' => 'Minggu',
                 'start_time' => '09:00',
                 'end_time' => '10:00',
@@ -169,8 +172,11 @@ class ClassScheduleSeeder extends Seeder
             ],
         ];
 
-        foreach ($schedules as $schedule) {
-            ClassSchedule::create($schedule);
-        }
+        $validSchedules = array_filter($schedules, function ($schedule) use ($availableTrainers) {
+            return in_array($schedule['trainer_id'], $availableTrainers);
+        });
+
+        // Use upsert to efficiently insert or update records
+        ClassSchedule::upsert($validSchedules, ['custom_class_name', 'day', 'start_time'], ['end_time', 'trainer_id', 'max_quota', 'quota', 'type', 'description', 'is_active']);
     }
 }
