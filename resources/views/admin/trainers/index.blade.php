@@ -36,8 +36,6 @@
         </div>
     @endif
 
-    <!-- Header "Data Trainer" dan Tombol Tambah -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
     <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4">
         <h3 class="mb-0" style="color: var(--admin-primary);">Data Trainer</h3>
         <button type="button" class="btn btn-accent" data-bs-toggle="modal" data-bs-target="#addTrainerModal">
@@ -54,9 +52,6 @@
                 <div class="card h-100 border-0 shadow-sm hover-card">
                     <div class="card-body d-flex flex-column text-center p-3 p-md-4">
                         
-                        {{-- 3. Tambahkan foto bulat (circular) di dalam card-body --}}
-                        <img src="{{ asset('storage/' . $trainer->image) }}" class="rounded-circle mx-auto" alt="{{ $trainer->name }}" 
-                             style="width: 180px; height: 180px; object-fit: cover; object-position: center top; margin-bottom: 1rem; border: 4px solid var(--admin-bg);">
                         {{-- Foto Trainer --}}
                         <img src="{{ $trainer->getImageUrl() }}" 
                              class="rounded-circle mx-auto mb-3" 
@@ -179,9 +174,9 @@
                                 $isInvalid = $errors->has('image') && old('form_type') == 'add';
                                 @endphp
                                 <input type="file" 
-                                    class="form-control {{ $isInvalid ? 'is-invalid' : '' }} image-upload-input" 
-                                    id="add_image" 
-                                    name="image" 
+                                     class="form-control {{ $isInvalid ? 'is-invalid' : '' }} image-upload-input" 
+                                     id="add_image" 
+                                     name="image" 
                                         accept=".png,.jpg">
                                     <small class="form-text text-muted">Hanya file PNG atau JPG yang diizinkan. Maksimal 2MB.</small>
 
@@ -270,45 +265,6 @@
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" role="switch" id="edit_is_active_{{ $trainer->id }}" name="is_active" value="1" {{ (old('is_active', $trainer->is_active) == 1) ? 'checked' : '' }}>
                                     <label class="form-check-label" for="edit_is_active_{{ $trainer->id }}">Status Aktif</label>
-                                <label class="form-label">Nama Lengkap</label>
-                                <input type="text" class="form-control" name="name" value="{{ old('name', $trainer->name) }}" required>
-                            </div>
-                            <div class="col-12 col-md-6">
-                                <label class="form-label">Spesialisasi</label>
-                                <input type="text" class="form-control" name="specialization" value="{{ old('specialization', $trainer->specialization) }}" required>
-                            </div>
-                            <div class="col-12 col-md-6">
-                                <label class="form-label">Email</label>
-                                <input type="email" class="form-control" name="email" value="{{ old('email', $trainer->email) }}" required>
-                            </div>
-                            <div class="col-12 col-md-6">
-                                <label class="form-label">No. Telepon</label>
-                                <input type="tel" class="form-control" name="phone" value="{{ old('phone', $trainer->phone) }}">
-                            </div>
-                            <div class="col-12 col-md-6">
-                                <label class="form-label">Pengalaman (Tahun)</label>
-                                <input type="number" class="form-control" name="experience" value="{{ old('experience', $trainer->experience) }}" min="0" required>
-                            </div>
-                            <div class="col-12 col-md-6">
-                                <label class="form-label">Jumlah Klien</label>
-                                <input type="text" class="form-control" name="clients" value="{{ old('clients', $trainer->clients) }}">
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label">Sertifikasi</label>
-                                <input type="text" class="form-control" name="certifications" value="{{ old('certifications', $trainer->certifications ? implode(', ', $trainer->certifications) : '') }}">
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label">Bio Singkat</label>
-                                <textarea class="form-control" name="bio" rows="3">{{ old('bio', $trainer->bio) }}</textarea>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label">Ganti Foto Trainer (Opsional)</label>
-                                <input type="file" class="form-control" name="image" accept="image/*">
-                            </div>
-                            <div class="col-12">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" role="switch" name="is_active" value="1" {{ (old('is_active', $trainer->is_active) == 1) ? 'checked' : '' }}>
-                                    <label class="form-check-label">Status Aktif</label>
                                 </div>
                             </div>
                         </div>
@@ -327,6 +283,7 @@
 
 @push('styles')
 <style>
+    /* Style untuk hover effect card trainer */
     .hover-card {
         transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
@@ -334,6 +291,42 @@
         transform: translateY(-5px);
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
     }
+
+    /* ===============================================================
+      FIX: MODAL FOOTER TENGGELAM DI LAYAR BESAR
+      ===============================================================
+      Kita paksa layout modal menggunakan Flexbox
+      untuk memastikan footer (tombol) selalu terlihat.
+    */
+    
+    /* 1. Batasi tinggi KESELURUHAN modal agar tidak "tumpah" dari layar */
+    .modal-dialog .modal-content {
+        max-height: 85vh;  /* 85% tinggi layar, bisa disesuaikan */
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* 2. Paksa <form> di dalam modal untuk mengisi ruang. */
+    .modal-content form {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;    /* Paksa form untuk mengisi sisa ruang */
+        min-height: 0;   /* Fix bug overflow aneh di flexbox */
+    }
+
+    /* 3. Kunci ukuran header dan footer */
+    .modal-content .modal-header,
+    .modal-content .modal-footer {
+        flex-shrink: 0; /* Jangan biarkan header/footer menyusut */
+    }
+
+    /* 4. Buat HANYA modal-body yang bisa di-scroll */
+    .modal-content .modal-body {
+        flex-grow: 1;       /* Ambil semua sisa ruang di tengah */
+        overflow-y: auto;   /* HANYA body yang bisa di-scroll */
+        min-height: 0;      /* Fix bug overflow aneh di flexbox */
+    }
+    /* =============================================================== */
 </style>
 @endpush
 
@@ -404,9 +397,7 @@
                 }
             });
         });
-    });
-</script>
-@endpush
+
         @if($errors->any())
             @if(old('form_type') == 'add')
                 var addModal = new bootstrap.Modal(document.getElementById('addTrainerModal'));
@@ -419,4 +410,3 @@
     });
 </script>
 @endpush
-{{-- Modified by: User-Interfaced Team -- }}

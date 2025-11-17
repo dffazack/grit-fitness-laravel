@@ -3,6 +3,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\User;
+use App\Models\MembershipPackage;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 
@@ -10,62 +11,83 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
+        // Get some packages to assign to users
+        $regular1Month = MembershipPackage::where('type', 'regular')->where('duration_months', 1)->first();
+        $regular6Month = MembershipPackage::where('type', 'regular')->where('duration_months', 6)->first();
+        $regular12Month = MembershipPackage::where('type', 'regular')->where('duration_months', 12)->first();
+
         // Admin Account
-        User::create([
-            'name' => 'Admin GRIT',
-            'email' => 'admin@gritfitness.com',
-            'password' => Hash::make('password'),
-            'phone' => '+62 812 3456 7890',
-            'role' => 'admin',
-            'membership_status' => 'non-member',
-        ]);
+        User::firstOrCreate(
+            ['email' => 'admin@gritfitness.com'], // Kunci unik untuk dicari
+            [
+                'name' => 'Admin GRIT',
+                'password' => Hash::make('password'),
+                'phone' => '+62 812 3456 7890',
+                'role' => 'admin',
+                'membership_status' => 'non-member',
+            ]
+        );
 
-        // Active Member (Premium)
-        User::create([
-            'name' => 'John Doe',
-            'email' => 'member@gritfitness.com',
-            'password' => Hash::make('password'),
-            'phone' => '+62 812 1111 2222',
-            'role' => 'member',
-            'membership_status' => 'active',
-            'membership_package' => 'premium',
-            'membership_expiry' => Carbon::now()->addMonths(12),
-            'joined_date' => Carbon::now(),
-        ]);
+        // Active Member (Premium -> Regular 6 Months)
+        if ($regular6Month) {
+            User::firstOrCreate(
+                ['email' => 'member@gritfitness.com'], // Kunci unik
+                [
+                    'name' => 'John Doe',
+                    'password' => Hash::make('password'),
+                    'phone' => '+62 812 1111 2222',
+                    'role' => 'member',
+                    'membership_status' => 'active',
+                    'membership_package_id' => $regular6Month->id,
+                    'membership_expiry' => Carbon::now()->addMonths(6),
+                    'joined_date' => Carbon::now(),
+                ]
+            );
+        }
 
-        // Active Member (VIP)
-        User::create([
-            'name' => 'Jane Smith',
-            'email' => 'jane@example.com',
-            'password' => Hash::make('password'),
-            'phone' => '+62 813 2222 3333',
-            'role' => 'member',
-            'membership_status' => 'active',
-            'membership_package' => 'vip',
-            'membership_expiry' => Carbon::now()->addMonths(12),
-            'joined_date' => Carbon::now()->subMonths(2),
-        ]);
+        // Active Member (VIP -> Regular 12 Months)
+        if ($regular12Month) {
+            User::firstOrCreate(
+                ['email' => 'jane@example.com'], // Kunci unik
+                [
+                    'name' => 'Jane Smith',
+                    'password' => Hash::make('password'),
+                    'phone' => '+62 813 2222 3333',
+                    'role' => 'member',
+                    'membership_status' => 'active',
+                    'membership_package_id' => $regular12Month->id,
+                    'membership_expiry' => Carbon::now()->addMonths(12),
+                    'joined_date' => Carbon::now()->subMonths(2),
+                ]
+            );
+        }
 
-        // Pending Member
-        User::create([
-            'name' => 'Bob Wilson',
-            'email' => 'bob@example.com',
-            'password' => Hash::make('password'),
-            'phone' => '+62 814 3333 4444',
-            'role' => 'guest',
-            'membership_status' => 'pending',
-            'membership_package' => 'basic',
-            'joined_date' => Carbon::now(),
-        ]);
+        // Pending Member (Basic -> Regular 1 Month)
+        if ($regular1Month) {
+            User::firstOrCreate(
+                ['email' => 'bob@example.com'], // Kunci unik
+                [
+                    'name' => 'Bob Wilson',
+                    'password' => Hash::make('password'),
+                    'phone' => '+62 814 3333 4444',
+                    'role' => 'guest',
+                    'membership_status' => 'pending',
+                    'membership_package_id' => $regular1Month->id,
+                    'joined_date' => Carbon::now(),
+                ]
+            );
+        }
 
         // Guest (Registered but not subscribed)
-        User::create([
-            'name' => 'Alice Brown',
-            'email' => 'alice@example.com',
-            'password' => Hash::make('password'),
-            'phone' => '+62 815 4444 5555',
-            'role' => 'guest',
-            'membership_status' => 'non-member',
-        ]);
+        User::firstOrCreate(
+            ['email' => 'alice@example.com'], // Kunci unik
+            [
+                'name' => 'Alice Brown',
+                'password' => Hash::make('password'),
+                'phone' => '+62 815 4444 5555',
+                'role' => 'guest',
+                'membership_status' => 'non-member',
+            ]
+        );
     }
 }

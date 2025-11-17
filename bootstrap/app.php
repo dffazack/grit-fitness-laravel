@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \App\Http\Middleware\CheckRole::class, // Tambahkan ini
             'membership' => \App\Http\Middleware\CheckMembershipStatus::class, // Tambahkan ini
         ]);
+
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->renderable(function (AuthenticationException $e, $request) {

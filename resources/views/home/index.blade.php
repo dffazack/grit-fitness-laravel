@@ -316,7 +316,6 @@
         opacity: 1;
     }
 }
-</style>
 
 /* About Section Styling */
 .bg-dark {
@@ -346,7 +345,6 @@
     }
 }
 
-/* Ensure equal card heights */
 .h-100 {
     height: 100% !important;
 }
@@ -357,4 +355,4 @@
 }
 </style>
 @endpush
-{{-- Modified by: User-Interfaced Team -- }}
+

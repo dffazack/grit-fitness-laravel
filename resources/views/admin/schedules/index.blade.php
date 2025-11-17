@@ -120,7 +120,7 @@
                         <div class="card-body p-3">
                             <div class="d-flex justify-content-between align-items-start mb-3">
                                 <div>
-                                    <h6 class="mb-1 fw-semibold">{{ $schedule->name }}</h6>
+                                    <h6 class="mb-1 fw-semibold">{{ $schedule->custom_class_name ?? $schedule->classList->name ?? 'N/A' }}</h6>
                                     <small class="text-muted">{{ $schedule->type }}</small>
                                 </div>
                                 <span class="badge {{ $schedule->bookings_count >= $schedule->max_quota ? 'bg-danger' : 'bg-success' }}">
@@ -214,13 +214,6 @@
                                 <input type="text" class="form-control @error('custom_class_name') is-invalid @enderror" id="add_custom_class_name" name="custom_class_name" value="{{ old('custom_class_name') }}" placeholder="Enter new class name">
                                 @error('custom_class_name')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
-                    <div class="modal-body p-3 p-md-4">
-                        <div class="row g-3">
-                            <div class="col-12">
-                                <label for="add_name" class="form-label">Nama Kelas</label>
-                                <input type="text" class="form-control @error('name') is-invalid @enderror" id="add_name" name="name" value="{{ old('name') }}" required>
-                                @error('name')
-                                    <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
 
@@ -347,11 +340,6 @@
                                 @error('custom_class_name')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
-                    <div class="modal-body p-3 p-md-4">
-                        <div class="row g-3">
-                            <div class="col-12">
-                                <label for="edit_name" class="form-label">Nama Kelas</label>
-                                <input type="text" class="form-control" id="edit_name" name="name" required>
                             </div>
 
                             <div class="col-12 col-md-6">
@@ -433,17 +421,13 @@
             
             // Isi semua field di form dengan data schedule
             form.querySelector('#edit_class_list_id').value = schedule.class_list_id || '';  
-            const form = document.getElementById('editScheduleForm');
-            
-            form.action = action;
-            form.querySelector('#edit_name').value = schedule.name;
             form.querySelector('#edit_day').value = schedule.day;
             form.querySelector('#edit_type').value = schedule.type;
             form.querySelector('#edit_start_time').value = schedule.start_time ? schedule.start_time.substring(0, 5) : '';
             form.querySelector('#edit_end_time').value = schedule.end_time ? schedule.end_time.substring(0, 5) : '';
             form.querySelector('#edit_trainer_id').value = schedule.trainer_id;
             form.querySelector('#edit_max_quota').value = schedule.max_quota;
-            form.querySelector('#edit_description').value = schedule.description;
+            form.querySelector('#edit_description').value = schedule.description || '';
 
             // Handle 'Other' option for edit modal
             const editClassListSelect = form.querySelector('#edit_class_list_id');
@@ -474,10 +458,6 @@
         });
 
         // --- SCRIPT UNTUK MENANGANI ERROR VALIDASI DAN AUTO-OPEN MODAL ---
-        // Jika ada error validasi di form TAMBAH, buka kembali modal-nya
-            form.querySelector('#edit_description').value = schedule.description || '';
-        });
-
         @if ($errors->any() && old('form_type') === 'add')
             const addModal = new bootstrap.Modal(document.getElementById('addScheduleModal'));
             addModal.show();
@@ -572,7 +552,3 @@
     });
 </script>
 @endpush
-    });
-</script>
-@endpush
-{{-- Modified by: User-Interfaced Team -- }}

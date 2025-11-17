@@ -62,7 +62,7 @@
                 <div class="card-header bg-white border-0 py-3">
                     <h5 class="card-title-custom mb-0">Edit Hero Section</h5>
                 </div>
-                <form action="{{ route('admin.homepage.hero') }}" method="POST">
+                <form action="{{ route('admin.homepage.hero') }}" method="POST" enctype="multipart/form-data">
                     <div class="card-body p-3 p-md-4">
                         @csrf
                         @method('PUT')
@@ -78,16 +78,29 @@
                         </div>
                         
                         <div class="mb-3">
-                            <label class="form-label">Background Image URL</label>
-                            <input type="text" name="image" class="form-control" value="{{ $hero->image ?? '' }}" placeholder="https://images.unsplash.com/photo-..." required>
+                            <label class="form-label">Current Hero Image</label>
+                            @if(isset($hero->image) && $hero->image)
+                                @php
+                                    $imageUrl = Str::startsWith($hero->image, ['http://', 'https://']) ? $hero->image : asset('storage/' . $hero->image);
+                                @endphp
+                                <img src="{{ $imageUrl }}" alt="Hero Preview" class="img-fluid rounded mb-2" style="max-height: 200px; border: 1px solid var(--admin-border);">
+                                <p class="text-muted small">Current: {{ $hero->image }}</p>
+                            @else
+                                <p class="text-muted">No image set.</p>
+                            @endif
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Image URL (Optional)</label>
+                            <input type="url" name="image_url" class="form-control" value="" placeholder="https://images.unsplash.com/photo-...">
+                            <small class="form-text text-muted">Enter a URL for the hero image. If a file is uploaded below, it will take precedence.</small>
                         </div>
                         
-                        @if(isset($hero->image) && $hero->image)
                         <div class="mb-3">
-                            <label class="form-label">Preview</label>
-                            <img src="{{ $hero->image }}" alt="Hero Preview" class="img-fluid rounded" style="max-height: 200px; border: 1px solid var(--admin-border);">
+                            <label class="form-label">Upload Image File (Optional)</label>
+                            <input type="file" name="image_file" class="form-control">
+                            <small class="form-text text-muted">Upload an image file (max 5MB). If a URL is provided above, this file will take precedence.</small>
                         </div>
-                        @endif
                     </div>
                     <div class="card-footer bg-white border-0 py-3 text-end">
                         <button type="submit" class="btn btn-accent">
@@ -108,6 +121,14 @@
                 </div>
                 <form action="{{ route('admin.homepage.stats') }}" method="POST">
                     <div class="card-body p-3 p-md-4">
+                        
+                    <div class="alert alert-warning d-flex align-items-center mt-4" role="alert">
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                            <div>
+                                 Tip: Otomatis akan ditambahkan tanda '+' di belakang nilai!
+                             </div>
+                    </div>
+
                         @csrf
                         @method('PUT')
                         
@@ -118,11 +139,22 @@
                             </div>
                             <div class="col-12 col-md-4">
                                 <label class="form-label">Value</label>
-                                <input type="text" name="stats[{{ $i }}][value]" class="form-control" value="{{ $stats[$i]->value ?? '' }}" placeholder="500+" required>
+                                <input type="number" 
+                                       name="stats[{{ $i }}][value]" 
+                                       class="form-control" 
+                                       value="{{ preg_replace('/[^0-9]/', '', $stats[$i]->value ?? '') }}" 
+                                       placeholder="500" 
+                                       min="0" 
+                                       required>
                             </div>
                             <div class="col-12 col-md-8">
                                 <label class="form-label">Label</label>
-                                <input type="text" name="stats[{{ $i }}][label]" class="form-control" value="{{ $stats[$i]->label ?? '' }}" placeholder="Member Aktif" required>
+                                <input type="text" 
+                                       name="stats[{{ $i }}][label]" 
+                                       class="form-control" 
+                                       value="{{ $stats[$i]->label ?? '' }}" 
+                                       placeholder="Member Aktif" 
+                                       required>
                             </div>
                         </div>
                         @endfor
@@ -285,4 +317,3 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 @endpush
-{{-- Modified by: User-Interfaced Team -- }}

@@ -12,6 +12,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Member\DashboardController as MemberDashboardController;
 use App\Http\Controllers\Member\ProfileController as MemberProfileController;
 use App\Http\Controllers\Member\PaymentController as MemberPaymentController;
+use App\Http\Controllers\Member\BookingController as MemberBookingController;
 // Admin Controllers
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\MemberController as AdminMemberController;
@@ -22,7 +23,6 @@ use App\Http\Controllers\TrainerController;
 use App\Http\Controllers\Admin\TrainerController as AdminTrainerController;
 use App\Http\Controllers\Admin\HomepageController as AdminHomepageController;
 use App\Http\Controllers\Admin\NotificationController as AdminNotificationController;
-use App\Http\Controllers\Auth\AdminLoginController;
 
 /*
 |--------------------------------------------------------------------------
@@ -59,19 +59,38 @@ Route::post('logout', [LoginController::class, 'logout'])->name('logout')->middl
 | Member Routes
 |--------------------------------------------------------------------------
 */
+Route::middleware(['auth'])->group(function () {
+    // Payment (Guest and Member should be able to access this)
+    Route::get('/member/payment', [MemberPaymentController::class, 'index'])->name('member.payment');
+    Route::post('/member/payment', [MemberPaymentController::class, 'store'])->name('member.payment.store');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Member Routes (Strictly for Active Members)
+|--------------------------------------------------------------------------
+*/
 Route::middleware(['auth', 'role:member'])->prefix('member')->name('member.')->group(function () {
     Route::get('/dashboard', [MemberDashboardController::class, 'index'])->name('dashboard');
     Route::get('/profile', [MemberProfileController::class, 'index'])->name('profile');
     Route::post('/profile/update', [MemberProfileController::class, 'update'])->name('profile.update');
     Route::post('/profile/password', [MemberProfileController::class, 'updatePassword'])->name('profile.updatePassword');
 
-    // Payment (Guest harus bisa akses ini)
-    Route::get('/payment', [MemberPaymentController::class, 'index'])
-        ->name('payment');
-
-    Route::post('/payment', [MemberPaymentController::class, 'store'])
-        ->name('payment.store');
+    // Booking Routes
+    Route::get('bookings', [MemberBookingController::class, 'index'])->name('bookings.index');
+    Route::post('bookings/{schedule}', [MemberBookingController::class, 'store'])->name('bookings.store');
+    Route::delete('bookings/{booking}', [MemberBookingController::class, 'destroy'])->name('bookings.destroy');
 });
+
+/*
+|--------------------------------------------------------------------------
+| Admin Login Routes
+|--------------------------------------------------------------------------
+*/
+// TIDAK pakai middleware guest:admin karena ada bug
+// Kita handle manual di controller
+Route::get('admin/login', [LoginController::class, 'showLoginForm'])->name('admin.login');
+Route::post('admin/login', [LoginController::class, 'login'])->name('admin.login.submit');
 
 /*
 |--------------------------------------------------------------------------
@@ -122,5 +141,5 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
     Route::put('homepage/testimonials', [AdminHomepageController::class, 'updateTestimonials'])->name('homepage.testimonials');
     
     // Logout
-    Route::post('logout', [AdminLoginController::class, 'logout'])->name('logout');
+    Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 });

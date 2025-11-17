@@ -43,7 +43,7 @@ return [
 
         'admin' => [
             'driver' => 'session',
-            'provider' => 'admins', // Nama provider yang akan kita buat di bawah
+            'provider' => 'admins',
         ],
     ],
 
@@ -72,7 +72,7 @@ return [
 
         'admins' => [
             'driver' => 'eloquent',
-            'model' => App\Models\Admin::class, // Arahkan ke Model Admin
+            'model' => App\Models\Admin::class,
         ],
     ],
 

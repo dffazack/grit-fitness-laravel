@@ -21,7 +21,7 @@ class User extends Authenticatable
         'profile_photo',
         'role',
         'membership_status',
-        'membership_package', // <-- Kunci relasi (string)
+        'membership_package_id',
         'membership_expiry',
         'remaining_sessions',
         'joined_date',
@@ -45,18 +45,14 @@ class User extends Authenticatable
         return $this->hasMany(Transaction::class);
     }
 
-    // ==============================================================
-    //  TAMBAHKAN FUNGSI INI (INI YANG MEMPERBAIKI ERROR ANDA)
-    // ==============================================================
-    /**
-     * Mendapatkan paket membership yang dimiliki user.
-     * Relasi ini mencocokkan kolom string 'membership_package' di tabel 'users'
-     * dengan kolom string 'name' di tabel 'membership_packages'.
-     */
     public function membership(): BelongsTo
     {
-        // Pastikan nama modelnya 'MembershipPackage'
-        return $this->belongsTo(MembershipPackage::class, 'membership_package', 'name');
+        return $this->belongsTo(MembershipPackage::class, 'membership_package_id');
+    }
+
+    public function bookings(): HasMany
+    {
+        return $this->hasMany(Booking::class);
     }
     // ==============================================================
 

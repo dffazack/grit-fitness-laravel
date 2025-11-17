@@ -32,14 +32,15 @@ class MembershipPackageController extends Controller
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0|max:99999999.99',
             'duration_months' => 'required|integer|min:1',
-            'features' => 'required|string', // Ambil sebagai string
+            'features' => 'required|array', // Changed to array
+            'features.*' => 'required|string|max:255', // Validate each feature item
             'description' => 'nullable|string',
             'is_active' => 'nullable', // Checkbox
             'is_popular' => 'nullable', // Jika Anda menambahkan kolom ini
         ]);
 
-        // Ubah string 'features' (dipisah koma) menjadi array
-        $validated['features'] = array_map('trim', explode(',', $validated['features']));
+        // Trim whitespace from each feature
+        $validated['features'] = array_map('trim', $validated['features']);
         
         // Handle checkbox
         $validated['is_active'] = $request->has('is_active');
@@ -59,19 +60,24 @@ class MembershipPackageController extends Controller
     {
         $package = MembershipPackage::findOrFail($id);
 
+        // Get all existing types from the database and merge with the official types
+        $existingTypes = MembershipPackage::distinct()->pluck('type')->toArray();
+        $allowedTypes = array_unique(array_merge($existingTypes, array_keys(MembershipPackage::TYPES)));
+
         $validated = $request->validate([
-            'type' => ['required', Rule::in(array_keys(MembershipPackage::TYPES))],
+            'type' => ['required', Rule::in($allowedTypes)],
             'name' => 'required|string|max:255',
-            'price' => 'required|numeric|min:0|max:9999999.99',
+            'price' => 'required|numeric|min:0|max:99999999.99',
             'duration_months' => 'required|integer|min:1',
-            'features' => 'required|string', // Ambil sebagai string
+            'features' => 'required|array', // Changed to array
+            'features.*' => 'required|string|max:255', // Validate each feature item
             'description' => 'nullable|string',
             'is_active' => 'nullable',
             'is_popular' => 'nullable',
         ]);
 
-        // Ubah string 'features' (dipisah koma) menjadi array
-        $validated['features'] = array_map('trim', explode(',', $validated['features']));
+        // Trim whitespace from each feature
+        $validated['features'] = array_map('trim', $validated['features']);
         
         // Handle checkbox
         $validated['is_active'] = $request->has('is_active');
@@ -90,8 +96,14 @@ class MembershipPackageController extends Controller
     {
         $package = MembershipPackage::findOrFail($id);
         
-        // TODO: Cek dulu apakah ada member yang sedang pakai paket ini?
-        // Jika ya, mungkin jangan dihapus, tapi di 'is_active' = false
+        // Cek apakah ada member yang sedang pakai paket ini
+        $isUsedByUser = \App\Models\User::where('membership_package_id', $id)->exists();
+        $isUsedInTransaction = \App\Models\Transaction::where('membership_package_id', $id)->exists();
+
+        if ($isUsedByUser || $isUsedInTransaction) {
+            return redirect()->route('admin.memberships.index')
+                ->with('error', 'Paket tidak dapat dihapus karena sedang digunakan oleh member atau ada dalam riwayat transaksi. Nonaktifkan paket jika tidak ingin digunakan lagi.');
+        }
 
         $package->delete();
         

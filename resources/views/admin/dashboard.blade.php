@@ -63,7 +63,7 @@
                             <i class="bi bi-clock-history fs-5 text-warning"></i>
                         </div>
                     </div>
-                    <h3 class="fw-bold mb-1 text-warning" style="font-size: clamp(1.5rem, 4vw, 2rem);">{{ $pendingPayments ?? 0 }}</h3>
+                    <h3 class="fw-bold mb-1 text-warning" style="font-size: clamp(1.5rem, 4vw, 2rem);">{{ $pendingPayments->count() ?? 0 }}</h3>
                     <p class="text-muted mb-0 small">Pending Validasi</p>
                 </div>
             </div>
@@ -249,4 +249,3 @@
     }
 </style>
 @endpush
-{{-- Modified by: User-Interfaced Team -- }}

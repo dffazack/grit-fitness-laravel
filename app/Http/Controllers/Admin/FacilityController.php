@@ -26,16 +26,14 @@ class FacilityController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'required|string',
             'icon' => 'nullable|string|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
             'order' => 'nullable|integer',
             'is_active' => 'boolean'
         ]);
 
         // Handle image upload
         if ($request->hasFile('image')) {
-            $filename = time() . '.' . $request->image->extension();
-            $path = $request->file('image')->storeAs('trainers', $filename, 'public');
-            $validated['image'] = $path;
+            $validated['image'] = $request->file('image')->store('facilities', 'public');
         }
 
         $validated['is_active'] = $request->has('is_active') ? 1 : 0;

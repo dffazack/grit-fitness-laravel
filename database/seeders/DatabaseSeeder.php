@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             AdminSeeder::class,
             MembershipPackageSeeder::class,
+            UpdateMembershipPackageIdSeeder::class,
             TrainerSeeder::class,
             ClassListSeeder::class,
             ClassScheduleSeeder::class,

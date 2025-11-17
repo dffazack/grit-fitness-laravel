@@ -108,9 +108,11 @@ class TrainerController extends Controller
     {
         $trainer = Trainer::findOrFail($id);
 
-        if ($trainer->image && Storage::disk('public')->exists($trainer->image)) {
-            Storage::disk('public')->delete($trainer->image);
-        }
+        // Jangan hapus gambar karena ini adalah soft delete.
+        // Gambar hanya boleh dihapus jika record dihapus permanen (force delete).
+        // if ($trainer->image && Storage::disk('public')->exists($trainer->image)) {
+        //     Storage::disk('public')->delete($trainer->image);
+        // }
 
         $trainer->delete();
 

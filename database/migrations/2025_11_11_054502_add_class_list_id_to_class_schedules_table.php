@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('class_list_id')->nullable()->constrained('class_lists')->onDelete('cascade');
         });
 
-        DB::statement('UPDATE class_schedules cs SET class_list_id = (SELECT id FROM class_lists cl WHERE cl.name = cs.name)');
+        DB::statement('UPDATE class_schedules SET class_list_id = (SELECT cl.id FROM class_lists cl WHERE cl.name = class_schedules.name)');
     }
 
     /**

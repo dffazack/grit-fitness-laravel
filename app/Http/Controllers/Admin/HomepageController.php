@@ -11,7 +11,7 @@ class HomepageController extends Controller
     /**
      * Menampilkan halaman ringkasan (sesuai desain).
      */
-    public function index()$sche
+    public function index()
     {
         // Method ini hanya menampilkan view ringkasan
         return view('admin.homepage.index');
@@ -65,16 +65,35 @@ class HomepageController extends Controller
     // Method untuk handle update 'hero'
     public function updateHero(Request $request)
     {
-        $data = $request->validate([
+        $homepageContent = HomepageContent::firstOrCreate(['section' => 'hero']);
+        $currentContent = (object) $homepageContent->content;
+
+        $request->validate([
             'title' => 'required|string|max:255',
             'subtitle' => 'required|string',
-            'image' => 'required|url',
+            'image_url' => 'nullable|url',
+            'image_file' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:5120', // 5MB
         ]);
 
-        HomepageContent::updateOrCreate(
-            ['section' => 'hero'],
-            ['content' => json_encode($data)]
-        );
+        $data = [
+            'title' => $request->input('title'),
+            'subtitle' => $request->input('subtitle'),
+            'image' => $currentContent->image ?? '', // Default to current image
+        ];
+
+        if ($request->hasFile('image_file')) {
+            // Handle file upload
+            $imageFile = $request->file('image_file');
+            $imageName = time() . '.' . $imageFile->getClientOriginalExtension();
+            $imageFile->move(public_path('images/homepage'), $imageName);
+            $data['image'] = 'images/homepage/' . $imageName;
+        } elseif ($request->filled('image_url')) {
+            // Handle URL input
+            $data['image'] = $request->input('image_url');
+        }
+
+        $homepageContent->content = $data;
+        $homepageContent->save();
 
         return redirect()->route('admin.homepage.edit')->with('success', 'Hero section updated successfully!')->withFragment('hero');
     }
@@ -90,7 +109,7 @@ class HomepageController extends Controller
 
         HomepageContent::updateOrCreate(
             ['section' => 'stats'],
-            ['content' => json_encode($data['stats'])]
+            ['content' => $data['stats']]
         );
 
         return redirect()->route('admin.homepage.edit')->with('success', 'Statistics section updated successfully!')->withFragment('stats');
@@ -108,7 +127,7 @@ class HomepageController extends Controller
 
         HomepageContent::updateOrCreate(
             ['section' => 'benefits'],
-            ['content' => json_encode($data['benefits'])]
+            ['content' => $data['benefits']]
         );
 
         return redirect()->route('admin.homepage.edit')->with('success', 'Benefits section updated successfully!')->withFragment('benefits');
@@ -127,7 +146,7 @@ class HomepageController extends Controller
 
         HomepageContent::updateOrCreate(
             ['section' => 'testimonials'],
-            ['content' => json_encode($data['testimonials'])]
+            ['content' => $data['testimonials']]
         );
 
         return redirect()->route('admin.homepage.edit')->with('success', 'Testimonials section updated successfully!')->withFragment('testimonials');

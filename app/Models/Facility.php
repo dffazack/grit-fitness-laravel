@@ -12,6 +12,7 @@ class Facility extends Model
     protected $fillable = [
         'name',
         'description',
+        'icon',
         'image',
         'is_active',
         'order'

@@ -2,13 +2,20 @@
 
 namespace Tests\Feature;
 
-use App\Models\Admin;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class AdminDashboardTest extends TestCase
 {
     use RefreshDatabase;
+
+    /**
+     * Indicates if the database should be seeded.
+     *
+     * @var bool
+     */
+    protected $seed = true;
 
     public function test_unauthenticated_user_is_redirected_from_admin_dashboard(): void
     {
@@ -19,9 +26,9 @@ class AdminDashboardTest extends TestCase
 
     public function test_authenticated_admin_can_access_dashboard(): void
     {
-        $admin = Admin::factory()->create();
+        $adminUser = User::factory()->create(['role' => 'admin']);
 
-        $response = $this->actingAs($admin, 'admin')->get('/admin/dashboard');
+        $response = $this->actingAs($adminUser)->get('/admin/dashboard');
 
         $response->assertStatus(200);
     }

@@ -17,7 +17,7 @@
         <p class="text-muted">Kelola operasional gym dengan mudah dan efisien</p>
     </div>
 
-    
+    {{--
     @if (session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             <i class="bi bi-check-circle-fill me-2"></i>
@@ -25,8 +25,9 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
+    --}}
 
-    <div class="card border-0 shadow-sm">
+    <div class="card border-0 shadow-sm"></div>
         <div class="card-header bg-white border-0 py-3">
             <h5 class="card-title-custom mb-0">
                 <i class="bi bi-credit-card me-2 d-none d-sm-inline"></i>
@@ -64,7 +65,7 @@
                                     </div>
                                 </td>
                                 <td>
-                                    {{ $tx->membership->name ?? $tx->package }}
+                                    {{ $tx->membership->name }}
                                     @if($tx->membership)
                                         <br><small class="text-muted">{{ $tx->membership->duration_months }} Bulan</small>
                                     @endif
@@ -107,7 +108,7 @@
                                 <div class="col-12">
                                     <small class="text-muted d-block">Paket</small>
                                     <span class="small fw-semibold">
-                                        {{ $tx->membership->name ?? $tx->package }}
+                                        {{ $tx->membership->name }}
                                         @if($tx->membership)
                                             ({{ $tx->membership->duration_months }} Bulan)
                                         @endif
@@ -151,7 +152,7 @@
                         </li>
                         <li class="list-group-item d-flex justify-content-between px-0 py-2">
                             <span class="text-muted">Paket</span>
-                            <span class="fw-semibold">{{ $tx->membership->name ?? $tx->package }}</span>
+                            <span class="fw-semibold">{{ $tx->membership->name }}</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between px-0 py-2">
                             <span class="text-muted">Jumlah</span>
@@ -161,9 +162,9 @@
 
                     @if($tx->proof_url)
                         <div class="mb-3">
-                            <a href="{{ $tx->proof_url }}" target="_blank" class="btn btn-outline-primary w-100">
+                            <button type="button" class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#proofModal-{{ $tx->id }}">
                                 <i class="bi bi-eye-fill me-2"></i> Lihat Bukti Pembayaran
-                            </a>
+                            </button>
                         </div>
                     @else
                         <div class="alert alert-warning text-center mb-3">
@@ -193,5 +194,23 @@
     </div>
     @endforeach
 
+    {{-- Image Proof Modals --}}
+    @foreach($transactions as $tx)
+        @if($tx->proof_url)
+        <div class="modal fade" id="proofModal-{{ $tx->id }}" tabindex="-1" aria-labelledby="proofModalLabel-{{ $tx->id }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="proofModalLabel-{{ $tx->id }}">Bukti Pembayaran: {{ $tx->user->name ?? 'N/A' }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <img src="{{ $tx->full_proof_url }}" class="img-fluid rounded" alt="Bukti Pembayaran">
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+    @endforeach
+
 @endsection
-{{-- Modified by: User-Interfaced Team -- }}

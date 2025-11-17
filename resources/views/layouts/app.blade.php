@@ -19,103 +19,8 @@
     <!-- Alpine.js (Untuk tab di Homepage Admin) -->
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     
-    <!-- GRIT Custom CSS (Inline) -->
-    <style>
-        /* Import GRIT Design System Variables */
-        :root {
-            --grit-primary: #2B3282;
-            --grit-primary-dark: #1f2461;
-            --grit-accent: #E51B83;
-            --grit-accent-dark: #c01669;
-            --grit-background: #F5F5F7;
-            --grit-text: #333333;
-            --grit-text-light: #717182;
-            --grit-border: #E0E0E0;
-            --grit-shadow-lg: 0 8px 32px rgba(0,0,0,0.16);
-        }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            color: var(--grit-text);
-            background-color: #FFFFFF; /* Pastikan background putih */
-        }
-
-        /* Custom Bootstrap Override */
-        .btn-primary {
-            background-color: var(--grit-primary);
-            border-color: var(--grit-primary);
-            font-weight: 500;
-        }
-        .btn-primary:hover {
-            background-color: var(--grit-primary-dark);
-            border-color: var(--grit-primary-dark);
-        }
-
-        .btn-accent {
-            background-color: var(--grit-accent);
-            border-color: var(--grit-accent);
-            color: white;
-            font-weight: 500;
-        }
-        .btn-accent:hover {
-            background-color: var(--grit-accent-dark);
-            border-color: var(--grit-accent-dark);
-            color: white;
-        }
-        
-        .btn-grit-primary {
-            background-color: var(--grit-primary);
-            border-color: var(--grit-primary);
-            color: white;
-        }
-        .btn-grit-primary:hover {
-            background-color: var(--grit-primary-dark);
-            border-color: var(--grit-primary-dark);
-            color: white;
-        }
-
-        .text-primary { color: var(--grit-primary) !important; }
-        .text-accent { color: var(--grit-accent) !important; }
-        .bg-primary { background-color: var(--grit-primary) !important; }
-        .bg-accent { background-color: var(--grit-accent) !important; }
-        .bg-light-custom { background-color: var(--grit-background) !important; }
-
-        .navbar-brand {
-            font-weight: 700;
-            font-size: 24px;
-        }
-
-        .card {
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        }
-
-        .hero-section {
-            background-size: cover;
-            background-position: center;
-            min-height: 600px;
-            display: flex;
-            align-items: center;
-        }
-
-        /* Input Form Kustom */
-        .grit-label {
-            font-weight: 500;
-            color: var(--grit-text);
-            font-size: 0.9rem;
-        }
-        .grit-input, .form-select.grit-input {
-            border-radius: 8px;
-            border: 1px solid var(--grit-border);
-            padding: 0.75rem 1rem;
-        }
-        .grit-input:focus, .form-select.grit-input:focus {
-            border-color: var(--grit-primary);
-            box-shadow: 0 0 0 3px rgba(43, 50, 130, 0.1);
-        }
-        
-    </style>
+    <!-- GRIT Custom CSS -->
+    <link href="{{ asset('css/grit-style.css') }}" rel="stylesheet">
     
     @stack('styles')
 </head>
@@ -139,5 +44,3 @@
     @stack('scripts')
 </body>
 </html>
-{{-- Modified by: User-Interfaced Team -- }}
-

@@ -29,14 +29,15 @@ class ScheduleController extends Controller
 
     public function create(Request $request)
     {
-        // Redirect ke index dengan sinyal untuk buka modal create
-        return redirect()->route('admin.schedules.index')->with('modal', 'add');
+        $trainers = Trainer::where('is_active', true)->get();
+        $classLists = ClassList::all();
+        return view('admin.schedules.create', compact('trainers', 'classLists'));
     }
 
     public function store(Request $request)
     {
         // Validasi field umum
-        $request->validate([
+        $validated = $request->validate([
             'day' => 'required|in:' . implode(',', ClassSchedule::DAYS),
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i|after:start_time',
@@ -49,19 +50,14 @@ class ScheduleController extends Controller
         // Validasi kondisional untuk class_list_id dan custom_class_name
         $classListIdInput = $request->input('class_list_id');
         if ($classListIdInput === 'other') {
-            $request->validate(['custom_class_name' => 'required|string|max:255']);
+            $customClassValidated = $request->validate(['custom_class_name' => 'required|string|max:255']);
             $validated['class_list_id'] = null;
-            $validated['custom_class_name'] = $request->custom_class_name;
+            $validated['custom_class_name'] = $customClassValidated['custom_class_name'];
         } else {
-            $request->validate(['class_list_id' => 'required|exists:class_lists,id']);
-            $validated['class_list_id'] = $classListIdInput;
+            $classListValidated = $request->validate(['class_list_id' => 'required|exists:class_lists,id']);
+            $validated['class_list_id'] = $classListValidated['class_list_id'];
             $validated['custom_class_name'] = null;
         }
-
-        // Gabungkan semua validated data
-        $validated = array_merge($validated, $request->only([
-            'day', 'start_time', 'end_time', 'trainer_id', 'max_quota', 'type', 'description'
-        ]));
 
         ClassSchedule::create($validated);
 
@@ -82,7 +78,7 @@ class ScheduleController extends Controller
         $schedule = ClassSchedule::findOrFail($id);
 
         // Validasi field umum
-        $request->validate([
+        $validated = $request->validate([
             'day' => 'required|in:' . implode(',', ClassSchedule::DAYS),
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i|after:start_time',
@@ -95,19 +91,14 @@ class ScheduleController extends Controller
         // Validasi kondisional untuk class_list_id dan custom_class_name
         $classListIdInput = $request->input('class_list_id');
         if ($classListIdInput === 'other') {
-            $request->validate(['custom_class_name' => 'required|string|max:255']);
+            $customClassValidated = $request->validate(['custom_class_name' => 'required|string|max:255']);
             $validated['class_list_id'] = null;
-            $validated['custom_class_name'] = $request->custom_class_name;
+            $validated['custom_class_name'] = $customClassValidated['custom_class_name'];
         } else {
-            $request->validate(['class_list_id' => 'required|exists:class_lists,id']);
-            $validated['class_list_id'] = $classListIdInput;
+            $classListValidated = $request->validate(['class_list_id' => 'required|exists:class_lists,id']);
+            $validated['class_list_id'] = $classListValidated['class_list_id'];
             $validated['custom_class_name'] = null;
         }
-
-        // Gabungkan semua validated data
-        $validated = array_merge($validated, $request->only([
-            'day', 'start_time', 'end_time', 'trainer_id', 'max_quota', 'type', 'description'
-        ]));
 
         $schedule->update($validated);
 

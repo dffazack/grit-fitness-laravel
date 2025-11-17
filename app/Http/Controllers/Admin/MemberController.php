@@ -79,6 +79,11 @@ class MemberController extends Controller
     
     public function destroy($id)
     {
+        if (Auth::id() == $id) {
+            return redirect()->route('admin.members.index')
+                ->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
+        }
+
         $member = User::findOrFail($id);
         $member->delete();
         

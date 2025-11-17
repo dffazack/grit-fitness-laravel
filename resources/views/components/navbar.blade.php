@@ -84,6 +84,11 @@
                                     <i class="bi bi-credit-card me-2 text-muted"></i> Riwayat Pembayaran
                                 </a>
                             </li>
+                            <li>
+                                <a class="dropdown-item py-2" href="{{ route('member.bookings.index') }}">
+                                    <i class="bi bi-calendar-check me-2 text-muted"></i> Booking Saya
+                                </a>
+                            </li>
                             <li><hr class="dropdown-divider mx-3"></li>
                             <li>
                                 <form action="{{ route('logout') }}" method="POST" class="d-inline">
@@ -112,4 +117,4 @@
 
 
 {{-- ... (style Anda yang sudah ada) ... --}}
-{{-- Modified by: User-Interfaced Team -- }}
+

@@ -7,12 +7,23 @@ use Illuminate\Http\Request;
 
 class TrainerController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $trainers = Trainer::where('is_active', true)
-            ->orderBy('name')
-            ->paginate(9);
-        
-        return view('trainers.index', compact('trainers'));
+        $filterSpecialization = $request->query('specialization');
+
+        $trainersQuery = Trainer::where('is_active', true);
+
+        if ($filterSpecialization && $filterSpecialization !== 'all') {
+            $trainersQuery->where('specialization', $filterSpecialization);
+        }
+
+        $trainers = $trainersQuery->orderBy('name')->paginate(9);
+
+        $specializations = Trainer::where('is_active', true)
+            ->whereNotNull('specialization')
+            ->distinct()
+            ->pluck('specialization');
+
+        return view('trainers.index', compact('trainers', 'specializations', 'filterSpecialization'));
     }
 }

@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
-class form-input.blade extends Component
+class FormInput extends Component
 {
     /**
      * Create a new component instance.
@@ -21,6 +21,6 @@ class form-input.blade extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.form-input.blade.php');
+        return view('components.form-input');
     }
 }

@@ -89,30 +89,34 @@
                 <div class="card border-0 shadow-sm h-100">
                     <div class="card-header bg-white border-0 pt-4 px-4">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h4 class="text-primary">Kelas Mendatang</h4>
-                            <a href="{{ route('classes') }}" class="btn btn-primary btn-sm">Booking Kelas Baru</a>
+                            <h4 class="text-primary">Booking Kelas Saya</h4>
+                            <a href="{{ route('member.bookings.index') }}" class="btn btn-outline-primary btn-sm">Lihat Semua</a>
                         </div>
                     </div>
                     <div class="card-body p-4">
                         <div class="list-group list-group-flush">
-                            {{-- Ganti $upcomingClasses dengan data dari controller --}}
-                            @php $upcomingClasses = []; /* Hapus ini jika data sudah ada dari controller */ @endphp
-                            @forelse($upcomingClasses as $class)
+                            @forelse($myBookings as $booking)
                                 <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-3">
                                     <div>
-                                        <h6 class="mb-1 text-primary">{{ $class->name }}</h6>
-                                        <p class="small text-muted mb-0">
-                                            <i class="bi bi-calendar me-1"></i> {{ $class->date }} | {{ $class->time }}
-                                            <br>
-                                            <i class="bi bi-person me-1"></i> {{ $class->trainer }}
-                                        </p>
+                                        @if($booking->classSchedule)
+                                            <h6 class="mb-1 text-primary">{{ $booking->classSchedule->custom_class_name ?? $booking->classSchedule->classList->name ?? 'Kelas Dihapus' }}</h6>
+                                            <p class="small text-muted mb-0">
+                                                <i class="bi bi-calendar-event me-1"></i> {{ $booking->classSchedule->day }}, {{ $booking->classSchedule->start_time->format('H:i') }}
+                                                <br>
+                                                <i class="bi bi-person me-1"></i> {{ $booking->classSchedule->trainer->name ?? 'N/A' }}
+                                            </p>
+                                        @else
+                                            <h6 class="mb-1 text-danger">Jadwal Kelas Tidak Tersedia</h6>
+                                            <p class="small text-muted mb-0">Jadwal untuk booking ini mungkin telah dihapus.</p>
+                                        @endif
                                     </div>
                                     <span class="badge bg-success-light text-success rounded-pill">Booked</span>
                                 </div>
                             @empty
                                 <div class="text-center py-4">
                                     <i class="bi bi-calendar-x fs-1 text-muted"></i>
-                                    <p class="mt-2 text-muted">Belum ada kelas yang kamu booking.</p>
+                                    <p class="mt-2 text-muted">Belum ada kelas yang Anda booking.</p>
+                                    <a href="{{ route('classes') }}" class="btn btn-primary btn-sm mt-2">Booking Kelas Sekarang</a>
                                 </div>
                             @endforelse
                         </div>

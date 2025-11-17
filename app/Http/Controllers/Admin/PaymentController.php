@@ -49,11 +49,16 @@ class PaymentController extends Controller
         if ($user && $transaction->membership) {
             $duration = $transaction->membership->duration_months;
             
+            // Cek apakah user sedang dalam masa aktif, jika ya, perpanjang. Jika tidak, mulai dari sekarang.
+            $newExpiryDate = ($user->hasActiveMembership() && $user->membership_expiry && $user->membership_expiry->isFuture())
+                ? $user->membership_expiry->addMonths($duration)
+                : now()->addMonths($duration);
+
             $user->update([
                 'membership_status' => 'active',
-                'membership_package' => $transaction->package,
-                // Hitung tanggal kedaluwarsa dari SEKARANG
-                'membership_expiry' => now()->addMonths($duration), 
+                'role' => 'member', // Update the user's role
+                'membership_package_id' => $transaction->membership_package_id,
+                'membership_expiry' => $newExpiryDate, 
             ]);
         }
 

@@ -7,7 +7,6 @@
     {{-- Menggunakan komponen tab terpusat --}}
     @include('admin.components.datamaster-tabs')
 
-    <!-- Header "Kelola Paket" dan Tombol Tambah -->
     <div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-center mb-4">
         <h3 class="mb-2 mb-sm-0" style="color: var(--admin-primary);">Kelola Paket Membership</h3>
         <button type="button" class="btn btn-accent" data-bs-toggle="modal" data-bs-target="#addPackageModal">
@@ -16,7 +15,13 @@
         </button>
     </div>
 
-    <!-- Grid Kartu Paket -->
+        <div class="alert alert-warning d-flex align-items-center mt-4" role="alert">
+        <i class="bi bi-info-circle-fill me-2"></i>
+        <div>
+            Tip: Paket yang ditandai 'Populer' akan ditampilkan dengan *highlight* khusus di halaman utama.
+        </div>
+        </div>
+
     <div class="row g-4">
         @forelse($packages as $package)
             <div class="col-12 col-lg-6 col-xl-4 d-flex">
@@ -77,20 +82,10 @@
         @endforelse
     </div>
 
-    <!-- Peringatan di Bawah -->
-    <div class="alert alert-warning d-flex align-items-center mt-4" role="alert">
-        <i class="bi bi-info-circle-fill me-2"></i>
-        <div>
-            Tip: Paket yang ditandai 'Populer' akan ditampilkan dengan *highlight* khusus di halaman utama.
-        </div>
-    </div>
 
-
-    <!-- =================================================================================== -->
-    <!--                               MODAL TAMBAH PAKET                                  -->
-    <!-- =================================================================================== -->
     <div class="modal fade" id="addPackageModal" tabindex="-1" aria-labelledby="addPackageModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
+        {{-- HAPUS CLASS 'modal-dialog-centered' AGAR LEBIH AMAN --}}
+        <div class="modal-dialog modal-dialog-scrollable modal-lg">
             <div class="modal-content" style="border-radius: 12px;">
                 <form action="{{ route('admin.memberships.store') }}" method="POST">
                     @csrf
@@ -121,9 +116,33 @@
                                 <label for="add_duration_months" class="form-label">Durasi (Bulan)</label>
                                 <input type="number" class="form-control" id="add_duration_months" name="duration_months" value="{{ old('duration_months') }}" placeholder="Contoh: 1" min="1" required>
                             </div>
+                            
                             <div class="col-12">
-                                <label for="add_features" class="form-label">Fitur (Pisahkan dengan koma)</label>
-                                <textarea class="form-control" id="add_features" name="features" rows="3" placeholder="Contoh: Akses gym 24/7, Loker pribadi, ...">{{ old('features') }}</textarea>
+                                <label class="form-label">Fitur Paket</label>
+                                <div id="add-features-container">
+                                    @if(old('features'))
+                                        @foreach(old('features') as $feature)
+                                            @if(!empty($feature)) 
+                                            <div class="input-group mb-2">
+                                                <input type="text" class="form-control" name="features[]" placeholder="Contoh: Akses gym 24/7" value="{{ $feature }}" required>
+                                                <button class="btn btn-outline-danger remove-feature-btn" type="button">
+                                                    <i class="bi bi-trash-fill"></i>
+                                                </button>
+                                            </div>
+                                            @endif
+                                        @endforeach
+                                    @else
+                                        <div class="input-group mb-2">
+                                            <input type="text" class="form-control" name="features[]" placeholder="Contoh: Akses gym 24/7" required>
+                                            <button class="btn btn-outline-danger remove-feature-btn" type="button">
+                                                <i class="bi bi-trash-fill"></i>
+                                            </button>
+                                        </div>
+                                    @endif
+                                </div>
+                                <button type="button" class="btn btn-sm btn-outline-success mt-2" id="add-feature-btn">
+                                    <i class="bi bi-plus-circle me-1"></i> Tambah Fitur
+                                </button>
                             </div>
 
                             <div class="col-12">
@@ -148,12 +167,10 @@
     </div>
 
 
-    <!-- =================================================================================== -->
-    <!--                               MODAL EDIT PAKET                                    -->
-    <!-- =================================================================================== -->
     @foreach($packages as $package)
     <div class="modal fade" id="editModal-{{ $package->id }}" tabindex="-1" aria-labelledby="editModalLabel-{{ $package->id }}" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
+        {{-- HAPUS CLASS 'modal-dialog-centered' AGAR LEBIH AMAN --}}
+        <div class="modal-dialog modal-dialog-scrollable modal-lg">
             <div class="modal-content" style="border-radius: 12px;">
                 <form action="{{ route('admin.memberships.update', $package->id) }}" method="POST">
                     @csrf
@@ -186,11 +203,40 @@
                                 <label for="edit_duration_months-{{ $package->id }}" class="form-label">Durasi (Bulan)</label>
                                 <input type="number" class="form-control" id="edit_duration_months-{{ $package->id }}" name="duration_months" value="{{ old('duration_months', $package->duration_months) }}" min="1" required>
                             </div>
+                            
                             <div class="col-12">
-                                <label for="edit_features-{{ $package->id }}" class="form-label">Fitur (Pisahkan dengan koma)</label>
-                                {{-- Ubah array 'features' kembali menjadi string --}}
-                                <textarea class="form-control" id="edit_features-{{ $package->id }}" name="features" rows="3" required>{{ old('features', is_array($package->features) ? implode(', ', $package->features) : '') }}</textarea>
+                                <label class="form-label">Fitur Paket</label>
+                                <div class="features-container" id="edit-features-container-{{ $package->id }}">
+                                    @php
+                                        $features = $package->features;
+                                        if (old('form_type') == 'edit' && old('package_id') == $package->id) {
+                                            $features = old('features', []); 
+                                        }
+                                    @endphp
+
+                                    @forelse($features as $feature)
+                                        @if(!empty($feature))
+                                        <div class="input-group mb-2">
+                                            <input type="text" class="form-control" name="features[]" placeholder="Contoh: Akses gym 24/7" value="{{ $feature }}" required>
+                                            <button class="btn btn-outline-danger remove-feature-btn" type="button">
+                                                <i class="bi bi-trash-fill"></i>
+                                            </button>
+                                        </div>
+                                        @endif
+                                    @empty
+                                        <div class="input-group mb-2">
+                                            <input type="text" class="form-control" name="features[]" placeholder="Contoh: Akses gym 24/7" required>
+                                            <button class="btn btn-outline-danger remove-feature-btn" type="button">
+                                                <i class="bi bi-trash-fill"></i>
+                                            </button>
+                                        </div>
+                                    @endforelse
+                                </div>
+                                <button type="button" class="btn btn-sm btn-outline-success mt-2 add-feature-btn-edit" data-container-target="#edit-features-container-{{ $package->id }}">
+                                    <i class="bi bi-plus-circle me-1"></i> Tambah Fitur
+                                </button>
                             </div>
+                            
                             <div class="col-12">
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" role="switch" id="edit_is_active-{{ $package->id }}" name="is_active" value="1" {{ (old('is_active', $package->is_active) == 1) ? 'checked' : '' }}>
@@ -215,25 +261,133 @@
 
 @endsection
 
+@push('styles')
+<style>
+    /* ===============================================================
+      FIX: MODAL FOOTER TENGGELAM DI LAYAR BESAR (FLEXBOX)
+      ===============================================================
+    */
+    
+    /* 1. Batasi tinggi KESELURUHAN modal agar tidak "tumpah" */
+    .modal-dialog .modal-content {
+        max-height: 85vh;  /* 85% tinggi layar */
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* 2. Paksa <form> untuk mengisi sisa ruang */
+    .modal-content form {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        min-height: 0; /* Fix bug flexbox */
+    }
+
+    /* 3. Kunci ukuran header dan footer agar tidak mengecil */
+    .modal-content .modal-header,
+    .modal-content .modal-footer {
+        flex-shrink: 0; 
+    }
+
+    /* 4. Buat HANYA modal-body yang bisa di-scroll */
+    .modal-content .modal-body {
+        flex-grow: 1;
+        overflow-y: auto;
+        min-height: 0;
+    }
+    /* =============================================================== */
+</style>
+@endpush
+
 @push('scripts')
 <script>
-    // Script untuk menangani jika ada error validasi
-    document.addEventListener('DOMContentLoaded', function () {
-        @if($errors->any())
-            var formType = '{{ old('form_type') }}';
-            
-            // Jika error terjadi saat 'add'
-            @if(old('form_type') == 'add')
-                var addModal = new bootstrap.Modal(document.getElementById('addPackageModal'));
-                addModal.show();
-            
-            // Jika error terjadi saat 'edit'
-            @elseif(old('form_type') == 'edit' && old('package_id'))
-                var editModalId = '#editModal-{{ old('package_id') }}';
-                var editModal = new bootstrap.Modal(document.querySelector(editModalId));
-                editModal.show();
-            @endif
+document.addEventListener('DOMContentLoaded', function () {
+    
+    // --- Menampilkan Modal Error Validation ---
+    @if($errors->any())
+        var formType = '{{ old('form_type') }}';
+        
+        @if(old('form_type') == 'add')
+            var addModal = new bootstrap.Modal(document.getElementById('addPackageModal'));
+            addModal.show();
+        @elseif(old('form_type') == 'edit' && old('package_id'))
+            var editModalId = '#editModal-{{ old('package_id') }}';
+            var editModal = new bootstrap.Modal(document.querySelector(editModalId));
+            editModal.show();
         @endif
+    @endif
+
+    // --- Logika Repeater Input Fitur ---
+
+    const featureInputTemplate = `
+    <div class="input-group mb-2">
+        <input type="text" class="form-control" name="features[]" placeholder="Fitur baru" required>
+        <button class="btn btn-outline-danger remove-feature-btn" type="button">
+            <i class="bi bi-trash-fill"></i>
+        </button>
+    </div>`;
+    
+    function updateRemoveButtons(container) {
+        if (!container) return;
+        const inputGroups = container.querySelectorAll('.input-group');
+        
+        if (inputGroups.length <= 1) {
+            inputGroups[0].querySelector('.remove-feature-btn').style.display = 'none';
+        } else {
+            inputGroups.forEach(group => {
+                group.querySelector('.remove-feature-btn').style.display = 'block';
+            });
+        }
+    }
+
+    // Event Delegation
+    document.addEventListener('click', function(e) {
+        let addBtn = null;
+        
+        if (e.target.id === 'add-feature-btn') {
+            addBtn = e.target;
+        } else if (e.target.closest('.add-feature-btn-edit')) {
+            addBtn = e.target.closest('.add-feature-btn-edit');
+        }
+
+        // Tambah Fitur
+        if (addBtn) {
+            e.preventDefault(); 
+            const targetSelector = addBtn.id === 'add-feature-btn' ? '#add-features-container' : addBtn.getAttribute('data-container-target');
+            const container = document.querySelector(targetSelector);
+            
+            if (container) {
+                container.insertAdjacentHTML('beforeend', featureInputTemplate);
+                updateRemoveButtons(container); 
+            }
+        }
+
+        // Hapus Fitur
+        if (e.target.classList.contains('remove-feature-btn') || e.target.closest('.remove-feature-btn')) {
+            e.preventDefault(); 
+            
+            const button = e.target.classList.contains('remove-feature-btn') ? e.target : e.target.closest('.remove-feature-btn');
+            const inputGroup = button.closest('.input-group');
+            const container = inputGroup.parentElement;
+            
+            if (container.querySelectorAll('.input-group').length > 1) {
+                inputGroup.remove();
+                updateRemoveButtons(container);
+            }
+        }
     });
+
+    // Inisialisasi status tombol hapus saat modal dibuka
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('shown.bs.modal', function() {
+            const addContainer = modal.querySelector('#add-features-container');
+            const editContainers = modal.querySelectorAll('.features-container');
+            
+            if (addContainer) updateRemoveButtons(addContainer);
+            editContainers.forEach(container => updateRemoveButtons(container));
+        });
+    });
+
+});
 </script>
 @endpush

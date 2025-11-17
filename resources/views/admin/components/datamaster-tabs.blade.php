@@ -5,12 +5,24 @@
 {{-- Header --}}
 <div class="mb-4">
     <h1 class="h3 h2-sm fw-bold" style="color: var(--admin-primary);">Kelola Data Master</h1>
-    <p class="text-muted mb-0 small">Kelola data Trainers, Homepage, dan Notifikasi</p>
+    {{-- DIUBAH --}}
+    <p class="text-muted mb-0 small">Kelola data Membership, Trainers, Homepage, dan Notifikasi</p>
 </div>
 
 {{-- Tab Navigasi - Responsive --}}
 <div class="nav-tabs-wrapper mb-4">
     <ul class="nav nav-tabs flex-nowrap overflow-auto" style="border-bottom-color: var(--admin-border); -webkit-overflow-scrolling: touch;">
+        
+        {{-- TAMBAHAN: Tab Membership --}}
+        <li class="nav-item flex-shrink-0">
+            <a class="nav-link {{ request()->routeIs('admin.memberships.*') ? 'active' : '' }}"
+               href="{{ route('admin.memberships.index') }}"
+               style="{{ request()->routeIs('admin.memberships.*') ? 'color: var(--admin-primary); border-bottom: 2px solid var(--admin-primary);' : 'color: var(--admin-text-light);' }}">
+                <i class="bi bi-person-vcard me-1 d-none d-sm-inline"></i>
+                <span>Membership</span>
+            </a>
+        </li>
+
         <li class="nav-item flex-shrink-0">
             <a class="nav-link {{ request()->routeIs('admin.trainers.*') ? 'active' : '' }}"
                href="{{ route('admin.trainers.index') }}"
@@ -82,4 +94,3 @@
         }
     }
 </style>
-{{-- Modified by: User-Interfaced Team -- }}

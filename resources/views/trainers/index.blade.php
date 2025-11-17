@@ -10,11 +10,33 @@
         <p class="text-muted">Didukung oleh pelatih bersertifikasi dengan passion membara.</p>
     </div>
 
+    {{-- Filter Section --}}
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <form action="{{ route('trainers') }}" method="GET">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-8">
+                        <label for="filterSpecialization" class="form-label small">Filter Spesialisasi:</label>
+                        <select id="filterSpecialization" name="specialization" class="form-select form-select-sm">
+                            <option value="all">Semua Spesialisasi</option>
+                            @foreach($specializations as $spec)
+                                <option value="{{ $spec }}" {{ ($filterSpecialization ?? '') === $spec ? 'selected' : '' }}>{{ $spec }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-primary btn-sm w-100">Terapkan Filter</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
     {{-- Trainers Grid --}}
     <div class="row g-4">
         @forelse($trainers as $trainer)
             {{-- xs=12 (1 per row mobile), md=6 (2 per row), lg=3 (4 per row) --}}
-            <div class="col-12 col-md-6 col-lg-3">
+            <div class="col-12 col-md-6 col-lg-4">
                 <div class="card border-0 shadow-sm text-center h-100">
                     <div class="card-body d-flex flex-column align-items-center p-3 p-md-4">
                         <img src="{{ $trainer->image ? asset('storage/' . $trainer->image) : 'https://via.placeholder.com/150' }}"
@@ -35,7 +57,7 @@
         @empty
             <div class="col-12">
                 <div class="alert alert-info text-center">
-                    Data trainer belum tersedia.
+                    Tidak ada trainer yang cocok dengan filter yang dipilih.
                 </div>
             </div>
         @endforelse
@@ -43,7 +65,7 @@
 
     @if($trainers->hasPages())
         <div class="mt-4">
-            {{ $trainers->links() }}
+            {{ $trainers->appends(request()->query())->links() }}
         </div>
     @endif
 </div>

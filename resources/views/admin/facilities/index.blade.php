@@ -22,7 +22,7 @@
             <div class="col-12 col-lg-6 col-xl-4 d-flex">
                 <div class="card flex-fill shadow-sm">
                     @if($facility->getImageUrl())
-                        <img src="{{ asset('storage/' . $facility->image) }}" class="card-img-top" alt="{{ $facility->name }}" style="height: 200px; object-fit: cover;">
+                        <img src="{{ $facility->getImageUrl() }}" class="card-img-top" alt="{{ $facility->name }}" style="height: 200px; object-fit: cover;">
                     @endif
                     <div class="card-body d-flex flex-column">
                         {{-- Status Badge --}}
@@ -91,7 +91,7 @@
     <!--                               MODAL TAMBAH FASILITAS                              -->
     <!-- =================================================================================== -->
     <div class="modal fade" id="addFacilityModal" tabindex="-1" aria-labelledby="addFacilityModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
             <div class="modal-content" style="border-radius: 12px;">
                 <form action="{{ route('admin.facilities.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
@@ -136,7 +136,7 @@
     <!--                               MODAL EDIT FASILITAS                                -->
     <!-- =================================================================================== -->
     <div class="modal fade" id="editFacilityModal" tabindex="-1" aria-labelledby="editFacilityModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
             <div class="modal-content" style="border-radius: 12px;">
                 <form id="editFacilityForm" method="POST" enctype="multipart/form-data">
                     @csrf

@@ -15,8 +15,30 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
         
-        $upcomingClasses = ClassSchedule::with('trainer')
+        // Get user's upcoming bookings
+        $myBookings = $user->bookings()
+            ->with(['classSchedule' => function ($query) {
+                $query->with(['trainer', 'classList']);
+            }])
+            ->get()
+            ->filter(function ($booking) {
+                // Basic upcoming filter: today or future days
+                $dayOrder = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+                $todayIndex = array_search(now()->format('l'), $dayOrder);
+                $classIndex = array_search($booking->classSchedule->day, $dayOrder);
+                return $classIndex >= $todayIndex;
+            })
+            ->sortBy(function($booking) {
+                return $booking->classSchedule->day . $booking->classSchedule->start_time;
+            })
+            ->take(5);
+
+        // Generic upcoming classes (for exploration)
+        $upcomingClasses = ClassSchedule::with('trainer', 'classList')
             ->where('is_active', true)
+            ->where('day', '>=', now()->format('l')) // Simplified: from today onwards
+            ->orderBy('day', 'asc')
+            ->orderBy('start_time', 'asc')
             ->limit(6)
             ->get();
             
@@ -25,6 +47,6 @@ class DashboardController extends Controller
             ->limit(4)
             ->get();
         
-        return view('member.dashboard', compact('user', 'upcomingClasses', 'facilities'));
+        return view('member.dashboard', compact('user', 'myBookings', 'upcomingClasses', 'facilities'));
     }
 }

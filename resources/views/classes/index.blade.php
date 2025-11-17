@@ -13,29 +13,29 @@
     {{-- Filter Section --}}
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-body">
-            <form>
+            <form action="{{ route('classes') }}" method="GET">
                 <div class="row g-3 align-items-end">
                     <div class="col-md-4">
                         <label for="filterDay" class="form-label small">Filter Hari:</label>
-                        <select id="filterDay" class="form-select form-select-sm">
+                        <select id="filterDay" name="day" class="form-select form-select-sm">
                             <option value="all">Semua Hari</option>
-                            <option value="Senin">Senin</option>
-                            <option value="Selasa">Selasa</option>
-                            <option value="Rabu">Rabu</option>
-                            <option value="Kamis">Kamis</option>
-                            <option value="Jumat">Jumat</option>
-                            <option value="Sabtu">Sabtu</option>
-                            <option value="Minggu">Minggu</option>
+                            <option value="Senin" {{ ($filterDay ?? '') === 'Senin' ? 'selected' : '' }}>Senin</option>
+                            <option value="Selasa" {{ ($filterDay ?? '') === 'Selasa' ? 'selected' : '' }}>Selasa</option>
+                            <option value="Rabu" {{ ($filterDay ?? '') === 'Rabu' ? 'selected' : '' }}>Rabu</option>
+                            <option value="Kamis" {{ ($filterDay ?? '') === 'Kamis' ? 'selected' : '' }}>Kamis</option>
+                            <option value="Jumat" {{ ($filterDay ?? '') === 'Jumat' ? 'selected' : '' }}>Jumat</option>
+                            <option value="Sabtu" {{ ($filterDay ?? '') === 'Sabtu' ? 'selected' : '' }}>Sabtu</option>
+                            <option value="Minggu" {{ ($filterDay ?? '') === 'Minggu' ? 'selected' : '' }}>Minggu</option>
                         </select>
                     </div>
                     <div class="col-md-4">
                         <label for="filterType" class="form-label small">Filter Tipe Kelas:</label>
-                        <select id="filterType" class="form-select form-select-sm">
+                        <select id="filterType" name="class_type" class="form-select form-select-sm">
                             <option value="all">Semua Tipe</option>
-                            <option value="Cardio">Cardio</option>
-                            <option value="Strength">Strength</option>
-                            <option value="Yoga">Yoga</option>
-                            <option value="HIIT">HIIT</option>
+                            <option value="Cardio" {{ ($filterType ?? '') === 'Cardio' ? 'selected' : '' }}>Cardio</option>
+                            <option value="Strength" {{ ($filterType ?? '') === 'Strength' ? 'selected' : '' }}>Strength</option>
+                            <option value="Yoga" {{ ($filterType ?? '') === 'Yoga' ? 'selected' : '' }}>Yoga</option>
+                            <option value="HIIT" {{ ($filterType ?? '') === 'HIIT' ? 'selected' : '' }}>HIIT</option>
                         </select>
                     </div>
                     <div class="col-md-4">
@@ -92,18 +92,32 @@
                                         </div>
                                     </div>
 
-                                    <div class="mt-auto">
+                                    <div class="mt-auto pt-3">
                                         {{-- Tombol Booking --}}
                                         @auth
-                                            @if(method_exists(Auth::user(), 'isMember') ? Auth::user()->isMember() || Auth::user()->hasActiveMembership() : (Auth::user()->role === 'member'))
-                                                <button class="btn btn-accent btn-sm w-100 mt-2" {{ ($schedule->quota ?? 0) >= ($schedule->max_quota ?? 0) ? 'disabled' : '' }}>
-                                                    {{ ($schedule->quota ?? 0) >= ($schedule->max_quota ?? 0) ? 'Kelas Penuh' : 'Booking Kelas' }}
-                                                </button>
+                                            @if(Auth::user()->hasActiveMembership())
+                                                @php
+                                                    $isBooked = in_array($schedule->id, $userBookings);
+                                                    $isFull = ($schedule->quota ?? 0) >= ($schedule->max_quota ?? 0);
+                                                @endphp
+
+                                                <form action="{{ route('member.bookings.store', $schedule->id) }}" method="POST">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-accent btn-sm w-100" {{ $isFull || $isBooked ? 'disabled' : '' }}>
+                                                        @if($isFull)
+                                                            Kelas Penuh
+                                                        @elseif($isBooked)
+                                                            Sudah Dibooking
+                                                        @else
+                                                            Booking Kelas
+                                                        @endif
+                                                    </button>
+                                                </form>
                                             @else
-                                                <a href="{{ route('membership') }}" class="btn btn-secondary btn-sm w-100 mt-2">Upgrade Membership</a>
+                                                <a href="{{ route('membership') }}" class="btn btn-secondary btn-sm w-100">Upgrade Membership</a>
                                             @endif
                                         @else
-                                            <a href="{{ route('login') }}" class="btn btn-outline-primary btn-sm w-100 mt-2">Login untuk Booking</a>
+                                            <a href="{{ route('login') }}" class="btn btn-outline-primary btn-sm w-100">Login untuk Booking</a>
                                         @endauth
                                     </div>
                                 </div>
@@ -204,4 +218,3 @@
     }
 </style>
 @endsection
-{{-- Modified by: User-Interfaced Team -- }}

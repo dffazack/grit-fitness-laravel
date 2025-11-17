@@ -9,6 +9,9 @@ class LoginController extends Controller
 {
     public function showLoginForm()
     {
+        if (request()->routeIs('admin.login')) {
+            return view('auth.admin-login');
+        }
         return view('auth.login');
     }
     
@@ -19,24 +22,35 @@ class LoginController extends Controller
             'email' => 'required|email',
             'password' => 'required',
         ]);
-        
-        if (Auth::attempt($credentials, $request->filled('remember'))) {
+
+        // Handle Admin Login
+        if ($request->routeIs('admin.login.submit')) {
+            if (Auth::guard('admin')->attempt($credentials, $request->filled('remember'))) {
+                $request->session()->regenerate();
+                return redirect()->route('admin.dashboard')
+                    ->with('success', 'Selamat datang kembali, ' . Auth::guard('admin')->user()->name . '!');
+            }
+
+            return back()->withErrors([
+                'email' => 'Email atau password salah untuk akun admin.',
+            ])->onlyInput('email');
+        }
+
+        // Handle Member Login
+        if (Auth::guard('web')->attempt($credentials, $request->filled('remember'))) {
             $request->session()->regenerate();
-            
-            $user = Auth::user();
-            
-            // Check membership status for members
-            if ($user->membership_status === 'non-member') {
+            $user = Auth::guard('web')->user();
+
+            if ($user->membership_status === 'non-member' || $user->isGuest()) {
                 return redirect()->route('membership')
-                    ->with('info', 'Silakan pilih paket membership untuk melanjutkan.');
+                    ->with('info', 'Akun Anda sudah terdaftar. Silakan pilih paket membership untuk melanjutkan.');
             }
             
-            if ($user->membership_status === 'pending') {
+            if ($user->isPending()) {
                 return redirect()->route('member.dashboard')
                     ->with('info', 'Pembayaran Anda sedang diproses. Kami akan menghubungi Anda segera.');
             }
             
-            // Default redirect for active members
             return redirect()->route('member.dashboard')
                 ->with('success', 'Selamat datang kembali, ' . $user->name . '!');
         }

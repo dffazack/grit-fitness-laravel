@@ -256,6 +256,12 @@
             border-bottom-width: 2px;
         }
 
+        /* Fix for scrollable modals on large screens */
+        .modal-dialog-scrollable .modal-body {
+            overflow-y: auto;
+            max-height: 75vh;
+        }
+
     </style>
     @stack('styles')
 </head>
@@ -431,4 +437,3 @@
     @stack('scripts')
 </body>
 </html>
-{{-- Modified by: User-Interfaced Team --}}
