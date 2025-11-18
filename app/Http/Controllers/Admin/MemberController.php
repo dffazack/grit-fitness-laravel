@@ -79,12 +79,14 @@ class MemberController extends Controller
     
     public function destroy($id)
     {
-        if (Auth::id() == $id) {
+        $member = User::findOrFail($id);
+
+        // Mencegah penghapusan akun dengan role 'admin'
+        if ($member->isAdmin()) {
             return redirect()->route('admin.members.index')
-                ->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
+                ->with('error', 'Anda tidak dapat menghapus akun dengan role Admin.');
         }
 
-        $member = User::findOrFail($id);
         $member->delete();
         
         return redirect()->route('admin.members.index')

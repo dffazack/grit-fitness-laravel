@@ -27,14 +27,6 @@
         </div>
     @endif
 
-    {{-- Menampilkan error upload ketika handler fallback menggunakan query param --}}
-    @if(request()->query('upload_error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <strong>Upload Gagal!</strong>
-            <p class="mb-0">{{ urldecode(request()->query('upload_error_message')) }}</p>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
 
     <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4">
         <h3 class="mb-0" style="color: var(--admin-primary);">Data Trainer</h3>
@@ -53,7 +45,7 @@
                     <div class="card-body d-flex flex-column text-center p-3 p-md-4">
                         
                         {{-- Foto Trainer --}}
-                        <img src="{{ $trainer->getImageUrl() }}" 
+                        <img src="{{ asset('storage/' . $trainer->image) }}" 
                              class="rounded-circle mx-auto mb-3" 
                              alt="{{ $trainer->name }}" 
                              style="width: 120px; height: 120px; object-fit: cover; object-position: center top; border: 4px solid var(--admin-bg); box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
@@ -221,45 +213,59 @@
                         <div class="row g-3">
                             <div class="col-12 col-md-6">
                                 <label for="edit_name_{{ $trainer->id }}" class="form-label">Nama Lengkap</label>
-                                <input type="text" class="form-control" id="edit_name_{{ $trainer->id }}" name="name" value="{{ old('name', $trainer->name) }}" required>
+                                <input type="text" class="form-control @error('name') is-invalid @enderror" id="edit_name_{{ $trainer->id }}" name="name" value="{{ old('name', $trainer->name) }}" required>
+                                @error('name')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-12 col-md-6">
                                 <label for="edit_specialization_{{ $trainer->id }}" class="form-label">Spesialisasi</label>
-                                <input type="text" class="form-control" id="edit_specialization_{{ $trainer->id }}" name="specialization" value="{{ old('specialization', $trainer->specialization) }}" required>
+                                <input type="text" class="form-control @error('specialization') is-invalid @enderror" id="edit_specialization_{{ $trainer->id }}" name="specialization" value="{{ old('specialization', $trainer->specialization) }}" required>
+                                @error('specialization')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-12 col-md-6">
                                 <label for="edit_email_{{ $trainer->id }}" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="edit_email_{{ $trainer->id }}" name="email" value="{{ old('email', $trainer->email) }}" required>
+                                <input type="email" class="form-control @error('email') is-invalid @enderror" id="edit_email_{{ $trainer->id }}" name="email" value="{{ old('email', $trainer->email) }}" required>
+                                @error('email')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-12 col-md-6">
                                 <label for="edit_phone_{{ $trainer->id }}" class="form-label">No. Telepon</label>
-                                <input type="tel" class="form-control" id="edit_phone_{{ $trainer->id }}" name="phone" value="{{ old('phone', $trainer->phone) }}">
+                                <input type="tel" class="form-control @error('phone') is-invalid @enderror" id="edit_phone_{{ $trainer->id }}" name="phone" value="{{ old('phone', $trainer->phone) }}">
+                                @error('phone')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-12 col-md-6">
                                 <label for="edit_experience_{{ $trainer->id }}" class="form-label">Pengalaman (Tahun)</label>
-                                <input type="number" class="form-control" id="edit_experience_{{ $trainer->id }}" name="experience" value="{{ old('experience', $trainer->experience) }}" min="0" required>
+                                <input type="number" class="form-control @error('experience') is-invalid @enderror" id="edit_experience_{{ $trainer->id }}" name="experience" value="{{ old('experience', $trainer->experience) }}" min="0" required>
+                                @error('experience')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-12 col-md-6">
                                 <label for="edit_clients_{{ $trainer->id }}" class="form-label">Jumlah Klien (Opsional)</label>
-                                <input type="text" class="form-control" id="edit_clients_{{ $trainer->id }}" name="clients" value="{{ old('clients', $trainer->clients) }}" placeholder="Contoh: 150+">
-                            </div>
-                            <div class="col-12">
-                                <label for="edit_certifications_{{ $trainer->id }}" class="form-label">Sertifikasi (Pisahkan dengan koma)</label>
-                                <input type="text" class="form-control" id="edit_certifications_{{ $trainer->id }}" name="certifications" value="{{ old('certifications', $trainer->certifications ? implode(', ', $trainer->certifications) : '') }}" placeholder="Contoh: ACE, RYT-200">
+                                <input type="text" class="form-control @error('clients') is-invalid @enderror" id="edit_clients_{{ $trainer->id }}" name="clients" value="{{ old('clients', $trainer->clients) }}" placeholder="Contoh: 150+">
+                                @error('clients')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-12">
                                 <label for="edit_bio_{{ $trainer->id }}" class="form-label">Bio Singkat</label>
-                                <textarea class="form-control" id="edit_bio_{{ $trainer->id }}" name="bio" rows="3">{{ old('bio', $trainer->bio) }}</textarea>
+                                <textarea class="form-control @error('bio') is-invalid @enderror" id="edit_bio_{{ $trainer->id }}" name="bio" rows="3">{{ old('bio', $trainer->bio) }}</textarea>
+                                @error('bio')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-12">
                                 <label for="edit_image_{{ $trainer->id }}" class="form-label">Ganti Foto Trainer (Opsional)</label>
-                                @php
-                                    $isInvalidEdit = $errors->has('image') && old('form_type') == 'edit' && old('trainer_id') == $trainer->id;
-                                @endphp
-                                <input type="file" class="form-control {{ $isInvalidEdit ? 'is-invalid' : '' }} image-upload-input" id="edit_image_{{ $trainer->id }}" name="image" accept=".png,.jpg">
-                                @if($isInvalidEdit)
-                                    <div class="invalid-feedback">{{ $errors->first('image') }}</div>
-                                @endif
+                                <input type="file" class="form-control @error('image') is-invalid @enderror image-upload-input" id="edit_image_{{ $trainer->id }}" name="image" accept=".png,.jpg">
+                                @error('image')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-12">
                                 <div class="form-check form-switch">

@@ -46,7 +46,7 @@
                         </span>
                     </div>
                     <h3 class="fw-bold mb-1" style="color: var(--admin-accent); font-size: clamp(1.25rem, 3.5vw, 1.75rem);">
-                        Rp {{ number_format(($monthlyRevenue ?? 0) / 1000000, 1) }}M
+                        Rp {{ number_format($monthlyRevenue ?? 0, 0, ',', '.') }}
                     </h3>
                     <p class="text-muted mb-0 small">Revenue Bulan Ini</p>
                 </div>
@@ -112,7 +112,7 @@
                                     @forelse($reports ?? [] as $report)
                                     <tr>
                                         <td>{{ $report->date ? $report->date->format('d M Y') : 'N/A' }}</td>
-                                        <td><span class="fw-semibold text-success">Rp {{ number_format($report->revenue / 1000000, 1) }}M</span></td>
+                                        <td><span class="fw-semibold text-success">Rp {{ number_format($report->revenue, 0, ',', '.') }}</span></td>
                                         <td>{{ $report->subscriptions }}</td>
                                         <td><span class="badge bg-warning-subtle text-warning">{{ $report->pending }}</span></td>
                                     </tr>
@@ -137,7 +137,7 @@
                                     <div class="row g-2">
                                         <div class="col-6">
                                             <small class="text-muted d-block">Revenue</small>
-                                            <span class="fw-semibold text-success">Rp {{ number_format($report->revenue / 1000000, 1) }}M</span>
+                                            <span class="fw-semibold text-success">Rp {{ number_format($report->revenue, 0, ',', '.') }}</span>
                                         </div>
                                         <div class="col-6">
                                             <small class="text-muted d-block">Berlangganan</small>

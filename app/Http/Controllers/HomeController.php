@@ -18,15 +18,28 @@ class HomeController extends Controller
         // 1. Ambil SEMUA data homepage
         $content = HomepageContent::all()->keyBy('section');
         
-        // 2. Ambil notifikasi (ini dari kode Anda yang lama, sudah benar)
+        // 2. Ambil notifikasi
         $notifications = Notification::active()->latest()->get();
 
         // 3. Siapkan data 'homepage' (untuk hero)
-        // Gunakan 'true' untuk mengubah JSON jadi ARRAY, BUKAN object
-        $homepage = $content->get('hero') ? $content->get('hero')->content : [
-            'title' => 'Transform Your Body, Transform Your Life',
-            'subtitle' => 'Bergabunglah dengan GRIT Fitness dan mulai perjalanan transformasi Anda.',
-            'image' => asset('images/hero-bg.jpg'), // Sediakan gambar default
+        $heroContent = $content->get('hero') ? $content->get('hero')->content : [];
+        
+        // LOGIKA GAMBAR YANG DIPERBAIKI
+        $heroImage = asset('images/hero-bg.jpg'); // Default fallback
+        
+        if (isset($heroContent['image']) && !empty($heroContent['image'])) {
+            // Cek apakah ini URL eksternal (http/https)
+            if (str_starts_with($heroContent['image'], 'http')) {
+                $heroImage = $heroContent['image']; // Gunakan langsung
+            } else {
+                $heroImage = asset($heroContent['image']); // Bungkus dengan asset() untuk file lokal
+            }
+        }
+
+        $homepage = [
+            'title' => $heroContent['title'] ?? 'Transform Your Body, Transform Your Life',
+            'subtitle' => $heroContent['subtitle'] ?? 'Bergabunglah dengan GRIT Fitness dan mulai perjalanan transformasi Anda.',
+            'image' => $heroImage,
         ];
 
         // 4. Siapkan data 'stats'
@@ -36,9 +49,8 @@ class HomeController extends Controller
         ]);
         
         // 5. Siapkan data 'benefits'
-        // [PERBAIKAN]: Mengganti 'iconName' menjadi 'icon' agar cocok dengan form
         $benefits = $content->get('benefits') ? $content->get('benefits')->content : array_fill(0, 4, [
-            'icon' => 'dumbbell', // <-- SUDAH DIGANTI
+            'icon' => 'dumbbell',
             'title' => 'Benefit',
             'description' => 'Deskripsi benefit belum diatur.',
         ]);
