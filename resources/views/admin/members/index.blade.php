@@ -32,6 +32,10 @@
                 </div>
                 <div class="col-12 col-md-4 col-lg-6 text-md-end">
                     <div class="d-flex gap-2 justify-content-end">
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMemberModal">
+                            <i class="bi bi-plus-circle"></i>
+                            <span class="d-none d-lg-inline ms-1">Tambah Member</span>
+                        </button>
                         <button class="btn btn-outline-secondary" onclick="window.print()">
                             <i class="bi bi-printer"></i>
                             <span class="d-none d-lg-inline ms-1">Print</span>
@@ -101,6 +105,9 @@
                                     <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#detailModal-{{ $member->id }}">
                                         <i class="bi bi-eye-fill"></i>
                                     </button>
+                                    <button type="button" class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#editMemberModal-{{ $member->id }}">
+                                        <i class="bi bi-pencil-fill"></i>
+                                    </button>
                                     <form action="{{ route('admin.members.destroy', $member->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Anda yakin ingin menghapus member ini?');">
                                         @csrf
                                         @method('DELETE')
@@ -155,6 +162,9 @@
                                 <button type="button" class="btn btn-sm btn-primary flex-grow-1" data-bs-toggle="modal" data-bs-target="#detailModal-{{ $member->id }}">
                                     <i class="bi bi-eye-fill me-1"></i> Detail
                                 </button>
+                                <button type="button" class="btn btn-sm btn-warning flex-grow-1" data-bs-toggle="modal" data-bs-target="#editMemberModal-{{ $member->id }}">
+                                    <i class="bi bi-pencil-fill me-1"></i> Edit
+                                </button>
                                 <form action="{{ route('admin.members.destroy', $member->id) }}" method="POST" onsubmit="return confirm('Anda yakin ingin menghapus member ini?');">
                                     @csrf
                                     @method('DELETE')
@@ -177,8 +187,46 @@
         @endif
     </div>
 
+    {{-- Add Member Modal --}}
+    <div class="modal fade" id="addMemberModal" tabindex="-1" aria-labelledby="addMemberModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form action="{{ route('admin.members.store') }}" method="POST">
+                    @csrf
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addMemberModalLabel">Tambah Member Baru</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Nama Lengkap</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Alamat Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password_confirmation" class="form-label">Konfirmasi Password</label>
+                            <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan Member</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     {{-- Modals --}}
     @foreach($members as $member)
+    {{-- Detail Modal --}}
     <div class="modal fade" id="detailModal-{{ $member->id }}" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content border-0 shadow-lg" style="border-radius: 12px;">
@@ -244,6 +292,36 @@
                     </div>
                     @endif
                 </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Edit Modal --}}
+    <div class="modal fade" id="editMemberModal-{{ $member->id }}" tabindex="-1" aria-labelledby="editMemberModalLabel-{{ $member->id }}" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form action="{{ route('admin.members.update', $member->id) }}" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editMemberModalLabel-{{ $member->id }}">Edit Member</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="name-{{ $member->id }}" class="form-label">Nama Lengkap</label>
+                            <input type="text" class="form-control" id="name-{{ $member->id }}" name="name" value="{{ $member->name }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email-{{ $member->id }}" class="form-label">Alamat Email</label>
+                            <input type="email" class="form-control" id="email-{{ $member->id }}" name="email" value="{{ $member->email }}" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

@@ -20,13 +20,13 @@ class TrainerController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'specialization' => 'required|string|max:255',
-            'email' => 'required|email|unique:trainers',
+            'email' => 'required|email',
             'phone' => 'nullable|string',
             'experience' => 'required|integer|min:0',
             'clients' => 'nullable|string',
             'certifications' => 'nullable|string',
             'bio' => 'nullable|string',
-            'image' => 'nullable|required_without:current_image|image|mimes:png,jpg,jpeg|max:2048',
+            'image' => 'required|image|mimes:png,jpg,jpeg|max:2048',
         ], [
             'image.image' => 'File yang diunggah harus berupa gambar.',
             'image.mimes' => 'Format file tidak valid. Hanya file gambar dengan format png atau jpg yang diperbolehkan.',
@@ -55,14 +55,19 @@ class TrainerController extends Controller
     {
         $trainer = Trainer::findOrFail($id);
 
+        // Set form_type and trainer_id for error handling before validation
+        $request->merge([
+            'form_type' => 'edit',
+            'trainer_id' => $trainer->id,
+        ]);
+
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'specialization' => 'required|string|max:255',
-            'email' => 'required|email|unique:trainers,email,' . $id,
+            'email' => 'required|email',
             'phone' => 'nullable|string',
             'experience' => 'required|integer|min:0',
             'clients' => 'nullable|string',
-            'certifications' => 'nullable|string',
             'bio' => 'nullable|string',
             'image' => 'nullable|image|mimes:png,jpg,jpeg|max:2048',
         ], [
@@ -72,20 +77,7 @@ class TrainerController extends Controller
         ]);
 
         $validatedData['is_active'] = $request->has('is_active') ? 1 : 0;
-
-        if (!empty($validatedData['certifications'])) {
-            $validatedData['certifications'] = array_map('trim', explode(',', $validatedData['certifications']));
-        } else {
-            $validatedData['certifications'] = $trainer->certifications ?? [];
-        }
         
-        if ($request->hasFile('image')) {
-            if ($trainer->image && Storage::disk('public')->exists($trainer->image)) {
-                Storage::disk('public')->delete($trainer->image);
-            }
-        }
-
-
         // Ganti gambar hanya jika ada file baru
         if ($request->hasFile('image')) {
             if ($trainer->image && Storage::disk('public')->exists($trainer->image)) {

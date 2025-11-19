@@ -4,6 +4,25 @@
 
 @section('content')
 
+    {{-- Running Text Notification Banner --}}
+    @if(isset($notifications) && $notifications->isNotEmpty())
+        @php
+            // 1. Menggabungkan semua notifikasi menjadi satu baris teks
+            $runningText = $notifications->map(function($notification) {
+                return "<strong>" . e($notification->title) . ":</strong> " . e($notification->message);
+            })->implode(' <span class="text-muted mx-4">&bull;</span> '); // &bull; adalah simbol titik
+        @endphp
+
+        {{-- 2. Container untuk banner tulisan berjalan --}}
+        <div class="running-text-container">
+            <div class="running-text-content">
+                {{-- 3. Teks diduplikasi agar animasi berjalan mulus tanpa putus --}}
+                <span>{!! $runningText !!}</span>
+                <span class="ms-5">{!! $runningText !!}</span>
+            </div>
+        </div>
+    @endif
+
     {{-- Hero Section --}}
     <section class="hero-section position-relative d-flex align-items-center justify-content-center text-white" style="min-height: 600px; background: linear-gradient(rgba(43, 50, 130, 0.7), rgba(43, 50, 130, 0.7)), url('{{ $homepage['image'] ?? asset('images/hero-bg.jpg') }}') center/cover no-repeat;">
         <div class="container text-center animate-fade-in">
@@ -32,7 +51,10 @@
                 @if(!empty($stats) && is_array($stats))
                     @foreach($stats as $stat)
                         <div class="col-6 col-md-3">
-                            <h2 class="display-4 fw-bold mb-1" style="color: var(--grit-accent);">{{ $stat['value'] ?? 'N/A' }}</h2>
+                            {{-- UPDATE: Menambahkan tanda '+' di sini --}}
+                            <h2 class="display-4 fw-bold mb-1" style="color: var(--grit-accent);">
+                                {{ $stat['value'] ?? '0' }}+
+                            </h2>
                             <p class="text-muted small text-uppercase mb-0">{{ $stat['label'] ?? 'N/A' }}</p>
                         </div>
                     @endforeach
@@ -43,7 +65,7 @@
         </div>
     </section>
 
-    {{-- Benefits Section - FIXED --}}
+    {{-- Benefits Section --}}
     <section class="py-5 mt-4">
         <div class="container">
             <div class="text-center mb-5">
@@ -156,15 +178,12 @@
     </section>
     @endif
 
-    {{-- Testimonials Section --}}
-    <section class="bg-light-custom py-5 mt-5">
-    {{-- About Us Section - NEW --}}
+    {{-- About Us Section --}}
     <section class="py-5 mt-5 bg-white">
         <div class="container">
             <div class="row align-items-center g-5">
-                {{-- Text Content (Kiri di Desktop, Atas di Mobile) --}}
+                {{-- Text Content --}}
                 <div class="col-12 col-lg-6 order-2 order-lg-1">
-                    {{-- Section Label --}}
                     <div class="d-flex align-items-center gap-3 mb-4">
                         <div style="width: 50px; height: 3px; background-color: var(--grit-accent);"></div>
                         <h6 class="text-uppercase fw-bold mb-0" style="color: var(--grit-accent); letter-spacing: 2px;">
@@ -172,12 +191,10 @@
                         </h6>
                     </div>
                     
-                    {{-- Main Heading --}}
                     <h2 class="display-5 fw-bold mb-4" style="color: var(--grit-primary);">
                         Pusat Kebugaran Modern di Jantung Kota Malang
                     </h2>
                     
-                    {{-- Description --}}
                     <p class="lead mb-4" style="line-height: 1.8; opacity: 0.9;">
                         Terletak strategis di Plaza Begawan, Tlogomas, Grit Fitness Malang hadir sebagai pusat kebugaran modern yang menawarkan lebih dari sekadar gym.
                     </p>
@@ -196,21 +213,18 @@
                     </p>
                 </div>
                 
-                {{-- Image (Kanan di Desktop, Atas di Mobile) --}}
+                {{-- Image --}}
                 <div class="col-12 col-lg-6 order-1 order-lg-2">
                     <div class="position-relative">
-                        {{-- Decorative Element --}}
                         <div class="position-absolute top-0 end-0 bg-accent" 
                              style="width: 100px; height: 100px; border-radius: 20px; transform: translate(20px, -20px); opacity: 0.5; z-index: 1;">
                         </div>
                         
-                        {{-- Main Image --}}
                         <img src="{{ asset('images/gym-about.jpg') }}" 
                              alt="GRIT Fitness Gym" 
                              class="img-fluid rounded-3 shadow-lg position-relative" 
                              style="z-index: 2; border: 5px solid rgba(229, 27, 131, 0.2);">
                         
-                        {{-- Decorative Element 2 --}}
                         <div class="position-absolute bottom-0 start-0 bg-primary" 
                              style="width: 80px; height: 80px; border-radius: 20px; transform: translate(-20px, 20px); opacity: 0.5; z-index: 1;">
                         </div>
@@ -220,7 +234,7 @@
         </div>
     </section>
 
-    {{-- Testimonials Section - FIXED --}}
+    {{-- Testimonials Section --}}
     <section class="bg-light-custom py-5 mt-4">
         <div class="container">
             <div class="text-center mb-5">
@@ -356,3 +370,37 @@
 </style>
 @endpush
 
+@push('styles')
+<style>
+.running-text-container {
+    width: 100%;
+    overflow: hidden;
+    background-color: #343a40; /* Sedikit lebih terang dari bg-dark */
+    color: #f8f9fa;
+    padding: 0.75rem 0;
+    white-space: nowrap;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.running-text-content {
+    display: inline-block;
+    /* Durasi animasi bisa disesuaikan (misal: 40s untuk lebih lambat) */
+    animation: marquee 30s linear infinite;
+}
+
+.running-text-content span {
+    display: inline-block;
+    padding-right: 5rem; /* Jarak antar teks notifikasi */
+}
+
+/* Animasi untuk menggerakkan teks */
+@keyframes marquee {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%); /* Bergerak sejauh satu blok konten (karena ada duplikat) */
+    }
+}
+</style>
+@endpush

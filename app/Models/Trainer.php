@@ -14,7 +14,6 @@ class Trainer extends Model
         'specialization',
         'experience',
         'clients',
-        'certifications',
         'bio',
         'image',
         'email',
@@ -23,7 +22,6 @@ class Trainer extends Model
     ];
 
     protected $casts = [
-        'certifications' => 'array',
         'is_active' => 'boolean',
     ];
 

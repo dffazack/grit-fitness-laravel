@@ -62,7 +62,11 @@ class LoginController extends Controller
     
     public function logout(Request $request)
     {
-        Auth::logout();
+        if (Auth::guard('admin')->check()) {
+            Auth::guard('admin')->logout();
+        } else {
+            Auth::guard('web')->logout();
+        }
         
         $request->session()->invalidate();
         $request->session()->regenerateToken();

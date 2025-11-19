@@ -81,7 +81,7 @@
                             <label class="form-label">Current Hero Image</label>
                             @if(isset($hero->image) && $hero->image)
                                 @php
-                                    $imageUrl = Str::startsWith($hero->image, ['http://', 'https://']) ? $hero->image : asset('storage/' . $hero->image);
+                                    $imageUrl = Str::startsWith($hero->image, ['http://', 'https://']) ? $hero->image : asset($hero->image);
                                 @endphp
                                 <img src="{{ $imageUrl }}" alt="Hero Preview" class="img-fluid rounded mb-2" style="max-height: 200px; border: 1px solid var(--admin-border);">
                                 <p class="text-muted small">Current: {{ $hero->image }}</p>
