@@ -35,7 +35,7 @@ class RegisterController extends Controller
         
         Auth::login($user);
         
-        return redirect()->route('member.dashboard')
-            ->with('success', 'Akun berhasil dibuat! Silakan pilih paket membership.');
+        return redirect('/')
+            ->with('success', 'Akun berhasil dibuat! Silakan verifikasi email Anda.');
     }
 }

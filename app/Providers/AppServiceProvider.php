@@ -17,8 +17,10 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-    public function boot(): void
-    {
-        //
+    public function boot()
+{
+    if (config('app.env') === 'production' || str_contains(config('app.url'), 'ngrok')) {
+        \Illuminate\Support\Facades\URL::forceScheme('https');
     }
+}
 }

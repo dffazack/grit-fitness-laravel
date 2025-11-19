@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory; // Tambahkan ini jika bel
 use Illuminate\Database\Eloquent\SoftDeletes; // Tambahkan ini karena migrasi Anda ada softDeletes()
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Relations\HasMany; // <-- TAMBAHKAN INI
-use Illuminate\Database\Eloquent\Relations\BelongsTo; // <-- TAMBAHKAN INI
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, Notifiable, SoftDeletes; // Tambahkan HasFactory dan SoftDeletes
 
