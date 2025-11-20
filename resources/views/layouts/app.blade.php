@@ -22,6 +22,9 @@
     <!-- GRIT Custom CSS -->
     <link href="{{ asset('css/grit-style.css') }}" rel="stylesheet">
     
+    <!-- AOS (Animate on Scroll) CSS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
     @stack('styles')
 </head>
 <body class="bg-light-custom"> {{-- Memberi background abu-abu muda untuk layout --}}
@@ -41,6 +44,16 @@
     <!-- Bootstrap 5.3 JS via CDN -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
+    <!-- AOS (Animate on Scroll) JS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 1000, // Durasi animasi dalam milidetik
+            once: true, // Apakah animasi hanya terjadi sekali
+            offset: 50, // Trigger animasi sedikit lebih awal
+        });
+    </script>
+
     @stack('scripts')
 </body>
 </html>

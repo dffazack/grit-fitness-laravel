@@ -3,7 +3,7 @@
         <div class="row g-4">
             <!-- Brand -->
             <div class="col-lg-4">
-                <h3 class="fw-bold mb-3">GRIT <span class="text-accent">FITNESS</span></h3>
+                <h3 class="fw-bold mb-3 text-white">GRIT <span class="text-accent">FITNESS</span></h3>
                 <p class="text-white-50">
                     Transformasikan tubuh dan pikiranmu bersama GRIT Fitness. Fasilitas modern, 
                     trainer profesional, dan komunitas yang supportif.
@@ -12,7 +12,7 @@
             
             <!-- Quick Links -->
             <div class="col-lg-2 col-md-4">
-                <h5 class="fw-semibold mb-3">Menu</h5>
+                <h5 class="fw-semibold mb-3 text-white">Menu</h5>
                 <ul class="list-unstyled">
                     <li class="mb-2">
                         <a href="{{ route('home') }}" class="text-white-50 text-decoration-none hover-accent">
@@ -34,7 +34,7 @@
             
             <!-- Contact -->
             <div class="col-lg-3 col-md-4">
-                <h5 class="fw-semibold mb-3">Kontak</h5>
+                <h5 class="fw-semibold mb-3 text-white">Kontak</h5>
                 <ul class="list-unstyled text-white-50">
                     <li class="mb-2">
                         <i class="bi bi-geo-alt"></i> Plaza Begawan, Tlogomas, Kota Malang, Jawa Timur
@@ -50,7 +50,7 @@
             
             <!-- Social Media -->
 <div class="col-lg-3 col-md-4">
-    <h5 class="fw-semibold mb-3">Ikuti Kami</h5>
+    <h5 class="fw-semibold mb-3 text-white">Ikuti Kami</h5>
 
     <div class="d-flex gap-2 align-items-center">
         <!-- Instagram -->

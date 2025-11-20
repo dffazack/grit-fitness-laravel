@@ -733,3 +733,10 @@ h6 { font-size: 18px; }
         print-color-adjust: exact;
     }
 }
+
+/* --- Robust Equal Height Cards for Popular Packages --- */
+.membership-card .card-body-grid {
+    display: grid;
+    grid-template-rows: auto auto auto 1fr auto; /* h3, h1, p, ul (flexible), div with button */
+    height: 100%;
+}
