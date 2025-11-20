@@ -1,0 +1,76 @@
+name: Run Cypress E2E Tests
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  cypress-run:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Checkout kode dari repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Setup PHP dan cache dependensi Composer
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, xml, curl, zip, sqlite, pdo_sqlite
+          coverage: none
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      # 3. Siapkan environment Laravel
+      - name: Setup Laravel environment
+        run: |
+          cp .env.example .env
+          composer install --no-interaction --no-progress --prefer-dist
+          php artisan key:generate
+          php artisan migrate --force
+
+      # 4. Setup Node.js dan cache dependensi NPM
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Cache Node.js modules
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install NPM dependencies
+        run: npm install
+
+      # 5. Jalankan tes Cypress
+      - name: Run Cypress tests
+        uses: cypress-io/github-action@v6
+        with:
+          start: php artisan serve
+          wait-on: 'http://127.0.0.1:8000'
+          browser: chrome
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: ':memory:'
+          APP_URL: http://127.0.0.1:8000
