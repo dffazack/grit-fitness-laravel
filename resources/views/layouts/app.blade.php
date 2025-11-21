@@ -33,6 +33,37 @@
     @include('components.notification-banner')
     
     <main>
+        {{-- Tambahan: Flash message dari session (untuk redirect middleware) --}}
+        @if (session('error'))
+            <div class="container mt-3">
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ session('error') }}
+                    <a href="{{ route('member.payment') }}" class="btn btn-primary btn-sm ms-2">Perpanjang Membership Sekarang</a>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        @elseif (session('info'))
+            <div class="container mt-3">
+                <div class="alert alert-info alert-dismissible fade show" role="alert">
+                    {{ session('info') }}
+                    <a href="{{ route('member.payment') }}" class="btn btn-primary btn-sm ms-2">Cek Status Pembayaran</a>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        @endif
+
+        {{-- JS optional untuk auto-dismiss setelah 5 detik --}}
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(function() {
+                    document.querySelectorAll('.alert-dismissible').forEach(function(alert) {
+                        var bsAlert = new bootstrap.Alert(alert);
+                        bsAlert.close();
+                    });
+                }, 5000);
+            });
+        </script>
+
         @yield('content')
     </main>
     

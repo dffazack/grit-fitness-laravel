@@ -9,10 +9,11 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasFactory, Notifiable, SoftDeletes; // Tambahkan HasFactory dan SoftDeletes
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes; // Tambahkan HasFactory dan SoftDeletes
 
     protected $fillable = [
         'name',

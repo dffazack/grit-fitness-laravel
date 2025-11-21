@@ -14,9 +14,7 @@ return new class extends Migration
             $table->string('specialization');
             $table->string('experience'); // e.g., "8+ Tahun"
             $table->string('clients'); // e.g., "200+"
-            $table->json('certifications'); // Array of certifications
             $table->text('bio');
-            $table->string('image')->nullable();
             $table->string('email')->nullable();
             $table->string('phone')->nullable();
             $table->boolean('is_active')->default(true);

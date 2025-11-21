@@ -23,4 +23,10 @@ abstract class TestCase extends BaseTestCase
 
         return $app;
     }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class);
+    }
 }
