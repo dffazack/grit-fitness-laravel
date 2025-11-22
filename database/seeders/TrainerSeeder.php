@@ -14,11 +14,11 @@ class TrainerSeeder extends Seeder
             'specialization' => 'Strength & Conditioning',
             'experience' => '8+ Tahun',
             'clients' => '200+',
-            'certifications' => [
+            'certifications' => json_encode([
                 'NSCA-CPT',
                 'ACE Certified',
                 'CrossFit Level 2',
-            ],
+            ]),
             'bio' => 'Spesialis dalam strength training dan conditioning dengan pengalaman melatih atlet profesional dan pemula.',
             'email' => 'michael@gritfitness.com',
             'phone' => '+62 816 1111 2222',
@@ -30,11 +30,11 @@ class TrainerSeeder extends Seeder
             'specialization' => 'Yoga & Pilates',
             'experience' => '6+ Tahun',
             'clients' => '150+',
-            'certifications' => [
+            'certifications' => json_encode([
                 'RYT-500',
                 'Pilates Mat Certified',
                 'Prenatal Yoga Certified',
-            ],
+            ]),
             'bio' => 'Instruktur yoga dan pilates berpengalaman yang fokus pada mind-body connection dan flexibility.',
             'email' => 'sarah@gritfitness.com',
             'phone' => '+62 817 2222 3333',
@@ -46,11 +46,11 @@ class TrainerSeeder extends Seeder
             'specialization' => 'HIIT & Boxing',
             'experience' => '7+ Tahun',
             'clients' => '180+',
-            'certifications' => [
+            'certifications' => json_encode([
                 'NASM-PES',
                 'Boxing Coach Level 1',
                 'HIIT Specialist',
-            ],
+            ]),
             'bio' => 'Pelatih energik yang spesialis dalam high-intensity training dan boxing untuk fat loss dan endurance.',
             'email' => 'david@gritfitness.com',
             'phone' => '+62 818 3333 4444',
@@ -62,11 +62,11 @@ class TrainerSeeder extends Seeder
             'specialization' => 'Functional Training',
             'experience' => '5+ Tahun',
             'clients' => '120+',
-            'certifications' => [
+            'certifications' => json_encode([
                 'ACE Certified',
                 'TRX Certified',
                 'Functional Movement Screen',
-            ],
+            ]),
             'bio' => 'Fokus pada functional training untuk meningkatkan performa dalam aktivitas sehari-hari.',
             'email' => 'lisa@gritfitness.com',
             'phone' => '+62 819 4444 5555',

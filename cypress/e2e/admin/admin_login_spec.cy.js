@@ -12,7 +12,7 @@ describe("Admin Login and Dashboard Test", () => {
     it("Should be on the admin dashboard after login", () => {
         // After login, we just verify that we are on the right page
         // and key elements are visible.
-        cy.contains("p", "Revenue Bulan Ini").should("be.visible");
+        cy.contains("Revenue Bulan Ini").should("be.visible");
         cy.contains("p", "Total Member").should("be.visible");
     });
 
