@@ -21,8 +21,8 @@
         @forelse($facilities as $facility)
             <div class="col-12 col-lg-6 col-xl-4 d-flex">
                 <div class="card flex-fill shadow-sm">
-                    @if($facility->getImageUrl())
-                        <img src="{{ $facility->getImageUrl() }}" class="card-img-top" alt="{{ $facility->name }}" style="height: 200px; object-fit: cover;">
+                    @if($facility->image())
+                        <img src="{{ asset('storage/' . $facility->image }}" class="card-img-top" alt="{{ $facility->name }}" style="height: 200px; object-fit: cover;">
                     @endif
                     <div class="card-body d-flex flex-column">
                         {{-- Status Badge --}}

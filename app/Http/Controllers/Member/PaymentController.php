@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Member;
 
 use App\Http\Controllers\Controller;
@@ -7,11 +8,10 @@ use App\Models\MembershipPackage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage; // <-- PASTIKAN INI DITAMBAHKAN
+use Illuminate\Support\Facades\Storage;
 
 class PaymentController extends Controller
 {
-
     public function index()
     {
         $packages = MembershipPackage::where('is_active', true)->get();
@@ -73,6 +73,11 @@ class PaymentController extends Controller
             'proof_url' => $filename, // Simpan path yang kita buat
             'status' => 'pending',
         ]);
+        
+        // !! TAMBAHAN: Update user membership_status ke 'pending'
+        $user = Auth::user();
+        $user->membership_status = 'pending';
+        $user->save();
         
         return back()->with('success', 'Pembayaran berhasil diajukan. Menunggu validasi admin.');
     }

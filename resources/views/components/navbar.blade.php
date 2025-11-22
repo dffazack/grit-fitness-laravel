@@ -26,9 +26,14 @@
 
                 @auth('web')
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('member.dashboard') ? 'active fw-semibold' : '' }}"
-                           style="{{ request()->routeIs('member.dashboard') ? 'color: var(--grit-accent);' : 'color: var(--grit-text);' }}"
-                           href="{{ route('member.dashboard') }}">
+                        @php
+                            // Fallback jika route belum defined (cegah error)
+                            $dashboardRoute = Route::has('member.dashboard') ? route('member.dashboard') : route('home');
+                            $isActive = request()->routeIs('member.dashboard');
+                        @endphp
+                        <a class="nav-link {{ $isActive ? 'active fw-semibold' : '' }}"
+                           style="{{ $isActive ? 'color: var(--grit-accent);' : 'color: var(--grit-text);' }}"
+                           href="{{ $dashboardRoute }}">
                            <i class="bi bi-layout-text-sidebar-reverse me-1"></i> Dashboard
                         </a>
                     </li>
@@ -70,7 +75,7 @@
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2" aria-labelledby="profileDropdown">
                             <li>
-                                <a class="dropdown-item py-2" href="{{ route('member.dashboard') }}">
+                                <a class="dropdown-item py-2" href="{{ $dashboardRoute }}">  {{-- Pakai fallback sama --}}
                                     <i class="bi bi-layout-text-sidebar-reverse me-2 text-muted"></i> Dashboard Saya
                                 </a>
                             </li>
@@ -114,7 +119,3 @@
         </div>
     </div>
 </nav>
-
-
-{{-- ... (style Anda yang sudah ada) ... --}}
-

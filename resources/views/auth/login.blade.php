@@ -21,28 +21,28 @@
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
                             <input type="email"
-                                   class="form-control @error('email') is-invalid @enderror"
-                                   id="email"
-                                   name="email"
-                                   value="{{ old('email') }}"
-                                   placeholder="Masukkan email Anda"
-                                   required
-                                   autofocus>
+                                class="form-control @error('email') is-invalid @enderror"
+                                id="email"
+                                name="email"
+                                value="{{ old('email') }}"
+                                placeholder="Masukkan email Anda"
+                                required
+                                autofocus>
                             @error('email')
-                                <div class="invalid-feedback">{{ $message }}</div>
+                            <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
 
                         <div class="mb-3">
                             <label for="password" class="form-label">Password</label>
                             <input type="password"
-                                   class="form-control @error('password') is-invalid @enderror"
-                                   id="password"
-                                   name="password"
-                                   placeholder="Masukkan password"
-                                   required>
+                                class="form-control @error('password') is-invalid @enderror"
+                                id="password"
+                                name="password"
+                                placeholder="Masukkan password"
+                                required>
                             @error('password')
-                                <div class="invalid-feedback">{{ $message }}</div>
+                            <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
 
@@ -51,6 +51,9 @@
                                 <input class="form-check-input" type="checkbox" name="remember" id="remember">
                                 <label class="form-check-label small" for="remember">
                                     Ingat Saya
+                                    <a href="{{ route('password.request') }}" class="small text-primary text-decoration-none">
+                                        Lupa Password?
+                                    </a>
                                 </label>
                             </div>
                             {{-- Tautan Lupa Password bisa ditambahkan jika ada fiturnya --}}

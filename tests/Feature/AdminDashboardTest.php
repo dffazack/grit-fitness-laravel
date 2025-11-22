@@ -1,35 +1,23 @@
 <?php
 
-namespace Tests\Feature;
-
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
+use Illuminate\Support\Facades\Auth;
 
-class AdminDashboardTest extends TestCase
-{
-    use RefreshDatabase;
+beforeEach(function () {
+    // Create an admin user once for all tests in this file
+    $adminUser = User::factory()->create(['role' => 'admin']);
+    $this->actingAs($adminUser, 'admin');
+});
 
-    /**
-     * Indicates if the database should be seeded.
-     *
-     * @var bool
-     */
-    protected $seed = true;
+test('unauthenticated user is redirected from admin dashboard', function () {
+    Auth::logout();
+    $response = $this->get('/admin/dashboard');
 
-    public function test_unauthenticated_user_is_redirected_from_admin_dashboard(): void
-    {
-        $response = $this->get('/admin/dashboard');
+    $response->assertRedirect(route('admin.login'));
+});
 
-        $response->assertRedirect(route('admin.login'));
-    }
+test('authenticated admin can access dashboard', function () {
+    $response = $this->get('/admin/dashboard');
 
-    public function test_authenticated_admin_can_access_dashboard(): void
-    {
-        $adminUser = User::factory()->create(['role' => 'admin']);
-
-        $response = $this->actingAs($adminUser)->get('/admin/dashboard');
-
-        $response->assertStatus(200);
-    }
-}
+    $response->assertStatus(200);
+});

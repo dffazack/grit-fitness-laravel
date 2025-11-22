@@ -4,37 +4,51 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class CheckMembershipStatus
 {
-    /**
-     * Handle an incoming request.
-     */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!auth()->check()) {
+        $user = Auth::user();
+
+        // 1. Pastikan user login (Jaga-jaga)
+        if (!$user) {
             return redirect()->route('login');
         }
 
-        $user = auth()->user();
+        // =================================================================
+        // PERBAIKAN UTAMA: DAFTAR PENGECUALIAN (WHITELIST)
+        // =================================================================
+        // Kita harus mengizinkan user mengakses halaman 'payment' atau 'membership'
+        // meskipun status mereka 'pending' atau 'expired', supaya tidak loop.
+        
+        // Ganti 'member.payment' dan 'membership' sesuai nama route kamu
+        $allowedRoutes = [
+            'member.payment', 
+            'member.payment.store', 
+            'membership',
+            'logout', // Penting! Biar user bisa logout kalau nyangkut
+        ];
 
-        // Check if membership is expired
-        if ($user->membership_status === 'expired') {
-            return redirect()->route('member.payment')
-                ->with('error', 'Membership Anda telah berakhir. Silakan perpanjang membership.');
+        if (in_array($request->route()->getName(), $allowedRoutes)) {
+            return $next($request);
         }
+        // =================================================================
 
-        // Check if membership is pending
-        if ($user->membership_status === 'pending') {
-            return redirect()->route('member.dashboard')
-                ->with('info', 'Pembayaran Anda sedang diproses oleh admin.');
-        }
+        // 2. Cek Status Membership
+        if ($user->membership_status !== 'active') {
+            
+            // Jika Pending, lempar ke halaman pembayaran member
+            if ($user->membership_status === 'pending') {
+                return redirect()->route('member.payment')
+                    ->with('warning', 'Pembayaran Anda sedang diproses. Silakan selesaikan pembayaran.');
+            }
 
-        // Check if user is not a member
-        if ($user->membership_status === 'non-member') {
+            // Jika Expired atau belum punya, lempar ke halaman pilih paket
             return redirect()->route('membership')
-                ->with('info', 'Silakan pilih paket membership terlebih dahulu.');
+                ->with('warning', 'Membership Anda tidak aktif. Silakan beli paket.');
         }
 
         return $next($request);
