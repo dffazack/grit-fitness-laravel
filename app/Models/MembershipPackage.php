@@ -42,13 +42,18 @@ class MembershipPackage extends Model
         return 'Rp ' . number_format($this->price, 0, ',', '.');
     }
 
-    public function isRegular()
+    public function isBasic()
     {
-        return $this->type === 'regular';
+        return $this->type === 'basic';
     }
 
-    public function isStudent()
+    public function isPremium()
     {
-        return $this->type === 'student';
+        return $this->type === 'premium';
+    }
+
+    public function isVip()
+    {
+        return $this->type === 'vip';
     }
 }

@@ -54,24 +54,16 @@ class ClassSchedule extends Model
         'is_active',
     ];
 
-    /**
-     * Atribut yang harus di-cast ke tipe data tertentu.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
-        'start_time' => 'datetime:H:i', // Format Jam:Menit
-        'end_time' => 'datetime:H:i',   // Format Jam:Menit
-        'is_active' => 'boolean',       // tinyint(1) akan jadi true/false
+        'start_time' => 'datetime:H:i',
+        'end_time' => 'datetime:H:i',
+        'is_active' => 'boolean',
         'quota' => 'integer',
         'max_quota' => 'integer',
     ];
 
     // --- RELASI ---
 
-    /**
-     * Mendapatkan daftar kelas (ClassList) yang terkait dengan jadwal ini.
-     */
     public function classList(): BelongsTo
     {
         return $this->belongsTo(ClassList::class);
@@ -153,6 +145,4 @@ class ClassSchedule extends Model
         if ($this->max_quota == 0) return 0;
         return round(($this->quota / $this->max_quota) * 100);
     }
-
-    // DUPLIKAT FUNGSI DAN KOMENTAR SISA MERGE DIHAPUS DARI SINI
 }

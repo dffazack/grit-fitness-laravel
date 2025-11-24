@@ -73,13 +73,9 @@
             "php-http/discovery": true
         },
         "audit": {
-<<<<<<< HEAD
             "ignore": [
                 "PKSA-365x-2zjk-pt47"
             ]
-=======
-            "ignore": ["PKSA-365x-2zjk-pt47"]
->>>>>>> origin/verification
         }
     },
     "minimum-stability": "stable",
