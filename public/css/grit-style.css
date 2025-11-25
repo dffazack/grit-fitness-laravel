@@ -740,3 +740,110 @@ h6 { font-size: 18px; }
     grid-template-rows: auto auto auto 1fr auto; /* h3, h1, p, ul (flexible), div with button */
     height: 100%;
 }
+
+/* ============================================
+   STYLES FROM HOME/INDEX.BLADE.PHP
+   ============================================ */
+
+.card-hover {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card-hover:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
+}
+.running-text-container {
+    width: 100%;
+    overflow: hidden;
+    background-color: #343a40;
+    color: #f8f9fa;
+    padding: 0.75rem 0;
+    white-space: nowrap;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.running-text-content {
+    display: inline-block;
+    animation: marquee 30s linear infinite;
+}
+.running-text-content span {
+    display: inline-block;
+    padding-right: 5rem;
+}
+/* === Perbaikan responsive untuk Popular Packages (mobile friendly) === */
+
+/* Pastikan card menggunakan box-sizing dan penuh lebar kontainer kolom */
+.membership-card {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: clamp(320px, 30vw, 560px); /* tetap responsif; ubah jika perlu */
+}
+
+/* Body kartu agar mengisi vertikal dan tombol mt-auto bekerja */
+.membership-card .card-body,
+.membership-card .card-body-grid {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 1.25rem;
+}
+
+/* List fitur ambil sisa ruang dan scroll bila konten panjang */
+.membership-card .list-unstyled {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+  padding-right: 0.25rem;
+}
+
+/* Adjustments khusus untuk layar kecil supaya kartu tampak lebih 'full' */
+@media (max-width: 575.98px) {
+  /* kurangi efek gutter berlebihan pada kolom mobile (tetap beri sedikit padding) */
+  .row.g-4 > [class*="col-"] {
+    padding-left: 0.6rem;
+    padding-right: 0.6rem;
+  }
+
+  /* pastikan card memenuhi kolom tanpa offset */
+  .membership-card {
+    min-height: auto;    /* mobile: biarkan tinggi menyesuaikan konten */
+    width: 100%;
+    border-radius: 12px;
+  }
+
+  .membership-card .card-body,
+  .membership-card .card-body-grid {
+    padding: 0.95rem;
+  }
+
+  /* kalau mau list fitur tidak membuat halaman makin panjang, batasi sedikit */
+  .membership-card .list-unstyled {
+    max-height: 320px;
+  }
+}
+
+/* Opsi full-bleed (jika kamu ingin kartu benar-benar melebar ke tepi layar mobile)
+   - Gunakan salah satu: aktifkan dengan menambahkan kelas .full-bleed pada section
+*/
+@media (max-width: 575.98px) {
+  .popular-packages-section.full-bleed .container {
+    max-width: 100%;
+    padding-left: 0.6rem;
+    padding-right: 0.6rem;
+  }
+  .popular-packages-section.full-bleed .row {
+    margin-left: 0;
+    margin-right: 0;
+  }
+  .popular-packages-section.full-bleed .col-12 {
+    padding-left: 0.6rem;
+    padding-right: 0.6rem;
+  }
+}
+
+@keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}

@@ -119,7 +119,7 @@
 
     {{-- ==================== MODAL TAMBAH TRAINER ==================== --}}
     <div class="modal fade" id="addTrainerModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg modal-fullscreen-sm-down">
             <div class="modal-content border-0 shadow-lg" style="border-radius:12px;">
                 <form action="{{ route('admin.trainers.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
@@ -279,31 +279,78 @@
 {{-- ====================== STYLES ====================== --}}
 @push('styles')
 <style>
-    .hover-card{
-        transition:transform .3s ease,box-shadow .3s ease;
+    /* ==== HOVER CARD (tetap) ==== */
+    .hover-card {
+        transition: transform .3s ease, box-shadow .3s ease;
     }
-    .hover-card:hover{
-        transform:translateY(-5px);
-        box-shadow:0 8px 24px rgba(0,0,0,.15)!important;
+    .hover-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 24px rgba(0,0,0,.15)!important;
     }
 
-    /* Fix modal footer tidak terlihat di layar kecil */
-    .modal-dialog .modal-content{
-        max-height:90vh;
-        display:flex;
-        flex-direction:column;
+    /* ==== FIX MODAL DI HP – SUPER RESPONSIVE ==== */
+    @media (max-width: 576px) {
+        /* Modal jadi full screen di HP kecil */
+        .modal-dialog.modal-lg {
+            margin: 0;
+            max-width: 100vw;
+            min-height: 100vh;
+        }
+        .modal-dialog .modal-content {
+            border-radius: 0 !important;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-header {
+            padding: 1rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .modal-body {
+            padding: 1rem;
+            flex-grow: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch; /* Smooth scroll di iOS */
+        }
+        .modal-footer {
+            padding: 1rem;
+            border-top: 1px solid #dee2e6;
+            flex-shrink: 0;
+        }
+
+        /* Form row jadi 1 kolom di HP */
+        .modal-body .row.g-3 > [class*="col-"] {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+
+        /* Input & label lebih besar di HP */
+        .modal-body .form-label {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .modal-body .form-control,
+        .modal-body .form-check-input {
+            font-size: 1rem;
+            padding: 0.75rem;
+        }
+        .modal-body .form-check-label {
+            font-size: 0.95rem;
+        }
     }
-    .modal-content form{
-        display:flex;
-        flex-direction:column;
-        flex-grow:1;
-        min-height:0;
+
+    /* Tablet & Desktop tetap rapi */
+    @media (min-width: 577px) {
+        .modal-dialog.modal-lg {
+            max-width: 800px;
+        }
     }
-    .modal-header,.modal-footer{flex-shrink:0;}
-    .modal-body{
-        flex-grow:1;
-        overflow-y:auto;
-        min-height:0;
+
+    /* Pastikan modal tetap bisa discroll */
+    .modal-body {
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
     }
 </style>
 @endpush

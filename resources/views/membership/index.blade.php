@@ -9,7 +9,7 @@
         
         {{-- Student Packages Section --}}
         @if($studentPackages->isNotEmpty())
-        <div class="package-section mb-5">
+        <div class="package-section mb-5" data-aos="fade-up">
             {{-- Section Header --}}
             <div class="package-header mb-4">
                 <div class="d-flex align-items-center gap-3">
@@ -26,7 +26,7 @@
             {{-- Student Package Cards --}}
             <div class="row g-4">
                 @foreach($studentPackages as $package)
-                <div class="col-12 col-md-6 col-lg-3">
+                <div class="col-12 col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="{{ ($loop->index + 1) * 100 }}">
                     <div class="membership-card-v2 h-100 {{ $package->is_popular ? 'recommended' : '' }}">
                         
                         {{-- Recommended Badge --}}
@@ -90,7 +90,7 @@
 
         {{-- Regular Packages Section --}}
         @if($regularPackages->isNotEmpty())
-        <div class="package-section">
+        <div class="package-section" data-aos="fade-up">
             {{-- Section Header --}}
             <div class="package-header mb-4">
                 <div class="d-flex align-items-center gap-3">
@@ -107,7 +107,7 @@
             {{-- Regular Package Cards --}}
             <div class="row g-4">
                 @foreach($regularPackages as $package)
-                <div class="col-12 col-md-6 col-lg-3">
+                <div class="col-12 col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="{{ ($loop->index + 1) * 100 }}">
                     <div class="membership-card-v2 h-100 {{ $package->is_popular ? 'recommended' : '' }}">
                         
                         {{-- Recommended Badge --}}
