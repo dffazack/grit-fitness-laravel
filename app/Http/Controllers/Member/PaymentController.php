@@ -23,7 +23,7 @@ class PaymentController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'package' => ['required', \Illuminate\Validation\Rule::in(array_keys(MembershipPackage::TYPES))],
+            'membership_package_id' => 'required|exists:membership_packages,id',
             'proof' => 'required|image|mimes:png,jpg,jpeg|max:2048',
         ]);
         
@@ -34,7 +34,7 @@ class PaymentController extends Controller
                 ->withInput();
         }
         
-        $package = MembershipPackage::where('type', $validated['package'])->firstOrFail();
+        $package = MembershipPackage::findOrFail($validated['membership_package_id']);
         
         // ==============================================================
         // !! PERUBAHAN LOGIKA PENYIMPANAN FILE !!

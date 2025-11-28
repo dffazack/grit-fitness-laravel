@@ -32,13 +32,13 @@
                         {{-- Recommended Badge --}}
                         @if($package->is_popular)
                         <div class="recommended-badge">
-                            ⭐ Recommended
+                            🔥 Populer
                         </div>
                         @endif
 
                         {{-- Package Duration --}}
                         <div class="package-duration mb-3">
-                            {{ $package->duration_months }} Bulan
+                            {{ ucfirst($package->type) }} - {{ $package->duration_months }} Bulan
                         </div>
 
                         {{-- Package Price --}}
@@ -113,13 +113,13 @@
                         {{-- Recommended Badge --}}
                         @if($package->is_popular)
                         <div class="recommended-badge">
-                            ⭐ Recommended
+                            🔥 Populer
                         </div>
                         @endif
 
                         {{-- Package Duration --}}
                         <div class="package-duration mb-3">
-                            {{ $package->duration_months }} Bulan
+                            {{ ucfirst($package->type) }} - {{ $package->duration_months }} Bulan
                         </div>
 
                         {{-- Package Price --}}

@@ -49,11 +49,11 @@
                             </thead>
                             <tbody>
                                 {{-- Ganti $paymentHistory dengan data dari controller --}}
-                                @php $paymentHistory = $user->transactions()->orderBy('created_at', 'desc')->get(); @endphp
+                                @php $paymentHistory = $user->transactions()->with('membership')->orderBy('created_at', 'desc')->get(); @endphp
                                 @forelse($paymentHistory as $payment)
                                     <tr>
                                         <td>{{ $payment->created_at->format('d M Y') }}</td>
-                                        <td class="text-capitalize">{{ $payment->package }} Membership</td>
+                                        <td class="text-capitalize">{{ ucfirst($payment->membership->type) }} - {{ $payment->membership->duration_months }} bulan</td>
                                         <td>Rp {{ number_format($payment->amount, 0, ',', '.') }}</td>
                                         <td>
                                             @if($payment->status == 'approved' || $payment->status == 'active')
@@ -92,18 +92,18 @@
                                 @csrf
                                 
                                 <div class="mb-3">
-                                    <label for="package" class="form-label">Pilih Paket</label>
-                                    <select class="form-select @error('package') is-invalid @enderror" id="package" name="package" required>
+                                    <label for="membership_package_id" class="form-label">Pilih Paket</label>
+                                    <select class="form-select @error('membership_package_id') is-invalid @enderror" id="membership_package_id" name="membership_package_id" required>
                                         <option value="">-- Pilih Paket Membership --</option>
                                         {{-- Ganti $packages dengan data dari controller --}}
-                                        @php $packages = \App\Models\MembershipPackage::where('is_active', true)->get(); @endphp
+                                        @php $packages = \App\Models\MembershipPackage::where('is_active', true)->orderBy('price')->get(); @endphp
                                         @foreach($packages as $package)
-                                            <option value="{{ $package->type }}" {{ request('package') == $package->type ? 'selected' : '' }}>
-                                                {{ $package->name }} (Rp {{ number_format($package->price, 0, ',', '.') }})
+                                            <option value="{{ $package->id }}" {{ old('membership_package_id') == $package->id ? 'selected' : '' }}>
+                                                {{ ucfirst($package->type) }} - {{ $package->duration_months }} bulan (Rp {{ number_format($package->price, 0, ',', '.') }})
                                             </option>
                                         @endforeach
                                     </select>
-                                    @error('package') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                    @error('membership_package_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                 </div>
 
                                 <div class="mb-3">

@@ -64,11 +64,8 @@
                                         <small class="text-muted">{{ $tx->user->email ?? '-' }}</small>
                                     </div>
                                 </td>
-                                <td>
-                                    {{ $tx->membership->name }}
-                                    @if($tx->membership)
-                                        <br><small class="text-muted">{{ $tx->membership->duration_months }} Bulan</small>
-                                    @endif
+                                <td class="text-capitalize">
+                                    {{ ucfirst($tx->membership->type) }} - {{ $tx->membership->duration_months }} bulan
                                 </td>
                                 <td><span class="fw-semibold">{{ $tx->getFormattedAmount() }}</span></td>
                                 <td><span class="badge rounded-pill bg-pending">{{ $tx->getStatusLabel() }}</span></td>
@@ -107,11 +104,8 @@
                                 </div>
                                 <div class="col-12">
                                     <small class="text-muted d-block">Paket</small>
-                                    <span class="small fw-semibold">
-                                        {{ $tx->membership->name }}
-                                        @if($tx->membership)
-                                            ({{ $tx->membership->duration_months }} Bulan)
-                                        @endif
+                                    <span class="small fw-semibold text-capitalize">
+                                        {{ ucfirst($tx->membership->type) }} - {{ $tx->membership->duration_months }} bulan
                                     </span>
                                 </div>
                             </div>
@@ -152,7 +146,7 @@
                         </li>
                         <li class="list-group-item d-flex justify-content-between px-0 py-2">
                             <span class="text-muted">Paket</span>
-                            <span class="fw-semibold">{{ $tx->membership->name }}</span>
+                            <span class="fw-semibold text-capitalize">{{ ucfirst($tx->membership->type) }} - {{ $tx->membership->duration_months }} bulan</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between px-0 py-2">
                             <span class="text-muted">Jumlah</span>
