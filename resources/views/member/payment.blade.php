@@ -99,7 +99,7 @@
                                         @php $packages = \App\Models\MembershipPackage::where('is_active', true)->get(); @endphp
                                         @foreach($packages as $package)
                                             <option value="{{ $package->type }}" {{ request('package') == $package->type ? 'selected' : '' }}>
-                                                {{ $package->name }} (Rp {{ number_format($package->price, 0, ',', '.') }})
+                                                {{ \App\Models\MembershipPackage::TYPES[$package->type] ?? $package->name }} {{ $package->duration_months }} bulan (Rp {{ number_format($package->price, 0, ',', '.') }})
                                             </option>
                                         @endforeach
                                     </select>

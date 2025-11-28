@@ -128,7 +128,7 @@
                     <div class="modal-header border-0">
                         <h5 class="modal-title">Tambah Trainer Baru</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
+                    </div>          
 
                     <div class="modal-body p-3 p-md-4">
                         <div class="row g-3">
@@ -193,72 +193,66 @@
     {{-- ==================== MODAL EDIT TRAINER (per trainer) ==================== --}}
     @foreach($trainers as $trainer)
         <div class="modal fade" id="editModal-{{ $trainer->id }}" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg modal-fullscreen-sm-down">
                 <div class="modal-content border-0 shadow-lg" style="border-radius:12px;">
                     <form action="{{ route('admin.trainers.update', $trainer->id) }}" method="POST" enctype="multipart/form-data">
-                        @csrf @method('PUT')
+                        @csrf
+                        @method('PUT')
                         <input type="hidden" name="form_type" value="edit">
-                        <div class="row g-3">
-                            <div class="col-12 col-md-6">
-                                <label for="edit_name_{{ $trainer->id }}" class="form-label">Nama Lengkap</label>
-                                <input type="text" class="form-control @error('name') is-invalid @enderror" id="edit_name_{{ $trainer->id }}" name="name" value="{{ old('name', $trainer->name) }}" required>
-                                @error('name')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="col-12 col-md-6">
-                                <label for="edit_specialization_{{ $trainer->id }}" class="form-label">Spesialisasi</label>
-                                <input type="text" class="form-control @error('specialization') is-invalid @enderror" id="edit_specialization_{{ $trainer->id }}" name="specialization" value="{{ old('specialization', $trainer->specialization) }}" required>
-                                @error('specialization')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="col-12 col-md-6">
-                                <label for="edit_email_{{ $trainer->id }}" class="form-label">Email</label>
-                                <input type="email" class="form-control @error('email') is-invalid @enderror" id="edit_email_{{ $trainer->id }}" name="email" value="{{ old('email', $trainer->email) }}" required>
-                                @error('email')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="col-12 col-md-6">
-                                <label for="edit_phone_{{ $trainer->id }}" class="form-label">No. Telepon</label>
-                                <input type="tel" class="form-control @error('phone') is-invalid @enderror" id="edit_phone_{{ $trainer->id }}" name="phone" value="{{ old('phone', $trainer->phone) }}">
-                                @error('phone')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="col-12 col-md-6">
-                                <label for="edit_experience_{{ $trainer->id }}" class="form-label">Pengalaman (Tahun)</label>
-                                <input type="number" class="form-control @error('experience') is-invalid @enderror" id="edit_experience_{{ $trainer->id }}" name="experience" value="{{ old('experience', $trainer->experience) }}" min="0" required>
-                                @error('experience')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="col-12 col-md-6">
-                                <label for="edit_clients_{{ $trainer->id }}" class="form-label">Jumlah Klien (Opsional)</label>
-                                <input type="text" class="form-control @error('clients') is-invalid @enderror" id="edit_clients_{{ $trainer->id }}" name="clients" value="{{ old('clients', $trainer->clients) }}" placeholder="Contoh: 150+">
-                                @error('clients')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="col-12">
-                                <label for="edit_bio_{{ $trainer->id }}" class="form-label">Bio Singkat</label>
-                                <textarea class="form-control @error('bio') is-invalid @enderror" id="edit_bio_{{ $trainer->id }}" name="bio" rows="3">{{ old('bio', $trainer->bio) }}</textarea>
-                                @error('bio')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="col-12">
-                                <label for="edit_image_{{ $trainer->id }}" class="form-label">Ganti Foto Trainer (Opsional)</label>
-                                <input type="file" class="form-control @error('image') is-invalid @enderror image-upload-input" id="edit_image_{{ $trainer->id }}" name="image" accept=".png,.jpg">
-                                @error('image')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="col-12">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" role="switch" id="edit_is_active_{{ $trainer->id }}" name="is_active" value="1" {{ (old('is_active', $trainer->is_active) == 1) ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="edit_is_active_{{ $trainer->id }}">Status Aktif</label>
+                        {{-- Penting untuk re-open modal jika validasi gagal --}}
+                        <input type="hidden" name="trainer_id" value="{{ $trainer->id }}">
+
+                        <div class="modal-header border-0">
+                            <h5 class="modal-title">Edit Data Trainer</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+
+                        <div class="modal-body p-3 p-md-4">
+                            <div class="row g-3">
+                                <div class="col-12 col-md-6">
+                                    <label for="edit_name_{{ $trainer->id }}" class="form-label">Nama Lengkap</label>
+                                    <input type="text" class="form-control" id="edit_name_{{ $trainer->id }}" name="name" value="{{ old('name', $trainer->name) }}" required>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <label for="edit_specialization_{{ $trainer->id }}" class="form-label">Spesialisasi</label>
+                                    <input type="text" class="form-control" id="edit_specialization_{{ $trainer->id }}" name="specialization" value="{{ old('specialization', $trainer->specialization) }}" required>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <label for="edit_email_{{ $trainer->id }}" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="edit_email_{{ $trainer->id }}" name="email" value="{{ old('email', $trainer->email) }}" required>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <label for="edit_phone_{{ $trainer->id }}" class="form-label">No. Telepon</label>
+                                    <input type="tel" class="form-control" id="edit_phone_{{ $trainer->id }}" name="phone" value="{{ old('phone', $trainer->phone) }}">
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <label for="edit_experience_{{ $trainer->id }}" class="form-label">Pengalaman (Tahun)</label>
+                                    <input type="number" class="form-control" id="edit_experience_{{ $trainer->id }}" name="experience" value="{{ old('experience', $trainer->experience) }}" min="0" required>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <label for="edit_clients_{{ $trainer->id }}" class="form-label">Jumlah Klien (Opsional)</label>
+                                    <input type="text" class="form-control" id="edit_clients_{{ $trainer->id }}" name="clients" value="{{ old('clients', $trainer->clients) }}" placeholder="Contoh: 150+">
+                                </div>
+                                 <div class="col-12">
+                                    <label for="edit_certifications_{{ $trainer->id }}" class="form-label">Sertifikasi (Pisahkan dengan koma)</label>
+                                    <input type="text" class="form-control" id="edit_certifications_{{ $trainer->id }}" name="certifications" value="{{ old('certifications', $trainer->certifications) }}" placeholder="Contoh: ACE, RYT-200">
+                                </div>
+                                <div class="col-12">
+                                    <label for="edit_bio_{{ $trainer->id }}" class="form-label">Bio Singkat</label>
+                                    <textarea class="form-control" id="edit_bio_{{ $trainer->id }}" name="bio" rows="3">{{ old('bio', $trainer->bio) }}</textarea>
+                                </div>
+                                <div class="col-12">
+                                    <label for="edit_image_{{ $trainer->id }}" class="form-label">Ganti Foto Trainer (Opsional)</label>
+                                    @php $isInvalid = $errors->has('image') && old('form_type') == 'edit' && old('trainer_id') == $trainer->id; @endphp
+                                    <input type="file" class="form-control {{ $isInvalid ? 'is-invalid' : '' }} image-upload-input" id="edit_image_{{ $trainer->id }}" name="image" accept=".png,.jpg,.jpeg">
+                                     <small class="form-text text-muted">Hanya PNG/JPG/JPEG, maksimal 2MB.</small>
+                                     @if($isInvalid)<div class="invalid-feedback">{{ $errors->first('image') }}</div>@endif
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" role="switch" id="edit_is_active_{{ $trainer->id }}" name="is_active" value="1" {{ (old('is_active', $trainer->is_active) == 1) ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="edit_is_active_{{ $trainer->id }}">Status Aktif</label>
+                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -71,6 +71,7 @@
                             <tr>
                                 <th class="border-0">Nama</th>
                                 <th class="border-0">Email</th>
+                                <th class="border-0">No. Telepon</th>
                                 <th class="border-0">Paket</th>
                                 <th class="border-0">Status</th>
                                 <th class="border-0">Expired</th>
@@ -90,6 +91,7 @@
                                     </div>
                                 </td>
                                 <td>{{ $member->email }}</td>
+                                <td>{{ $member->phone ?? 'N/A' }}</td>
                                 <td>{{ $member->membership->name ?? 'N/A' }}</td>
                                 <td>
                                     @if($member->membership_status == 'active')
@@ -207,6 +209,10 @@
                             <input type="email" class="form-control" id="email" name="email" required>
                         </div>
                         <div class="mb-3">
+                            <label for="phone" class="form-label">Nomor Telepon</label>
+                            <input type="tel" class="form-control" id="phone" name="phone" placeholder="Contoh: 08123456789">
+                        </div>
+                        <div class="mb-3">
                             <label for="password" class="form-label">Password</label>
                             <input type="password" class="form-control" id="password" name="password" required>
                         </div>
@@ -315,6 +321,10 @@
                         <div class="mb-3">
                             <label for="email-{{ $member->id }}" class="form-label">Alamat Email</label>
                             <input type="email" class="form-control" id="email-{{ $member->id }}" name="email" value="{{ $member->email }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="phone-{{ $member->id }}" class="form-label">Nomor Telepon</label>
+                            <input type="tel" class="form-control" id="phone-{{ $member->id }}" name="phone" value="{{ $member->phone }}" placeholder="Contoh: 08123456789">
                         </div>
                     </div>
                     <div class="modal-footer">
