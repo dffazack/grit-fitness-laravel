@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Controller;
 use App\Models\HomepageContent;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class HomepageController extends Controller
 {
@@ -25,27 +25,27 @@ class HomepageController extends Controller
         $content = HomepageContent::all()->keyBy('section');
 
         // Hero Data
-        $hero = $content->get('hero') ? (object)$content->get('hero')->content : (object)[
+        $hero = $content->get('hero') ? (object) $content->get('hero')->content : (object) [
             'title' => '',
             'subtitle' => '',
             'image' => '',
         ];
-        
+
         // Stats Data
-        $stats = $content->get('stats') ? array_map(fn($item) => (object)$item, $content->get('stats')->content) : array_fill(0, 4, (object)[
+        $stats = $content->get('stats') ? array_map(fn ($item) => (object) $item, $content->get('stats')->content) : array_fill(0, 4, (object) [
             'value' => '',
             'label' => '',
         ]);
-        
+
         // Benefits Data
-        $benefits = $content->get('benefits') ? array_map(fn($item) => (object)$item, $content->get('benefits')->content) : array_fill(0, 4, (object)[
+        $benefits = $content->get('benefits') ? array_map(fn ($item) => (object) $item, $content->get('benefits')->content) : array_fill(0, 4, (object) [
             'icon' => 'dumbbell',
             'title' => '',
             'description' => '',
         ]);
-        
+
         // Testimonials Data
-        $testimonials = $content->get('testimonials') ? array_map(fn($item) => (object)$item, $content->get('testimonials')->content) : array_fill(0, 3, (object)[
+        $testimonials = $content->get('testimonials') ? array_map(fn ($item) => (object) $item, $content->get('testimonials')->content) : array_fill(0, 3, (object) [
             'name' => '',
             'role' => '',
             'text' => '',
@@ -68,12 +68,12 @@ class HomepageController extends Controller
             'title' => 'required|string|max:255',
             'subtitle' => 'required|string',
             'image_url' => 'nullable|url',
-            'image_file' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:5120', 
+            'image_file' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:5120',
         ]);
 
         // 2. Ambil Data (Gunakan firstOrNew agar aman)
         $homepageContent = HomepageContent::firstOrNew(['section' => 'hero']);
-        
+
         // Ambil konten yang ada sekarang (jika ada)
         $currentContent = $homepageContent->content ?? [];
 
@@ -86,9 +86,9 @@ class HomepageController extends Controller
 
         if ($request->hasFile('image_file')) {
             $imageFile = $request->file('image_file');
-            $imageName = 'hero-' . time() . '.' . $imageFile->getClientOriginalExtension();
+            $imageName = 'hero-'.time().'.'.$imageFile->getClientOriginalExtension();
             Storage::disk('public')->putFileAs('images/homepage', $imageFile, $imageName);
-            $imagePath = 'storage/images/homepage/' . $imageName;
+            $imagePath = 'storage/images/homepage/'.$imageName;
         }
 
         // 4. Susun Data Final
@@ -113,7 +113,7 @@ class HomepageController extends Controller
         $data = $request->validate([
             'stats' => 'required|array|size:4',
             // Hapus max:50 agar bisa input angka besar
-            'stats.*.value' => 'required|numeric', 
+            'stats.*.value' => 'required|numeric',
             'stats.*.label' => 'required|string|max:100',
         ]);
 

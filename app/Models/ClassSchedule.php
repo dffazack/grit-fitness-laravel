@@ -4,8 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ClassSchedule extends Model
@@ -13,13 +13,13 @@ class ClassSchedule extends Model
     use HasFactory, SoftDeletes;
 
     public const DAYS = [
-        'Senin', 
-        'Selasa', 
-        'Rabu', 
-        'Kamis', 
-        'Jumat', 
-        'Sabtu', 
-        'Minggu'
+        'Senin',
+        'Selasa',
+        'Rabu',
+        'Kamis',
+        'Jumat',
+        'Sabtu',
+        'Minggu',
     ];
 
     public const CLASS_TYPES = [
@@ -31,7 +31,7 @@ class ClassSchedule extends Model
         'Boxing',
         'Zumba',
     ];
-    
+
     protected $table = 'class_schedules';
 
     /**
@@ -118,7 +118,7 @@ class ClassSchedule extends Model
      */
     public function getFormattedTime()
     {
-        return $this->start_time->format('H:i') . ' - ' . $this->end_time->format('H:i');
+        return $this->start_time->format('H:i').' - '.$this->end_time->format('H:i');
     }
 
     /**
@@ -150,7 +150,10 @@ class ClassSchedule extends Model
      */
     public function getQuotaPercentage()
     {
-        if ($this->max_quota == 0) return 0;
+        if ($this->max_quota == 0) {
+            return 0;
+        }
+
         return round(($this->quota / $this->max_quota) * 100);
     }
 

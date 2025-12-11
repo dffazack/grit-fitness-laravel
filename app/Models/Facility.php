@@ -15,7 +15,7 @@ class Facility extends Model
         'icon',
         'image',
         'is_active',
-        'order'
+        'order',
     ];
 
     protected $casts = [
@@ -39,10 +39,10 @@ class Facility extends Model
     /**
      * Helpers
      */
-    
+
     /**
      * Get the full URL for the facility image
-     * 
+     *
      * @return string
      */
     public function getImageUrl()
@@ -61,10 +61,10 @@ class Facility extends Model
             if (Storage::disk('public')->exists($this->image)) {
                 return Storage::disk('public')->url($this->image);
             }
-        } 
+        }
         // Otherwise, it's a simple filename (from seeder)
         else {
-            $publicPath = 'images/facilities/' . $this->image;
+            $publicPath = 'images/facilities/'.$this->image;
             if (file_exists(public_path($publicPath))) {
                 return asset($publicPath);
             }
@@ -77,7 +77,7 @@ class Facility extends Model
     /**
      * Get image attribute (accessor)
      * Auto-generates full URL when accessing image
-     * 
+     *
      * @return string
      */
     public function getImageUrlAttribute()
@@ -88,7 +88,7 @@ class Facility extends Model
     /**
      * Get description as array
      * Useful if description contains comma-separated features
-     * 
+     *
      * @return array
      */
     public function getDescriptionArray()
@@ -99,14 +99,14 @@ class Facility extends Model
 
         return array_filter(
             array_map('trim', explode(',', $this->description)),
-            fn($item) => !empty($item)
+            fn ($item) => ! empty($item)
         );
     }
 
     /**
      * Get features attribute (accessor)
      * Auto-converts description to array
-     * 
+     *
      * @return array
      */
     public function getFeaturesAttribute()

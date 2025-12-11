@@ -31,6 +31,7 @@ class ScheduleController extends Controller
     {
         $trainers = Trainer::where('is_active', true)->get();
         $classLists = ClassList::all();
+
         return view('admin.schedules.create', compact('trainers', 'classLists'));
     }
 
@@ -38,12 +39,12 @@ class ScheduleController extends Controller
     {
         // Validasi field umum
         $validated = $request->validate([
-            'day' => 'required|in:' . implode(',', ClassSchedule::DAYS),
+            'day' => 'required|in:'.implode(',', ClassSchedule::DAYS),
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i|after:start_time',
             'trainer_id' => 'required|exists:trainers,id',
             'max_quota' => 'required|integer|min:1',
-            'type' => 'required|in:' . implode(',', ClassSchedule::CLASS_TYPES),
+            'type' => 'required|in:'.implode(',', ClassSchedule::CLASS_TYPES),
             'description' => 'nullable|string',
         ]);
 
@@ -79,12 +80,12 @@ class ScheduleController extends Controller
 
         // Validasi field umum
         $validated = $request->validate([
-            'day' => 'required|in:' . implode(',', ClassSchedule::DAYS),
+            'day' => 'required|in:'.implode(',', ClassSchedule::DAYS),
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i|after:start_time',
             'trainer_id' => 'required|exists:trainers,id',
             'max_quota' => 'required|integer|min:1',
-            'type' => 'required|in:' . implode(',', ClassSchedule::CLASS_TYPES),
+            'type' => 'required|in:'.implode(',', ClassSchedule::CLASS_TYPES),
             'description' => 'nullable|string',
         ]);
 

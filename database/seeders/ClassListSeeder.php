@@ -16,9 +16,9 @@ class ClassListSeeder extends Seeder
     {
         // 1. Daftar nama kelas yang diberikan user
         $classNames = [
-            'BodyCombat', 'BodyPump', 'Pilates', 'Circuit Training', 'Dynamic Strength', 
-            'Fit Track', 'Power Up', 'Muay Thai', 'Boxing', 'Zumba', 'Hip Hop', 
-            'Yoga', 'Pound Fit'
+            'BodyCombat', 'BodyPump', 'Pilates', 'Circuit Training', 'Dynamic Strength',
+            'Fit Track', 'Power Up', 'Muay Thai', 'Boxing', 'Zumba', 'Hip Hop',
+            'Yoga', 'Pound Fit',
         ];
 
         // 2. Hapus duplikat jika ada

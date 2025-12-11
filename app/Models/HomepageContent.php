@@ -39,6 +39,7 @@ class HomepageContent extends Model
         $content = $this->content ?? [];
         $content[$key] = $value;
         $this->content = $content;
+
         return $this;
     }
 }

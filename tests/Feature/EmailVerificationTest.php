@@ -1,9 +1,9 @@
 <?php
 
 use App\Models\User;
-use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\Auth\Notifications\VerifyEmail;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\URL;
 
 test('user must verify email', function () {
 

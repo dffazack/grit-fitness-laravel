@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\ClassSchedule;
 use App\Models\Trainer;
 use Illuminate\Http\Request;
-
 use Illuminate\Support\Facades\Auth;
 
 class ClassController extends Controller

@@ -19,7 +19,7 @@ class RedirectIfAuthenticated
                 if ($guard === 'admin') {
                     return redirect()->route('admin.dashboard');
                 }
-                
+
                 // Member yang sudah login mencoba akses halaman login member
                 if ($guard === null || $guard === 'web') {
                     return redirect()->route('member.dashboard');

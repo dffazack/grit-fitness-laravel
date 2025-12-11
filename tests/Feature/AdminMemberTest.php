@@ -30,7 +30,7 @@ test('admin can create a new member', function () {
 test('admin can edit a member', function () {
     $user = User::factory()->create();
 
-    $response = $this->put('/admin/members/' . $user->id, [
+    $response = $this->put('/admin/members/'.$user->id, [
         'name' => 'Updated Name',
         'email' => $user->email,
     ]);
@@ -45,7 +45,7 @@ test('admin can edit a member', function () {
 test('admin can delete a member', function () {
     $user = User::factory()->create();
 
-    $response = $this->delete('/admin/members/' . $user->id);
+    $response = $this->delete('/admin/members/'.$user->id);
 
     $response->assertRedirect(route('admin.members.index'));
     $this->assertSoftDeleted('users', [

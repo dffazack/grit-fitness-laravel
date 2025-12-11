@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
 
 test('user can register successfully', function () {
     $response = $this->post('/register', [

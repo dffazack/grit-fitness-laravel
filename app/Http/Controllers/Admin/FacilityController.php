@@ -12,6 +12,7 @@ class FacilityController extends Controller
     public function index()
     {
         $facilities = Facility::ordered()->paginate(10);
+
         return view('admin.facilities.index', compact('facilities'));
     }
 
@@ -28,7 +29,7 @@ class FacilityController extends Controller
             'icon' => 'nullable|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
             'order' => 'nullable|integer',
-            'is_active' => 'boolean'
+            'is_active' => 'boolean',
         ]);
 
         // Handle image upload
@@ -57,7 +58,7 @@ class FacilityController extends Controller
             'icon' => 'nullable|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120', // Increased to 5MB
             'order' => 'nullable|integer',
-            'is_active' => 'sometimes|boolean'
+            'is_active' => 'sometimes|boolean',
         ]);
 
         // Handle image upload

@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 
 class PaymentController extends Controller
 {
-
     /**
      * Menampilkan daftar pembayaran yang PERLU VALIDASI (pending).
      */
@@ -17,18 +16,18 @@ class PaymentController extends Controller
     {
         // Modifikasi query: Hanya ambil yang statusnya 'pending'
         $query = Transaction::where('status', 'pending')
-                            ->with(['user', 'membership']); // Muat relasi user & membership
+            ->with(['user', 'membership']); // Muat relasi user & membership
 
         // Logika filter (opsional, tapi bagus untuk masa depan)
         if ($request->filled('search')) {
             $query->whereHas('user', function ($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->search . '%')
-                  ->orWhere('email', 'like', '%' . $request->search . '%');
+                $q->where('name', 'like', '%'.$request->search.'%')
+                    ->orWhere('email', 'like', '%'.$request->search.'%');
             });
         }
-        
+
         $transactions = $query->latest()->paginate(15);
-        
+
         return view('admin.payments.index', compact('transactions'));
     }
 
@@ -48,7 +47,7 @@ class PaymentController extends Controller
         $user = $transaction->user;
         if ($user && $transaction->membership) {
             $duration = $transaction->membership->duration_months;
-            
+
             // Cek apakah user sedang dalam masa aktif, jika ya, perpanjang. Jika tidak, mulai dari sekarang.
             $newExpiryDate = ($user->hasActiveMembership() && $user->membership_expiry && $user->membership_expiry->isFuture())
                 ? $user->membership_expiry->addMonths($duration)
@@ -58,7 +57,7 @@ class PaymentController extends Controller
                 'membership_status' => 'active',
                 'role' => 'member', // Update the user's role
                 'membership_package_id' => $transaction->membership_package_id,
-                'membership_expiry' => $newExpiryDate, 
+                'membership_expiry' => $newExpiryDate,
             ]);
         }
 
@@ -74,7 +73,7 @@ class PaymentController extends Controller
         $transaction->update([
             'status' => 'rejected',
         ]);
-        
+
         // (Opsional) Anda bisa tambahkan logika untuk mengirim notifikasi ke user
 
         return back()->with('success', 'Pembayaran berhasil ditolak.');

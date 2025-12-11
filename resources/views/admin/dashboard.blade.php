@@ -168,7 +168,11 @@
                             <div class="flex-grow-1">
                                 <h6 class="fw-semibold mb-1">{{ $payment->user->name ?? 'User' }}</h6>
                                 <p class="text-muted small mb-1">
-                                    {{ $payment->membership->name ?? $payment->package }} - {{ $payment->duration ?? '12' }} Bulan
+                                    @if($payment->membership)
+                                        {{ ucfirst($payment->membership->type) }} - {{ $payment->membership->name }}
+                                    @else
+                                        {{ $payment->package ?? 'N/A' }}
+                                    @endif
                                 </p>
                                 <p class="mb-0 small fw-semibold">Rp {{ number_format($payment->amount, 0, ',', '.') }}</p>
                             </div>

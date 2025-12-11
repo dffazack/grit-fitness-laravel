@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
@@ -12,9 +13,10 @@ class LoginController extends Controller
         if (request()->routeIs('admin.login')) {
             return view('auth.admin-login');
         }
+
         return view('auth.login');
     }
-    
+
     // GANTI METHOD INI DENGAN KODE BARU
     public function login(Request $request)
     {
@@ -27,8 +29,9 @@ class LoginController extends Controller
         if ($request->routeIs('admin.login.submit')) {
             if (Auth::guard('admin')->attempt($credentials, $request->filled('remember'))) {
                 $request->session()->regenerate();
+
                 return redirect()->route('admin.dashboard')
-                    ->with('success', 'Selamat datang kembali, ' . Auth::guard('admin')->user()->name . '!');
+                    ->with('success', 'Selamat datang kembali, '.Auth::guard('admin')->user()->name.'!');
             }
 
             return back()->withErrors([
@@ -42,24 +45,24 @@ class LoginController extends Controller
             $user = Auth::guard('web')->user();
 
             if ($user->membership_status === 'non-member' || $user->isGuest()) {
-                return redirect()->route('membership')
-                    ->with('info', 'Akun Anda sudah terdaftar. Silakan pilih paket membership untuk melanjutkan.');
+                return redirect()->route('homepage')
+                    ->with('info', 'Akun Anda sudah terdaftar.');
             }
-            
+
             if ($user->isPending()) {
                 return redirect()->route('member.dashboard')
                     ->with('info', 'Pembayaran Anda sedang diproses. Kami akan menghubungi Anda segera.');
             }
-            
+
             return redirect()->route('member.dashboard')
-                ->with('success', 'Selamat datang kembali, ' . $user->name . '!');
+                ->with('success', 'Selamat datang kembali, '.$user->name.'!');
         }
-        
+
         return back()->withErrors([
             'email' => 'Email atau password salah.',
         ])->onlyInput('email');
     }
-    
+
     public function logout(Request $request)
     {
         if (Auth::guard('admin')->check()) {
@@ -67,10 +70,10 @@ class LoginController extends Controller
         } else {
             Auth::guard('web')->logout();
         }
-        
+
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        
+
         return redirect()->route('home')
             ->with('success', 'Anda telah logout.');
     }

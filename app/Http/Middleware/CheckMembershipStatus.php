@@ -13,44 +13,43 @@ class CheckMembershipStatus
     {
         $user = Auth::user();
 
-        // 1. Pastikan user login (Jaga-jaga)
-        if (!$user) {
+        if (! $user) {
             return redirect()->route('login');
         }
 
-        // =================================================================
-        // PERBAIKAN UTAMA: DAFTAR PENGECUALIAN (WHITELIST)
-        // =================================================================
-        // Kita harus mengizinkan user mengakses halaman 'payment' atau 'membership'
-        // meskipun status mereka 'pending' atau 'expired', supaya tidak loop.
-        
-        // Ganti 'member.payment' dan 'membership' sesuai nama route kamu
+        // Special handling for pending members on the dashboard
+        if ($user->membership_status === 'pending' && $request->route()->named('member.dashboard')) {
+            // Flash the message and let them see the dashboard.
+            session()->flash('info', 'Pembayaran Anda sedang diproses oleh admin.');
+
+            return $next($request);
+        }
+
         $allowedRoutes = [
-            'member.payment', 
-            'member.payment.store', 
+            'member.payment',
+            'member.payment.store',
             'membership',
-            'logout', // Penting! Biar user bisa logout kalau nyangkut
+            'logout',
         ];
 
         if (in_array($request->route()->getName(), $allowedRoutes)) {
             return $next($request);
         }
-        // =================================================================
 
-        // 2. Cek Status Membership
-        if ($user->membership_status !== 'active') {
-            
-            // Jika Pending, lempar ke halaman pembayaran member
-            if ($user->membership_status === 'pending') {
-                return redirect()->route('member.payment')
-                    ->with('warning', 'Pembayaran Anda sedang diproses. Silakan selesaikan pembayaran.');
-            }
-
-            // Jika Expired atau belum punya, lempar ke halaman pilih paket
-            return redirect()->route('membership')
-                ->with('warning', 'Membership Anda tidak aktif. Silakan beli paket.');
+        if ($user->membership_status === 'non-member') {
+            return redirect('/membership')->with('info', 'Silakan pilih paket membership terlebih dahulu.');
         }
 
+        if ($user->membership_status === 'pending') {
+            // For any other route, redirect to the dashboard
+            return redirect('/member/dashboard');
+        }
+
+        if ($user->membership_status === 'expired') {
+            return redirect('/member/payment')->with('error', 'Membership Anda telah berakhir. Silakan perpanjang membership.');
+        }
+
+        // This is for 'active' members
         return $next($request);
     }
 }

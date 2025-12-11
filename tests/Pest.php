@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Middleware\VerifyCsrfToken;
-use Illuminate\Contracts\Http\Kernel;
 
 /*
 |--------------------------------------------------------------------------

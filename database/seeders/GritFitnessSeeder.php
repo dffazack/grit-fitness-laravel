@@ -1,7 +1,9 @@
 <?php
+
 namespace database\seeders; // <-- PASTIKAN NAMESPACE INI BENAR!
 
 use Illuminate\Database\Seeder;
+
 // use App\Models\User; // Import model yang Anda butuhkan
 
 class GritFitnessSeeder extends Seeder // <-- PASTIKAN NAMA CLASS INI BENAR!

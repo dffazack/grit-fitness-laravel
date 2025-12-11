@@ -5,10 +5,9 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered; // Pastikan baris ini ada (sudah ada di kodemu)
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class RegisterController extends Controller
 {
@@ -16,7 +15,7 @@ class RegisterController extends Controller
     {
         return view('auth.register');
     }
-    
+
     public function register(Request $request)
     {
         // 1. Validasi Input
@@ -26,7 +25,7 @@ class RegisterController extends Controller
             'phone' => 'required|string|max:20',
             'password' => 'required|string|min:8|confirmed',
         ]);
-        
+
         // 2. Buat User Baru di Database
         $user = User::create([
             'name' => $validated['name'],
@@ -36,7 +35,7 @@ class RegisterController extends Controller
             'role' => 'guest', // Default role
             'membership_status' => 'non-member',
         ]);
-        
+
         // ============================================================
         // PERBAIKAN: Tambahkan kode ini agar email otomatis terkirim
         // ============================================================
@@ -45,7 +44,7 @@ class RegisterController extends Controller
 
         // 3. Login Otomatis
         Auth::login($user);
-        
+
         // 4. Redirect ke Halaman Notice "Cek Email Anda"
         return redirect()->route('verification.notice')
             ->with('success', 'Akun berhasil dibuat! Silakan cek inbox email Anda untuk verifikasi.');

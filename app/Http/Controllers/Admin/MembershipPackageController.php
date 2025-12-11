@@ -15,9 +15,9 @@ class MembershipPackageController extends Controller
     public function index()
     {
         $packages = MembershipPackage::orderBy('price', 'asc')->get();
-        
+
         // Data ini kita kirim ke modal
-        $types = MembershipPackage::TYPES; 
+        $types = MembershipPackage::TYPES;
 
         return view('admin.membership.index', compact('packages', 'types'));
     }
@@ -41,17 +41,16 @@ class MembershipPackageController extends Controller
 
         // Trim whitespace from each feature
         $validated['features'] = array_map('trim', $validated['features']);
-        
+
         // Handle checkbox
         $validated['is_active'] = $request->has('is_active');
         $validated['is_popular'] = $request->has('is_popular');
 
         MembershipPackage::create($validated);
-        
+
         return redirect()->route('admin.memberships.index')
             ->with('success', 'Paket membership berhasil ditambahkan.');
     }
-
 
     /**
      * Mengupdate paket yang ada dari modal 'Edit'.
@@ -78,13 +77,13 @@ class MembershipPackageController extends Controller
 
         // Trim whitespace from each feature
         $validated['features'] = array_map('trim', $validated['features']);
-        
+
         // Handle checkbox
         $validated['is_active'] = $request->has('is_active');
         $validated['is_popular'] = $request->has('is_popular');
 
         $package->update($validated);
-        
+
         return redirect()->route('admin.memberships.index')
             ->with('success', 'Paket membership berhasil diperbarui.');
     }
@@ -95,7 +94,7 @@ class MembershipPackageController extends Controller
     public function destroy($id)
     {
         $package = MembershipPackage::findOrFail($id);
-        
+
         // Cek apakah ada member yang sedang pakai paket ini
         $isUsedByUser = \App\Models\User::where('membership_package_id', $id)->exists();
         $isUsedInTransaction = \App\Models\Transaction::where('membership_package_id', $id)->exists();
@@ -106,7 +105,7 @@ class MembershipPackageController extends Controller
         }
 
         $package->delete();
-        
+
         return redirect()->route('admin.memberships.index')
             ->with('success', 'Paket membership berhasil dihapus.');
     }

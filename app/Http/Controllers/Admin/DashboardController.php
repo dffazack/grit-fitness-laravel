@@ -3,16 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use App\Models\Transaction;
-use App\Models\ClassSchedule;
 use App\Models\Booking;
-use Illuminate\Http\Request;
+use App\Models\ClassSchedule;
+use App\Models\Transaction;
+use App\Models\User;
 use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
-    
     public function index()
     {
         // 1. Data untuk "Laporan Keuangan Harian"
@@ -32,24 +30,23 @@ class DashboardController extends Controller
 
         // 2. Data untuk "Pembayaran Menunggu Validasi"
         $pendingPayments = Transaction::where('status', 'pending')
-                            ->with(['user', 'membership'])
-                            ->latest()
-                            ->take(5)
-                            ->get();
+            ->with(['user', 'membership'])
+            ->latest()
+            ->take(5)
+            ->get();
 
         // 3. Data untuk "Booking Hari Ini"
         $todayClasses = ClassSchedule::whereDate('start_time', Carbon::today())
-                            ->with('trainer')
-                            ->withCount('bookings') // Ini akan membuat 'bookings_count'
-                            ->get();
+            ->with('trainer')
+            ->withCount('bookings') // Ini akan membuat 'bookings_count'
+            ->get();
 
         // 4. Data untuk Stats Cards
         $totalMembers = User::where('role', 'member')->count();
         $monthlyRevenue = Transaction::where('status', 'approved')
-                            ->whereMonth('created_at', Carbon::now()->month)
-                            ->sum('amount');
+            ->whereMonth('created_at', Carbon::now()->month)
+            ->sum('amount');
         $activeClasses = $todayClasses->count();
-        
 
         // 5. Kirim SEMUA data ke view
         return view('admin.dashboard', compact(

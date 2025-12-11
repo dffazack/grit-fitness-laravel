@@ -15,7 +15,7 @@ return new class extends Migration
             $table->date('booking_date');
             $table->enum('status', ['booked', 'attended', 'cancelled'])->default('booked');
             $table->timestamps();
-            
+
             // Prevent duplicate bookings
             $table->unique(['class_schedule_id', 'user_id', 'booking_date']);
         });

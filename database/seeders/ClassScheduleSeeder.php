@@ -1,10 +1,10 @@
 <?php
+
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
+use App\Models\ClassList;
 use App\Models\ClassSchedule;
-use App\Models\ClassList; // <-- PENTING
-use Carbon\Carbon;
+use Illuminate\Database\Seeder; // <-- PENTING
 
 class ClassScheduleSeeder extends Seeder
 {
@@ -18,19 +18,20 @@ class ClassScheduleSeeder extends Seeder
         $hiit = ClassList::where('name', 'HIIT')->first();
         $strength = ClassList::where('name', 'Strength')->first();
         $boxing = ClassList::where('name', 'Boxing')->first();
-        $pilates = ClassList::where('name', 'Pilates')->first();        if (!$yoga) {
+        $pilates = ClassList::where('name', 'Pilates')->first();
+        if (! $yoga) {
             $yoga = ClassList::factory()->create(['name' => 'Yoga']);
         }
-        if (!$hiit) {
+        if (! $hiit) {
             $hiit = ClassList::factory()->create(['name' => 'HIIT']);
         }
-        if (!$strength) {
+        if (! $strength) {
             $strength = ClassList::factory()->create(['name' => 'Strength']);
         }
-        if (!$boxing) {
+        if (! $boxing) {
             $boxing = ClassList::factory()->create(['name' => 'Boxing']);
         }
-        if (!$pilates) {
+        if (! $pilates) {
             $pilates = ClassList::factory()->create(['name' => 'Pilates']);
         }
         $schedules = [
@@ -61,7 +62,7 @@ class ClassScheduleSeeder extends Seeder
                 'description' => 'Latihan intensif untuk membakar kalori maksimal',
                 'is_active' => true,
             ],
-            
+
             // Selasa
             [
                 'class_list_id' => $strength->id,
@@ -89,7 +90,7 @@ class ClassScheduleSeeder extends Seeder
                 'description' => 'Pelajari teknik boxing dasar sambil cardio',
                 'is_active' => true,
             ],
-            
+
             // Rabu
             [
                 'class_list_id' => $pilates->id,
@@ -117,10 +118,10 @@ class ClassScheduleSeeder extends Seeder
                 'description' => 'Latihan fungsional untuk performa optimal',
                 'is_active' => true,
             ],
-            
+
             // Kamis
             [
-                'class_list_id' => $hiit->id, 
+                'class_list_id' => $hiit->id,
                 'custom_class_name' => 'Cardio Blast',
                 'day' => 'Kamis',
                 'start_time' => '07:00',
@@ -132,7 +133,7 @@ class ClassScheduleSeeder extends Seeder
                 'description' => 'High-energy cardio untuk stamina',
                 'is_active' => true,
             ],
-            
+
             // Jumat
             [
                 'class_list_id' => $yoga->id,
@@ -160,7 +161,7 @@ class ClassScheduleSeeder extends Seeder
                 'description' => 'Dasar-dasar crossfit untuk pemula',
                 'is_active' => true,
             ],
-            
+
             // Sabtu
             [
                 'class_list_id' => $strength->id,
@@ -188,7 +189,7 @@ class ClassScheduleSeeder extends Seeder
                 'description' => 'Kombinasi boxing dan cardio intensif',
                 'is_active' => true,
             ],
-            
+
             // Minggu
             [
                 'class_list_id' => $yoga->id,
@@ -206,8 +207,8 @@ class ClassScheduleSeeder extends Seeder
         ];
 
         // Hapus data lama untuk menghindari duplikat
-        ClassSchedule::query()->delete(); 
-        
+        ClassSchedule::query()->delete();
+
         foreach ($schedules as $schedule) {
             ClassSchedule::create($schedule);
         }

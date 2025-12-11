@@ -16,7 +16,7 @@ class CheckAdminAccess
     public function handle(Request $request, Closure $next): Response
     {
         // Jika ada user member yang login (bukan admin)
-        if (Auth::guard('web')->check() && !Auth::guard('admin')->check()) {
+        if (Auth::guard('web')->check() && ! Auth::guard('admin')->check()) {
             return redirect()->route('home')
                 ->with('error', 'Anda tidak memiliki akses ke halaman admin.');
         }

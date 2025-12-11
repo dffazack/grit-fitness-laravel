@@ -12,6 +12,7 @@ class TrainerController extends Controller
     public function index()
     {
         $trainers = Trainer::latest()->paginate(9);
+
         return view('admin.trainers.index', compact('trainers'));
     }
 
@@ -41,7 +42,7 @@ class TrainerController extends Controller
 
         $validated['is_active'] = $request->has('is_active') ? 1 : 0;
 
-        $validated['certifications'] = !empty($validated['certifications'])
+        $validated['certifications'] = ! empty($validated['certifications'])
             ? array_map('trim', explode(',', $validated['certifications']))
             : [];
 
@@ -77,13 +78,13 @@ class TrainerController extends Controller
         ]);
 
         $validatedData['is_active'] = $request->has('is_active') ? 1 : 0;
-        
+
         // Ganti gambar hanya jika ada file baru
         if ($request->hasFile('image')) {
             if ($trainer->image && Storage::disk('public')->exists($trainer->image)) {
                 Storage::disk('public')->delete($trainer->image);
             }
-            
+
             $path = $request->file('image')->store('trainers', 'public');
             $validatedData['image'] = $path;
         }

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->integer('order')->default(0)->comment('Display order');
             $table->timestamps();
-            
+
             // Indexes
             $table->index('is_active');
             $table->index('order');

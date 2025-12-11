@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Relations\BelongsTo; // <-- TAMBAHKAN INI
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes; // <-- TAMBAHKAN INI
 
 class Transaction extends Model
 {
@@ -44,7 +44,6 @@ class Transaction extends Model
     }
     // ==============================================================
 
-
     // Scopes
     public function scopePending($query)
     {
@@ -65,12 +64,12 @@ class Transaction extends Model
     // Helpers
     public function getFormattedAmount()
     {
-        return 'Rp ' . number_format($this->amount, 0, ',', '.');
+        return 'Rp '.number_format($this->amount, 0, ',', '.');
     }
 
     public function getStatusBadgeClass()
     {
-        return match($this->status) {
+        return match ($this->status) {
             'approved' => 'bg-success',
             'pending' => 'bg-warning',
             'rejected' => 'bg-danger',
@@ -80,7 +79,7 @@ class Transaction extends Model
 
     public function getStatusLabel()
     {
-        return match($this->status) {
+        return match ($this->status) {
             'approved' => 'Disetujui',
             'pending' => 'Menunggu',
             'rejected' => 'Ditolak',
@@ -105,15 +104,13 @@ class Transaction extends Model
 
     /**
      * Get the full public URL for the payment proof.
-     *
-     * @return string|null
      */
     public function getFullProofUrlAttribute(): ?string
     {
         if ($this->proof_url) {
             return \Illuminate\Support\Facades\Storage::disk('public')->url($this->proof_url);
         }
+
         return null;
     }
 }
-

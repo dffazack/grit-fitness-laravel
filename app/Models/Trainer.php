@@ -41,8 +41,9 @@ class Trainer extends Model
     public function getImageUrl()
     {
         if ($this->image) {
-            return asset('storage/' . $this->image);
+            return asset('storage/'.$this->image);
         }
+
         return asset('images/default-trainer.jpg');
     }
 
@@ -56,4 +57,3 @@ class Trainer extends Model
         return $this->classSchedules()->active()->count();
     }
 }
-

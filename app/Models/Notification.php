@@ -15,7 +15,7 @@ class Notification extends Model
     public const TYPES = [
         'promo',
         'event',
-        'announcement'
+        'announcement',
     ];
 
     /**
@@ -46,7 +46,7 @@ class Notification extends Model
     public function scopeActive($query)
     {
         return $query->where('is_active', true)
-                     ->where('start_date', '<=', now())
-                     ->where('end_date', '>=', now());
+            ->where('start_date', '<=', now())
+            ->where('end_date', '>=', now());
     }
 }

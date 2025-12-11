@@ -1,35 +1,31 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
-
-// Import Controllers (sesuai file yang kamu kirim)
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\ClassController;
-use App\Http\Controllers\MembershipController;
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\Auth\ForgotPasswordController;
-use App\Http\Controllers\Auth\ResetPasswordController;
-
-// Member Controllers
-use App\Http\Controllers\Member\DashboardController as MemberDashboardController;
-use App\Http\Controllers\Member\ProfileController as MemberProfileController;
-use App\Http\Controllers\Member\PaymentController as MemberPaymentController;
-use App\Http\Controllers\Member\BookingController as MemberBookingController;
-
-// Admin Controllers
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\HomepageController as AdminHomepageController;
+// Import Controllers (sesuai file yang kamu kirim)
 use App\Http\Controllers\Admin\MemberController as AdminMemberController;
+use App\Http\Controllers\Admin\MembershipPackageController;
+use App\Http\Controllers\Admin\NotificationController as AdminNotificationController;
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\ScheduleController as AdminScheduleController;
-use App\Http\Controllers\Admin\MembershipPackageController;
-use App\Http\Controllers\TrainerController;
 use App\Http\Controllers\Admin\TrainerController as AdminTrainerController;
-use App\Http\Controllers\Admin\HomepageController as AdminHomepageController;
-use App\Http\Controllers\Admin\NotificationController as AdminNotificationController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
+// Member Controllers
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\Auth\GoogleController;
+use App\Http\Controllers\ClassController;
+// Admin Controllers
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\Member\BookingController as MemberBookingController;
+use App\Http\Controllers\Member\DashboardController as MemberDashboardController;
+use App\Http\Controllers\Member\PaymentController as MemberPaymentController;
+use App\Http\Controllers\Member\ProfileController;
+use App\Http\Controllers\MembershipController;
+use App\Http\Controllers\TrainerController;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,6 +45,9 @@ Route::get('/membership', [MembershipController::class, 'index'])->name('members
 Route::middleware('guest')->group(function () {
     Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
     Route::post('login', [LoginController::class, 'login'])->name('login.submit');
+
+    Route::get('auth/google', [\App\Http\Controllers\Auth\GoogleController::class, 'redirectToGoogle'])->name('auth.google');
+    Route::get('auth/google/callback', [\App\Http\Controllers\Auth\GoogleController::class, 'handleGoogleCallback'])->name('auth.google.callback');
 
     Route::get('register', [RegisterController::class, 'showRegistrationForm'])->name('register');
     Route::post('register', [RegisterController::class, 'register'])->name('register.submit');
@@ -70,12 +69,10 @@ Route::middleware('guest')->group(function () {
 // Logout (auth)
 Route::post('logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
 
-
-
 // ...
 
 Route::get('/email/verify/{id}/{hash}', function (Illuminate\Http\Request $request, $id, $hash) {
-    
+
     // 1. Cari User (Pakai findOrFail biar ketahuan kalau ID salah)
     $user = \App\Models\User::findOrFail($id);
 
@@ -96,10 +93,10 @@ Route::get('/email/verify/{id}/{hash}', function (Illuminate\Http\Request $reque
     // 4. Skenario: User sebenarnya SUDAH verifikasi sebelumnya
     if ($user->hasVerifiedEmail()) {
         // Auto login user tersebut jika belum login
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             Auth::login($user, true);
         }
-        
+
         // Redirect dengan pesan manis
         return redirect()->route('membership')->with('info', 'Email Anda sudah terverifikasi sebelumnya.');
     }
@@ -107,7 +104,7 @@ Route::get('/email/verify/{id}/{hash}', function (Illuminate\Http\Request $reque
     // 5. PROSES VERIFIKASI UTAMA
     if ($user->markEmailAsVerified()) {
         event(new \Illuminate\Auth\Events\Verified($user));
-        
+
         // LOGIKA BISNIS KAMU: Ubah Guest jadi Member
         if ($user->role === 'guest') {
             $user->update(['role' => 'member']);
@@ -135,6 +132,7 @@ Route::middleware('auth')->group(function () {
     // Resend verification link (throttled)
     Route::post('/email/verification-notification', function (Illuminate\Http\Request $request) {
         $request->user()->sendEmailVerificationNotification();
+
         return back()->with('message', 'Verification link sent!');
     })->middleware(['throttle:6,1'])->name('verification.send');
 
@@ -145,27 +143,25 @@ Route::middleware('auth')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Member Routes (authenticated, verified, role:member)
+| Member Routes (authenticated, verified)
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'verified', 'role:member'])
-    ->prefix('member')
-    ->name('member.')
-    ->group(function () {
-        // Routes yang tidak butuh check membership (e.g., profile dan payment jika perlu)
-        Route::get('/profile', [MemberProfileController::class, 'index'])->name('profile');
-        Route::post('/profile/update', [MemberProfileController::class, 'update'])->name('profile.update');
-        Route::post('/profile/password', [MemberProfileController::class, 'updatePassword'])->name('profile.updatePassword');
+Route::middleware(['auth', 'verified'])->prefix('member')->name('member.')->group(function () {
+    // Profile is accessible to any logged-in user
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
+    Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.updatePassword');
+    Route::post('/profile/update-phone-quick', [ProfileController::class, 'updatePhoneQuick'])->name('profile.updatePhoneQuick');
 
-        // Routes yang butuh check membership (active only)
-        Route::middleware(\App\Http\Middleware\CheckMembershipStatus::class)->group(function () {
-            Route::get('/dashboard', [MemberDashboardController::class, 'index'])->name('dashboard');
+    // Routes below require an active membership status
+    Route::middleware([\App\Http\Middleware\CheckMembershipStatus::class])->group(function () {
+        Route::get('/dashboard', [MemberDashboardController::class, 'index'])->name('dashboard');
 
-            Route::get('bookings', [MemberBookingController::class, 'index'])->name('bookings.index');
-            Route::post('bookings/{schedule}', [MemberBookingController::class, 'store'])->name('bookings.store');
-            Route::delete('bookings/{booking}', [MemberBookingController::class, 'destroy'])->name('bookings.destroy');
-        });
+        Route::get('bookings', [MemberBookingController::class, 'index'])->name('bookings.index');
+        Route::post('bookings/{schedule}', [MemberBookingController::class, 'store'])->name('bookings.store');
+        Route::delete('bookings/{booking}', [MemberBookingController::class, 'destroy'])->name('bookings.destroy');
     });
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -195,6 +191,7 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
 
     // Schedules
     Route::resource('schedules', AdminScheduleController::class);
+    
 
     // Facilities
     Route::resource('facilities', \App\Http\Controllers\Admin\FacilityController::class);
@@ -226,5 +223,3 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
     // Logout (admin)
     Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 });
-
-

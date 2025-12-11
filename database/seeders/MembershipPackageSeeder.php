@@ -1,8 +1,9 @@
 <?php
+
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\MembershipPackage;
+use Illuminate\Database\Seeder;
 
 class MembershipPackageSeeder extends Seeder
 {
@@ -21,7 +22,7 @@ class MembershipPackageSeeder extends Seeder
                     'Shower & sauna',
                     'WiFi gratis',
                     'Area cardio & strength',
-                    '2 kelas grup per bulan'
+                    '2 kelas grup per bulan',
                 ],
                 'is_active' => true,
                 'is_popular' => false,
@@ -38,7 +39,7 @@ class MembershipPackageSeeder extends Seeder
                     'WiFi gratis',
                     'Area cardio & strength',
                     '2 kelas grup per bulan',
-                    'Hemat 10%'
+                    'Hemat 10%',
                 ],
                 'is_active' => true,
                 'is_popular' => false,
@@ -55,7 +56,7 @@ class MembershipPackageSeeder extends Seeder
                     'WiFi gratis',
                     'Area cardio & strength',
                     '4 kelas grup per bulan',
-                    'Hemat 15%'
+                    'Hemat 15%',
                 ],
                 'is_active' => true,
                 'is_popular' => true, // RECOMMENDED
@@ -73,7 +74,7 @@ class MembershipPackageSeeder extends Seeder
                     'Area cardio & strength',
                     'Unlimited kelas grup',
                     'Hemat 20%',
-                    'Bonus merchandise'
+                    'Bonus merchandise',
                 ],
                 'is_active' => true,
                 'is_popular' => false,
@@ -92,7 +93,7 @@ class MembershipPackageSeeder extends Seeder
                     'WiFi gratis',
                     'Area cardio & strength',
                     '4 kelas grup per bulan',
-                    '1 sesi PT gratis'
+                    '1 sesi PT gratis',
                 ],
                 'is_active' => true,
                 'is_popular' => false,
@@ -110,7 +111,7 @@ class MembershipPackageSeeder extends Seeder
                     'Area cardio & strength',
                     'Unlimited kelas grup',
                     '1 sesi PT gratis/bulan',
-                    'Hemat 10%'
+                    'Hemat 10%',
                 ],
                 'is_active' => true,
                 'is_popular' => false,
@@ -129,7 +130,7 @@ class MembershipPackageSeeder extends Seeder
                     'Unlimited kelas grup',
                     '2 sesi PT gratis/bulan',
                     'Konsultasi nutrisi',
-                    'Hemat 15%'
+                    'Hemat 15%',
                 ],
                 'is_active' => true,
                 'is_popular' => true, // RECOMMENDED
@@ -150,7 +151,7 @@ class MembershipPackageSeeder extends Seeder
                     'Konsultasi nutrisi',
                     'Akses area VIP',
                     'Hemat 20%',
-                    'Bonus merchandise'
+                    'Bonus merchandise',
                 ],
                 'is_active' => true,
                 'is_popular' => false,

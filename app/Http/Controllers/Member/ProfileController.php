@@ -14,8 +14,9 @@ class ProfileController extends Controller
     public function index()
     {
         $user = Auth::user();
+
         // Pastikan view 'member.profile' ada
-        return view('member.profile', compact('user')); 
+        return view('member.profile', compact('user'));
     }
 
     public function update(Request $request)
@@ -25,7 +26,7 @@ class ProfileController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
-            'email' => 'required|email|unique:users,email,' . $user->id,
+            'email' => 'required|email|unique:users,email,'.$user->id,
             // Logika password dipisah agar lebih aman
         ]);
 
@@ -49,7 +50,7 @@ class ProfileController extends Controller
         ]);
 
         if ($request->filled('password')) {
-            if (!Hash::check($request->current_password, $user->password)) {
+            if (! Hash::check($request->current_password, $user->password)) {
                 return back()->withErrors(['current_password' => 'Password saat ini salah']);
             }
             $user->password = Hash::make($validated['password']);
@@ -59,5 +60,20 @@ class ProfileController extends Controller
         }
 
         return back();
+    }
+
+    public function updatePhoneQuick(Request $request)
+    {
+        $user = Auth::user();
+
+        $validated = $request->validate([
+            'phone' => 'required|string|max:20',
+        ]);
+
+        $user->phone = $validated['phone'];
+
+        $user->save();
+
+        return back()->with('success', 'Phone number updated successfully.');
     }
 }

@@ -33,7 +33,7 @@ class BookingController extends Controller
         $user = Auth::user();
 
         // 1. Check if user is an active member
-        if (!$user->hasActiveMembership()) {
+        if (! $user->hasActiveMembership()) {
             return redirect()->back()->with('error', 'Anda harus memiliki membership aktif untuk booking kelas.');
         }
 
@@ -44,8 +44,8 @@ class BookingController extends Controller
 
         // 3. Check if the user has already booked this class
         $alreadyBooked = Booking::where('user_id', $user->id)
-                                ->where('class_schedule_id', $schedule->id)
-                                ->exists();
+            ->where('class_schedule_id', $schedule->id)
+            ->exists();
 
         if ($alreadyBooked) {
             return redirect()->back()->with('error', 'Anda sudah memesan kelas ini.');

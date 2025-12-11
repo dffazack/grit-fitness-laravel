@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Facility;
 use App\Models\HomepageContent;
-use App\Models\Notification;
 use App\Models\MembershipPackage;
-use Illuminate\Http\Request;
+use App\Models\Notification;
 
 class HomeController extends Controller
 {
@@ -17,17 +15,17 @@ class HomeController extends Controller
     {
         // 1. Ambil SEMUA data homepage
         $content = HomepageContent::all()->keyBy('section');
-        
+
         // 2. Ambil notifikasi
         $notifications = Notification::active()->latest()->get();
 
         // 3. Siapkan data 'homepage' (untuk hero)
         $heroContent = $content->get('hero') ? $content->get('hero')->content : [];
-        
+
         // LOGIKA GAMBAR YANG DIPERBAIKI
         $heroImage = asset('images/hero-bg.jpg'); // Default fallback
-        
-        if (isset($heroContent['image']) && !empty($heroContent['image'])) {
+
+        if (isset($heroContent['image']) && ! empty($heroContent['image'])) {
             // Cek apakah ini URL eksternal (http/https)
             if (str_starts_with($heroContent['image'], 'http')) {
                 $heroImage = $heroContent['image']; // Gunakan langsung
@@ -47,14 +45,14 @@ class HomeController extends Controller
             'value' => 'N/A',
             'label' => 'Statistik',
         ]);
-        
+
         // 5. Siapkan data 'benefits'
         $benefits = $content->get('benefits') ? $content->get('benefits')->content : array_fill(0, 4, [
             'icon' => 'dumbbell',
             'title' => 'Benefit',
             'description' => 'Deskripsi benefit belum diatur.',
         ]);
-        
+
         // 6. Siapkan data 'testimonials'
         $testimonials = $content->get('testimonials') ? $content->get('testimonials')->content : array_fill(0, 3, [
             'name' => 'Member',
@@ -71,7 +69,7 @@ class HomeController extends Controller
 
         // 8. Kirim SEMUA data ke view
         return view('home.index', compact(
-            'homepage', 
+            'homepage',
             'notifications',
             'stats',
             'benefits',
@@ -80,4 +78,3 @@ class HomeController extends Controller
         ));
     }
 }
-

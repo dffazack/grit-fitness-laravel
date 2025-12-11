@@ -2,7 +2,7 @@
 
 use App\Models\User;
 
-test('user can login successfully', function() {
+test('user can login successfully', function () {
     $user = User::factory()->create([
         'email' => 'test@example.com',
         'password' => bcrypt('password123'),

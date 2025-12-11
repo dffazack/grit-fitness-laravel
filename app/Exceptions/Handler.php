@@ -4,11 +4,9 @@ namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\Exceptions\PostTooLargeException;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 use Throwable;
-use Illuminate\Auth\AuthenticationException;
 
 class Handler extends ExceptionHandler
 {
@@ -25,7 +23,6 @@ class Handler extends ExceptionHandler
      * Render an exception into an HTTP response.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Throwable  $e
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function render($request, Throwable $e)
@@ -38,8 +35,8 @@ class Handler extends ExceptionHandler
                 return new JsonResponse([
                     'message' => $message,
                     'errors' => [
-                        'image' => [$message]
-                    ]
+                        'image' => [$message],
+                    ],
                 ], 422);
             }
 
@@ -52,6 +49,7 @@ class Handler extends ExceptionHandler
                 $referer = $request->headers->get('referer') ?: route('admin.trainers.index');
                 $sep = strpos($referer, '?') === false ? '?' : '&';
                 $url = $referer.$sep.'upload_error=1&upload_error_message='.rawurlencode($message);
+
                 return new RedirectResponse($url);
             }
         }

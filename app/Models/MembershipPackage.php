@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +12,7 @@ class MembershipPackage extends Model
         'regular' => 'Regular',
         'student' => 'Student',
     ];
-    
+
     protected $fillable = [
         'type',
         'name',
@@ -20,7 +21,7 @@ class MembershipPackage extends Model
         'features',
         'description',
         'is_active',
-        'is_popular'
+        'is_popular',
     ];
 
     protected $casts = [
@@ -39,7 +40,7 @@ class MembershipPackage extends Model
     // Helpers
     public function getFormattedPrice()
     {
-        return 'Rp ' . number_format($this->price, 0, ',', '.');
+        return 'Rp '.number_format($this->price, 0, ',', '.');
     }
 
     public function isRegular()

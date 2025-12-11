@@ -3,8 +3,8 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class CheckRole
@@ -18,7 +18,7 @@ class CheckRole
     {
         // This middleware is for the 'web' guard.
         // It should only check the currently authenticated user on this guard.
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             // If no user is authenticated on the web guard, redirect to login.
             return redirect()->route('login');
         }

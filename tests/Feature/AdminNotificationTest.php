@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\User;
 use App\Models\Notification;
+use App\Models\User;
 
 beforeEach(function () {
     // Create an admin user once for all tests in this file

@@ -1,8 +1,9 @@
 <?php
+
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Facility;
+use Illuminate\Database\Seeder;
 
 class FacilitySeeder extends Seeder
 {

@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory; // Tambahkan ini jika belum ada
-use Illuminate\Database\Eloquent\SoftDeletes; // Tambahkan ini karena migrasi Anda ada softDeletes()
+use Illuminate\Contracts\Auth\MustVerifyEmail; // Tambahkan ini jika belum ada
+use Illuminate\Database\Eloquent\Factories\HasFactory; // Tambahkan ini karena migrasi Anda ada softDeletes()
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable implements MustVerifyEmail
@@ -58,7 +58,6 @@ class User extends Authenticatable implements MustVerifyEmail
     }
     // ==============================================================
 
-
     // Helper methods (Digunakan di LoginController dan Middleware)
     public function isAdmin()
     {
@@ -85,10 +84,10 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->membership_status === 'pending';
     }
-    
+
     public function getMembershipStatusBadgeClass()
     {
-        return match($this->membership_status) {
+        return match ($this->membership_status) {
             'active' => 'bg-success',
             'pending' => 'bg-warning',
             'expired' => 'bg-danger',
@@ -96,4 +95,3 @@ class User extends Authenticatable implements MustVerifyEmail
         };
     }
 }
-

@@ -27,7 +27,7 @@ test('non members are redirected to membership page', function () {
     $response->assertSessionHas('info', 'Silakan pilih paket membership terlebih dahulu.');
 });
 
-test('pending members are redirected to dashboard with info', function () {
+test('pending members see info message on dashboard', function () {
     $user = User::factory()->create([
         'membership_status' => 'pending',
         'email_verified_at' => now(),
@@ -36,8 +36,8 @@ test('pending members are redirected to dashboard with info', function () {
 
     $response = $this->actingAs($user)->get('/member/dashboard');
 
-    $response->assertRedirect('/member/dashboard');
-    $response->assertSessionHas('info', 'Pembayaran Anda sedang diproses oleh admin.');
+    $response->assertStatus(200);
+    $response->assertSee('Pembayaran Anda sedang diproses oleh admin.');
 });
 
 test('expired members are redirected to payment page', function () {

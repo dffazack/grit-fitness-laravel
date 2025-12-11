@@ -5,7 +5,6 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class RejectLargeUploads
 {
@@ -24,19 +23,17 @@ class RejectLargeUploads
      * Handle an incoming request.
      * If file upload is detected and exceeds the limit, reject with validation error.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @return mixed
      */
     public function handle(Request $request, Closure $next)
     {
-        if (!$request->isMethod('POST')) {
+        if (! $request->isMethod('POST')) {
             return $next($request);
         }
         // If PHP rejected the upload due to ini settings, $_FILES may contain
         // entries with error codes but $request->allFiles() could be empty.
         // Detect common PHP upload errors and return a friendly message.
-        if (!empty($_FILES)) {
+        if (! empty($_FILES)) {
             foreach ($_FILES as $f) {
                 // support both single and array file inputs
                 if (is_array($f['error'])) {
@@ -59,13 +56,13 @@ class RejectLargeUploads
 
         try {
             $files = $request->allFiles();
-            
+
             if (empty($files)) {
                 return $next($request);
             }
 
             foreach ($files as $fieldName => $uploadedFile) {
-                if (!$uploadedFile) {
+                if (! $uploadedFile) {
                     continue;
                 }
 
@@ -77,6 +74,7 @@ class RejectLargeUploads
                             return $this->returnError($request, $error);
                         }
                     }
+
                     continue;
                 }
 
@@ -92,7 +90,7 @@ class RejectLargeUploads
         } catch (\Exception $e) {
             // Catch any unexpected errors and return a user-friendly message
             return $this->returnError(
-                $request, 
+                $request,
                 'The file must be a file of type: png, jpg, jpeg and not greater than 2MB.'
             );
         }
@@ -100,7 +98,7 @@ class RejectLargeUploads
 
     /**
      * Validate a single file
-     * 
+     *
      * @param  \Illuminate\Http\UploadedFile  $file
      * @return string|null Error message if validation fails, null if passes
      */
@@ -109,7 +107,7 @@ class RejectLargeUploads
         try {
             // First check file type
             $extension = strtolower($file->getClientOriginalExtension());
-            if (!in_array($extension, $this->allowedExtensions)) {
+            if (! in_array($extension, $this->allowedExtensions)) {
                 return 'The file must be a file of type: png, jpg, jpeg.';
             }
 
@@ -126,7 +124,7 @@ class RejectLargeUploads
 
     /**
      * Return an error response based on the request type
-     * 
+     *
      * @param  \Illuminate\Http\Request  $request
      * @param  string  $message
      * @return \Illuminate\Http\Response
@@ -137,8 +135,8 @@ class RejectLargeUploads
             return response()->json([
                 'message' => $message,
                 'errors' => [
-                    'image' => [$message]
-                ]
+                    'image' => [$message],
+                ],
             ], 422);
         }
 
