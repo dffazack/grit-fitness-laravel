@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\HomepageContent; // Pastikan Anda punya model ini
+use App\Models\HomepageContent;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class HomepageController extends Controller
 {
@@ -13,7 +14,6 @@ class HomepageController extends Controller
      */
     public function index()
     {
-        // Method ini hanya menampilkan view ringkasan
         return view('admin.homepage.index');
     }
 
@@ -22,37 +22,36 @@ class HomepageController extends Controller
      */
     public function edit()
     {
-        // 1. Ambil SEMUA data homepage
         $content = HomepageContent::all()->keyBy('section');
 
-        // 2. Siapkan data untuk view, sesuai yang diharapkan
-        // Gunakan data dari database, atau sediakan data kosong jika belum ada
-        
-        $hero = $content->get('hero') ? json_decode($content->get('hero')->content) : (object)[
+        // Hero Data
+        $hero = $content->get('hero') ? (object) $content->get('hero')->content : (object) [
             'title' => '',
             'subtitle' => '',
             'image' => '',
         ];
-        
-        $stats = $content->get('stats') ? json_decode($content->get('stats')->content) : array_fill(0, 4, (object)[
+
+        // Stats Data
+        $stats = $content->get('stats') ? array_map(fn ($item) => (object) $item, $content->get('stats')->content) : array_fill(0, 4, (object) [
             'value' => '',
             'label' => '',
         ]);
-        
-        $benefits = $content->get('benefits') ? json_decode($content->get('benefits')->content) : array_fill(0, 4, (object)[
+
+        // Benefits Data
+        $benefits = $content->get('benefits') ? array_map(fn ($item) => (object) $item, $content->get('benefits')->content) : array_fill(0, 4, (object) [
             'icon' => 'dumbbell',
             'title' => '',
             'description' => '',
         ]);
-        
-        $testimonials = $content->get('testimonials') ? json_decode($content->get('testimonials')->content) : array_fill(0, 3, (object)[
+
+        // Testimonials Data
+        $testimonials = $content->get('testimonials') ? array_map(fn ($item) => (object) $item, $content->get('testimonials')->content) : array_fill(0, 3, (object) [
             'name' => '',
             'role' => '',
             'text' => '',
             'rating' => 5,
         ]);
 
-        // 3. Panggil view 'edit'
         return view('admin.homepage.edit', compact(
             'hero',
             'stats',
@@ -61,22 +60,51 @@ class HomepageController extends Controller
         ));
     }
 
-
     // Method untuk handle update 'hero'
     public function updateHero(Request $request)
     {
-        $data = $request->validate([
+        // 1. Validasi Input
+        $request->validate([
             'title' => 'required|string|max:255',
             'subtitle' => 'required|string',
-            'image' => 'required|url',
+            'image_url' => 'nullable|url',
+            'image_file' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:5120',
         ]);
 
-        HomepageContent::updateOrCreate(
-            ['section' => 'hero'],
-            ['content' => json_encode($data)]
-        );
+        // 2. Ambil Data (Gunakan firstOrNew agar aman)
+        $homepageContent = HomepageContent::firstOrNew(['section' => 'hero']);
 
-        return redirect()->route('admin.homepage.edit')->with('success', 'Hero section updated successfully!')->withFragment('hero');
+        // Ambil konten yang ada sekarang (jika ada)
+        $currentContent = $homepageContent->content ?? [];
+
+        // 3. Tentukan Image Path (Logika Prioritas)
+        $imagePath = $currentContent['image'] ?? null;
+
+        if ($request->filled('image_url')) {
+            $imagePath = $request->input('image_url');
+        }
+
+        if ($request->hasFile('image_file')) {
+            $imageFile = $request->file('image_file');
+            $imageName = 'hero-'.time().'.'.$imageFile->getClientOriginalExtension();
+            Storage::disk('public')->putFileAs('images/homepage', $imageFile, $imageName);
+            $imagePath = 'storage/images/homepage/'.$imageName;
+        }
+
+        // 4. Susun Data Final
+        $data = [
+            'title' => $request->input('title'),
+            'subtitle' => $request->input('subtitle'),
+            'image' => $imagePath,
+        ];
+
+        // 5. Simpan
+        $homepageContent->content = $data;
+        $homepageContent->save();
+
+        return redirect()->route('admin.homepage.edit')
+            ->with('success', 'Hero section updated successfully!')
+            ->withFragment('hero');
     }
 
     // Method untuk handle update 'stats'
@@ -84,16 +112,19 @@ class HomepageController extends Controller
     {
         $data = $request->validate([
             'stats' => 'required|array|size:4',
-            'stats.*.value' => 'required|string|max:50',
+            // Hapus max:50 agar bisa input angka besar
+            'stats.*.value' => 'required|numeric',
             'stats.*.label' => 'required|string|max:100',
         ]);
 
-        HomepageContent::updateOrCreate(
-            ['section' => 'stats'],
-            ['content' => json_encode($data['stats'])]
-        );
+        // Gunakan firstOrNew agar aman
+        $homepageContent = HomepageContent::firstOrNew(['section' => 'stats']);
+        $homepageContent->content = $data['stats'];
+        $homepageContent->save();
 
-        return redirect()->route('admin.homepage.edit')->with('success', 'Statistics section updated successfully!')->withFragment('stats');
+        return redirect()->route('admin.homepage.edit')
+            ->with('success', 'Statistics section updated successfully!')
+            ->withFragment('stats');
     }
 
     // Method untuk handle update 'benefits'
@@ -106,12 +137,14 @@ class HomepageController extends Controller
             'benefits.*.description' => 'required|string',
         ]);
 
-        HomepageContent::updateOrCreate(
-            ['section' => 'benefits'],
-            ['content' => json_encode($data['benefits'])]
-        );
+        // Gunakan firstOrNew agar aman
+        $homepageContent = HomepageContent::firstOrNew(['section' => 'benefits']);
+        $homepageContent->content = $data['benefits'];
+        $homepageContent->save();
 
-        return redirect()->route('admin.homepage.edit')->with('success', 'Benefits section updated successfully!')->withFragment('benefits');
+        return redirect()->route('admin.homepage.edit')
+            ->with('success', 'Benefits section updated successfully!')
+            ->withFragment('benefits');
     }
 
     // Method untuk handle update 'testimonials'
@@ -125,11 +158,13 @@ class HomepageController extends Controller
             'testimonials.*.rating' => 'required|integer|min:1|max:5',
         ]);
 
-        HomepageContent::updateOrCreate(
-            ['section' => 'testimonials'],
-            ['content' => json_encode($data['testimonials'])]
-        );
+        // Gunakan firstOrNew agar aman
+        $homepageContent = HomepageContent::firstOrNew(['section' => 'testimonials']);
+        $homepageContent->content = $data['testimonials'];
+        $homepageContent->save();
 
-        return redirect()->route('admin.homepage.edit')->with('success', 'Testimonials section updated successfully!')->withFragment('testimonials');
+        return redirect()->route('admin.homepage.edit')
+            ->with('success', 'Testimonials section updated successfully!')
+            ->withFragment('testimonials');
     }
 }
