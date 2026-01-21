@@ -1,47 +1,51 @@
+{{-- resources/views/admin/trainers/index.blade.php --}}
 @extends('layouts.admin')
 
 @section('title', 'Data Master - Trainer')
 
 @section('content')
-    
-    {{-- Memanggil komponen header dan tab navigasi --}}
+
     @include('admin.components.datamaster-tabs')
 
-
-    
-    {{-- Menampilkan error validasi --}}
-    @if ($errors->any())
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <strong>Validasi Gagal!</strong> Harap periksa input Anda di form.
-            <ul class="mb-0 mt-2">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    {{-- Success Alert --}}
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
 
-    {{-- Menampilkan error upload ketika handler fallback menggunakan query param --}}
+    {{-- Validation Errors --}}
+    @if ($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <strong>Validasi Gagal!</strong> Harap periksa input Anda.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
+    {{-- Upload Error via Query String --}}
     @if(request()->query('upload_error'))
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <strong>Upload Gagal!</strong>
             <p class="mb-0">{{ urldecode(request()->query('upload_error_message')) }}</p>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
 
-    <!-- Header "Data Trainer" dan Tombol Tambah -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    {{-- Header + Tombol Tambah --}}
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4">
         <h3 class="mb-0" style="color: var(--admin-primary);">Data Trainer</h3>
         <button type="button" class="btn btn-accent" data-bs-toggle="modal" data-bs-target="#addTrainerModal">
             <i class="bi bi-plus-circle me-1"></i>
-            Tambah Trainer
+            <span class="d-none d-sm-inline">Tambah Trainer</span>
+            <span class="d-sm-none">Tambah</span>
         </button>
     </div>
 
-    <!-- Grid Kartu Trainer -->
-    <div class="row g-4">
+    {{-- Grid Trainer Cards --}}
+    <div class="row g-3 g-md-4">
         @forelse($trainers as $trainer)
             <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
                 <div class="card h-100 border-0 shadow-sm hover-card">
@@ -54,12 +58,10 @@
 
                         <h5 class="card-title-custom mb-1 text-truncate" title="{{ $trainer->name }}">{{ $trainer->name }}</h5>
 
-                        {{-- 4. Sederhanakan Tampilan Nama dan Badge --}}
-                        <h5 class="card-title-custom mb-1">{{ $trainer->name }}</h5>
                         @if($trainer->is_active)
-                            <span class="badge rounded-pill bg-active fw-semibold mb-2 align-self-center">Aktif</span>
+                            <span class="badge rounded-pill bg-success mb-2 align-self-center">Aktif</span>
                         @else
-                            <span class="badge rounded-pill bg-danger text-white fw-semibold mb-2 align-self-center">Non-Aktif</span>
+                            <span class="badge rounded-pill bg-danger text-white mb-2 align-self-center">Non-Aktif</span>
                         @endif
 
                         <p class="mb-2 fw-semibold text-truncate" style="color:var(--admin-accent);"
@@ -97,16 +99,17 @@
             </div>
         @empty
             <div class="col-12">
-                <div class="card">
+                <div class="card border-0 shadow-sm">
                     <div class="card-body text-center p-5">
-                        <p class="text-muted">Belum ada data trainer.</p>
+                        <i class="bi bi-person-x fs-1 text-muted mb-3"></i>
+                        <p class="text-muted mb-0">Belum ada data trainer.</p>
                     </div>
                 </div>
             </div>
         @endforelse
     </div>
 
-    <!-- Pagination Links -->
+    {{-- Pagination --}}
     @if($trainers->hasPages())
         <div class="mt-4">
             {{ $trainers->links() }}
@@ -114,20 +117,20 @@
     @endif
 
 
-    <!-- =================================================================================== -->
-    <!--                               MODAL TAMBAH TRAINER                                -->
-    <!-- =================================================================================== -->
-    <div class="modal fade" id="addTrainerModal" tabindex="-1" aria-labelledby="addTrainerModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content" style="border-radius: 12px;">
+    {{-- ==================== MODAL TAMBAH TRAINER ==================== --}}
+    <div class="modal fade" id="addTrainerModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+            <div class="modal-content border-0 shadow-lg" style="border-radius:12px;">
                 <form action="{{ route('admin.trainers.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
+                    <input type="hidden" name="form_type" value="add">
+
                     <div class="modal-header border-0">
-                        <h5 class="modal-title" id="addTrainerModalLabel">Tambah Trainer Baru</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <h5 class="modal-title">Tambah Trainer Baru</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
-                    <div class="modal-body p-4">
-                        <input type="hidden" name="form_type" value="add">
+
+                    <div class="modal-body p-3 p-md-4">
                         <div class="row g-3">
                             <div class="col-12 col-md-6">
                                 <label for="add_name" class="form-label">Nama Lengkap</label>
@@ -188,6 +191,7 @@
                             </div>
                         </div>
                     </div>
+
                     <div class="modal-footer border-0">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
                         <button type="submit" class="btn btn-primary">Simpan Trainer</button>
@@ -198,9 +202,7 @@
     </div>
 
 
-    <!-- =================================================================================== -->
-    <!--                               MODAL EDIT TRAINER                                  -->
-    <!-- =================================================================================== -->
+    {{-- ==================== MODAL EDIT TRAINER (per trainer) ==================== --}}
     @foreach($trainers as $trainer)
         <div class="modal fade" id="editModal-{{ $trainer->id }}" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
@@ -301,15 +303,15 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="modal-footer border-0">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary">Update Trainer</button>
-                    </div>
-                </form>
+
+                        <div class="modal-footer border-0">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-primary">Update Trainer</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
     @endforeach
 
 @endsection

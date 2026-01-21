@@ -12,6 +12,7 @@ class TrainerController extends Controller
     public function index()
     {
         $trainers = Trainer::latest()->paginate(9);
+
         return view('admin.trainers.index', compact('trainers'));
     }
 
@@ -20,13 +21,13 @@ class TrainerController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'specialization' => 'required|string|max:255',
-            'email' => 'required|email|unique:trainers',
+            'email' => 'required|email',
             'phone' => 'nullable|string',
             'experience' => 'required|integer|min:0',
             'clients' => 'nullable|string',
             'certifications' => 'nullable|string',
             'bio' => 'nullable|string',
-            'image' => 'nullable|required_without:current_image|image|mimes:png,jpg,jpeg|max:2048',
+            'image' => 'required|image|mimes:png,jpg,jpeg|max:2048',
         ], [
             'image.image' => 'File yang diunggah harus berupa gambar.',
             'image.mimes' => 'Format file tidak valid. Hanya file gambar dengan format png atau jpg yang diperbolehkan.',
@@ -35,14 +36,13 @@ class TrainerController extends Controller
 
         // Simpan gambar jika ada
         if ($request->hasFile('image')) {
-            $filename = time() . '.' . $request->image->extension();
-            $path = $request->file('image')->storeAs('trainers', $filename, 'public');
+            $path = $request->file('image')->store('trainers', 'public');
             $validated['image'] = $path;
         }
 
         $validated['is_active'] = $request->has('is_active') ? 1 : 0;
 
-        $validated['certifications'] = !empty($validated['certifications'])
+        $validated['certifications'] = ! empty($validated['certifications'])
             ? array_map('trim', explode(',', $validated['certifications']))
             : [];
 
@@ -56,14 +56,19 @@ class TrainerController extends Controller
     {
         $trainer = Trainer::findOrFail($id);
 
+        // Set form_type and trainer_id for error handling before validation
+        $request->merge([
+            'form_type' => 'edit',
+            'trainer_id' => $trainer->id,
+        ]);
+
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'specialization' => 'required|string|max:255',
-            'email' => 'required|email|unique:trainers,email,' . $id,
+            'email' => 'required|email',
             'phone' => 'nullable|string',
             'experience' => 'required|integer|min:0',
             'clients' => 'nullable|string',
-            'certifications' => 'nullable|string',
             'bio' => 'nullable|string',
             'image' => 'nullable|image|mimes:png,jpg,jpeg|max:2048',
         ], [
@@ -74,27 +79,13 @@ class TrainerController extends Controller
 
         $validatedData['is_active'] = $request->has('is_active') ? 1 : 0;
 
-        if (!empty($validatedData['certifications'])) {
-            $validatedData['certifications'] = array_map('trim', explode(',', $validatedData['certifications']));
-        } else {
-            $validatedData['certifications'] = $trainer->certifications ?? [];
-        }
-        
-        if ($request->hasFile('image')) {
-            if ($trainer->image && Storage::disk('public')->exists($trainer->image)) {
-                Storage::disk('public')->delete($trainer->image);
-            }
-        }
-
-
         // Ganti gambar hanya jika ada file baru
         if ($request->hasFile('image')) {
             if ($trainer->image && Storage::disk('public')->exists($trainer->image)) {
                 Storage::disk('public')->delete($trainer->image);
             }
 
-            $filename = time() . '.' . $request->image->extension();
-            $path = $request->file('image')->storeAs('trainers', $filename, 'public');
+            $path = $request->file('image')->store('trainers', 'public');
             $validatedData['image'] = $path;
         }
 
@@ -106,7 +97,12 @@ class TrainerController extends Controller
 
     public function destroy($id)
     {
-        $trainer = Trainer::findOrFail($id);
+        $trainer = Trainer::withCount('classSchedules')->findOrFail($id);
+
+        if ($trainer->class_schedules_count > 0) {
+            return redirect()->route('admin.trainers.index')
+                ->with('error', 'Trainer tidak dapat dihapus karena masih memiliki jadwal kelas.');
+        }
 
         if ($trainer->image && Storage::disk('public')->exists($trainer->image)) {
             Storage::disk('public')->delete($trainer->image);
