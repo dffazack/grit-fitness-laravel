@@ -1,0 +1,735 @@
+/**
+ * GRIT FITNESS - Custom CSS for Laravel + Bootstrap 5
+ * Design System Variables & Custom Classes
+ * File: resources/css/app.css
+ */
+
+/* ============================================
+   IMPORT FONTS
+   ============================================ */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* ============================================
+   CSS VARIABLES (GRIT DESIGN SYSTEM)
+   ============================================ */
+:root {
+    /* Brand Colors */
+    --grit-primary: #2B3282;
+    --grit-primary-dark: #1f2461;
+    --grit-primary-light: #3d42a8;
+    --grit-accent: #E51B83;
+    --grit-accent-dark: #c01669;
+    --grit-accent-light: #ff3d9f;
+    
+    /* Neutral Colors */
+    --grit-background: #F5F5F7;
+    --grit-white: #FFFFFF;
+    --grit-text: #333333;
+    --grit-text-light: #717182;
+    --grit-border: #E0E0E0;
+    
+    /* Status Colors */
+    --grit-success: #28A745;
+    --grit-success-light: #d4edda;
+    --grit-warning: #FFC107;
+    --grit-warning-light: #fff3cd;
+    --grit-danger: #DC3545;
+    --grit-danger-light: #f8d7da;
+    --grit-info: #17A2B8;
+    --grit-info-light: #d1ecf1;
+    
+    /* Shadows */
+    --grit-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --grit-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+    --grit-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.16);
+    
+    /* Border Radius */
+    --grit-radius-sm: 8px;
+    --grit-radius-md: 12px;
+    --grit-radius-lg: 16px;
+    --grit-radius-full: 9999px;
+    
+    /* Spacing */
+    --grit-spacing-xs: 4px;
+    --grit-spacing-sm: 8px;
+    --grit-spacing-md: 16px;
+    --grit-spacing-lg: 24px;
+    --grit-spacing-xl: 32px;
+    --grit-spacing-2xl: 48px;
+}
+
+/* ============================================
+   GLOBAL STYLES
+   ============================================ */
+body {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: var(--grit-text);
+    background-color: var(--grit-white);
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    color: var(--grit-text);
+    line-height: 1.2;
+}
+
+h1 { font-size: 48px; }
+h2 { font-size: 36px; }
+h3 { font-size: 28px; }
+h4 { font-size: 24px; }
+h5 { font-size: 20px; }
+h6 { font-size: 18px; }
+
+/* ============================================
+   CUSTOM TEXT COLORS
+   ============================================ */
+.text-primary { color: var(--grit-primary) !important; }
+.text-accent { color: var(--grit-accent) !important; }
+.text-muted { color: var(--grit-text-light) !important; }
+
+.text-primary-dark { color: var(--grit-primary-dark) !important; }
+.text-accent-dark { color: var(--grit-accent-dark) !important; }
+
+/* ============================================
+   CUSTOM BACKGROUND COLORS
+   ============================================ */
+.bg-primary { background-color: var(--grit-primary) !important; }
+.bg-accent { background-color: var(--grit-accent) !important; }
+.bg-light-custom { background-color: var(--grit-background) !important; }
+
+.bg-primary-dark { background-color: var(--grit-primary-dark) !important; }
+.bg-accent-dark { background-color: var(--grit-accent-dark) !important; }
+
+.bg-success-light { background-color: var(--grit-success-light) !important; }
+.bg-warning-light { background-color: var(--grit-warning-light) !important; }
+.bg-danger-light { background-color: var(--grit-danger-light) !important; }
+.bg-info-light { background-color: var(--grit-info-light) !important; }
+
+/* ============================================
+   CUSTOM BUTTONS
+   ============================================ */
+.btn {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    border-radius: var(--grit-radius-sm);
+    padding: 12px 24px;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.btn-primary {
+    background-color: var(--grit-primary);
+    color: var(--grit-white);
+}
+
+.btn-primary:hover {
+    background-color: var(--grit-primary-dark);
+    color: var(--grit-white);
+    transform: translateY(-2px);
+    box-shadow: var(--grit-shadow-md);
+}
+
+.btn-accent {
+    background-color: var(--grit-accent);
+    color: var(--grit-white);
+}
+
+.btn-accent:hover {
+    background-color: var(--grit-accent-dark);
+    color: var(--grit-white);
+    transform: translateY(-2px);
+    box-shadow: var(--grit-shadow-md);
+}
+
+.btn-outline-primary {
+    border: 2px solid var(--grit-primary);
+    color: var(--grit-primary);
+    background-color: transparent;
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--grit-primary);
+    color: var(--grit-white);
+}
+
+.btn-outline-accent {
+    border: 2px solid var(--grit-accent);
+    color: var(--grit-accent);
+    background-color: transparent;
+}
+
+.btn-outline-accent:hover {
+    background-color: var(--grit-accent);
+    color: var(--grit-white);
+}
+
+/* ============================================
+   CUSTOM CARDS
+   ============================================ */
+.card {
+    border: none;
+    border-radius: var(--grit-radius-md);
+    box-shadow: var(--grit-shadow-sm);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: var(--grit-shadow-md);
+    transform: translateY(-4px);
+}
+
+.card-header {
+    background-color: var(--grit-white);
+    border-bottom: 1px solid var(--grit-border);
+    border-radius: var(--grit-radius-md) var(--grit-radius-md) 0 0;
+}
+
+/* ============================================
+   CUSTOM FORMS
+   ============================================ */
+.form-control,
+.form-select {
+    border: 1.5px solid var(--grit-border);
+    border-radius: var(--grit-radius-sm);
+    padding: 12px 16px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--grit-primary);
+    box-shadow: 0 0 0 0.2rem rgba(43, 50, 130, 0.15);
+}
+
+.form-label {
+    font-weight: 500;
+    color: var(--grit-text);
+    margin-bottom: 8px;
+}
+
+.is-invalid {
+    border-color: var(--grit-danger) !important;
+}
+
+.invalid-feedback {
+    color: var(--grit-danger);
+    font-size: 14px;
+}
+
+/* ============================================
+   CUSTOM BADGES
+   ============================================ */
+.badge {
+    padding: 6px 12px;
+    border-radius: var(--grit-radius-sm);
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.badge-primary { background-color: var(--grit-primary); }
+.badge-accent { background-color: var(--grit-accent); }
+.badge-success { background-color: var(--grit-success); }
+.badge-warning { background-color: var(--grit-warning); }
+.badge-danger { background-color: var(--grit-danger); }
+
+/* Badge outline variants */
+.badge-outline-primary {
+    background-color: transparent;
+    border: 1.5px solid var(--grit-primary);
+    color: var(--grit-primary);
+}
+
+.badge-outline-success {
+    background-color: transparent;
+    border: 1.5px solid var(--grit-success);
+    color: var(--grit-success);
+}
+
+.badge-outline-warning {
+    background-color: transparent;
+    border: 1.5px solid var(--grit-warning);
+    color: var(--grit-warning);
+}
+
+.badge-outline-danger {
+    background-color: transparent;
+    border: 1.5px solid var(--grit-danger);
+    color: var(--grit-danger);
+}
+
+/* ============================================
+   CUSTOM NAVBAR
+   ============================================ */
+.navbar {
+    padding: 16px 0;
+    box-shadow: var(--grit-shadow-sm);
+}
+
+.navbar-brand {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.nav-link {
+    font-weight: 500;
+    padding: 8px 16px !important;
+    transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+    color: var(--grit-accent) !important;
+}
+
+/* ============================================
+   CUSTOM ALERTS
+   ============================================ */
+.alert {
+    border: none;
+    border-radius: var(--grit-radius-sm);
+    padding: 16px 20px;
+    font-size: 16px;
+}
+
+.alert-success {
+    background-color: var(--grit-success-light);
+    color: var(--grit-success);
+}
+
+.alert-warning {
+    background-color: var(--grit-warning-light);
+    color: #856404;
+}
+
+.alert-danger {
+    background-color: var(--grit-danger-light);
+    color: var(--grit-danger);
+}
+
+.alert-info {
+    background-color: var(--grit-info-light);
+    color: var(--grit-info);
+}
+
+/* ============================================
+   STAT CARDS (Admin Dashboard)
+   ============================================ */
+.stat-card {
+    background: var(--grit-white);
+    border-radius: var(--grit-radius-md);
+    padding: 24px;
+    text-align: center;
+    box-shadow: var(--grit-shadow-sm);
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    box-shadow: var(--grit-shadow-md);
+    transform: translateY(-4px);
+}
+
+.stat-card-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    display: inline-block;
+}
+
+.stat-card-value {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.stat-card-label {
+    color: var(--grit-text-light);
+    font-size: 14px;
+}
+
+/* ============================================
+   TABLES
+   ============================================ */
+.table {
+    background-color: var(--grit-white);
+}
+
+.table thead th {
+    background-color: var(--grit-background);
+    color: var(--grit-text);
+    font-weight: 600;
+    border-bottom: 2px solid var(--grit-border);
+    padding: 16px;
+}
+
+.table tbody td {
+    padding: 16px;
+    vertical-align: middle;
+}
+
+.table-hover tbody tr:hover {
+    background-color: var(--grit-background);
+}
+
+/* ============================================
+   PAGINATION
+   ============================================ */
+.pagination {
+    margin-top: 24px;
+}
+
+.page-link {
+    color: var(--grit-primary);
+    border: 1px solid var(--grit-border);
+    padding: 10px 16px;
+    margin: 0 4px;
+    border-radius: var(--grit-radius-sm);
+}
+
+.page-link:hover {
+    background-color: var(--grit-primary);
+    color: var(--grit-white);
+}
+
+.page-item.active .page-link {
+    background-color: var(--grit-primary);
+    border-color: var(--grit-primary);
+}
+
+/* ============================================
+   MODALS
+   ============================================ */
+.modal-content {
+    border: none;
+    border-radius: var(--grit-radius-md);
+    box-shadow: var(--grit-shadow-lg);
+}
+
+.modal-header {
+    background-color: var(--grit-primary);
+    color: var(--grit-white);
+    border-radius: var(--grit-radius-md) var(--grit-radius-md) 0 0;
+}
+
+.modal-header .btn-close {
+    filter: invert(1);
+}
+
+/* ============================================
+   HERO SECTION
+   ============================================ */
+.hero-section {
+    background-size: cover;
+    background-position: center;
+    min-height: 600px;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(43, 50, 130, 0.8), rgba(229, 27, 131, 0.6));
+}
+
+.hero-section .container {
+    position: relative;
+    z-index: 1;
+}
+
+/* ============================================
+   MEMBERSHIP CARDS
+   ============================================ */
+.membership-card-v2 {
+    background: var(--grit-white);
+    border: 1.5px solid var(--grit-border);
+    border-radius: var(--grit-radius-lg);
+    padding: 28px 24px;
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.membership-card-v2:hover {
+    border-color: var(--grit-primary);
+    box-shadow: 0 12px 32px rgba(43, 50, 130, 0.15);
+    transform: translateY(-6px);
+}
+
+/* Recommended/Popular Badge */
+.membership-card-v2.recommended {
+    border-color: var(--grit-accent);
+}
+
+.recommended-badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, var(--grit-accent), var(--grit-accent-dark));
+    color: white;
+    padding: 6px 18px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(229, 27, 131, 0.3);
+}
+
+/* Package Section Header */
+.package-header {
+    margin-bottom: 32px;
+}
+
+.package-icon {
+    font-size: 48px;
+    line-height: 1;
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(43, 50, 130, 0.1), rgba(229, 27, 131, 0.1));
+    border-radius: 16px;
+}
+
+.package-header h2 {
+    color: var(--grit-text);
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.package-header p {
+    color: var(--grit-text-light);
+    font-size: 15px;
+    margin-bottom: 0;
+}
+
+/* Package Duration Badge */
+.package-duration {
+    text-align: center;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--grit-text-light);
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--grit-border);
+}
+
+/* Package Price Display */
+.package-price {
+    text-align: center;
+    padding: 20px 0 16px;
+}
+
+.price-amount {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--grit-text);
+    line-height: 1.2;
+    margin-bottom: 4px;
+}
+
+.price-period {
+    font-size: 14px;
+    color: var(--grit-text-light);
+    margin-top: 4px;
+}
+
+/* Package Features List */
+.package-features {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+}
+
+.package-features li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 9px 0;
+    font-size: 14px;
+    color: var(--grit-text);
+    line-height: 1.5;
+}
+
+.package-features li i {
+    font-size: 16px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: var(--grit-success);
+}
+
+.package-features li span {
+    flex: 1;
+    line-height: 1.6;
+}
+
+/* Button Sizing for Membership */
+.membership-card-v2 .btn-lg {
+    padding: 14px 24px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.membership-card-v2 .btn-primary:hover {
+    background-color: var(--grit-primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(43, 50, 130, 0.3);
+}
+
+.membership-card-v2 .btn-accent:hover {
+    background-color: var(--grit-accent-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(229, 27, 131, 0.3);
+}
+
+/* Package Section Spacing */
+.package-section {
+    margin-bottom: 80px;
+}
+
+.package-section:last-child {
+    margin-bottom: 0;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 992px) {
+    .package-icon {
+        font-size: 40px;
+        width: 56px;
+        height: 56px;
+    }
+    
+    .package-header h2 {
+        font-size: 28px;
+    }
+    
+    .package-header p {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 768px) {
+    .price-amount {
+        font-size: 24px;
+    }
+    
+    .membership-card-v2 {
+        padding: 24px 20px;
+    }
+    
+    .package-header {
+        margin-bottom: 24px;
+    }
+    
+    .package-header h2 {
+        font-size: 24px;
+    }
+    
+    .package-icon {
+        font-size: 36px;
+        width: 48px;
+        height: 48px;
+    }
+    
+    .recommended-badge {
+        font-size: 12px;
+        padding: 5px 14px;
+        top: -10px;
+    }
+    
+    .package-section {
+        margin-bottom: 48px;
+    }
+}
+
+@media (max-width: 576px) {
+    .package-header .d-flex {
+        flex-direction: column;
+        text-align: center;
+        align-items: center !important;
+    }
+    
+    .package-header p {
+        text-align: center;
+    }
+    
+    .package-features li {
+        font-size: 13px;
+    }
+    
+    .membership-card-v2 .btn-lg {
+        padding: 12px 20px;
+        font-size: 14px;
+    }
+}
+
+/* ============================================
+   ANIMATION ENHANCEMENTS
+   ============================================ */
+
+@keyframes cardHover {
+    0% {
+        transform: translateY(0);
+    }
+    100% {
+        transform: translateY(-6px);
+    }
+}
+
+.membership-card-v2:hover {
+    animation: cardHover 0.3s ease forwards;
+}
+
+/* Badge pulse animation for recommended */
+@keyframes badgePulse {
+    0%, 100% {
+        box-shadow: 0 4px 12px rgba(229, 27, 131, 0.3);
+    }
+    50% {
+        box-shadow: 0 4px 20px rgba(229, 27, 131, 0.5);
+    }
+}
+
+.recommended-badge {
+    animation: badgePulse 2s ease-in-out infinite;
+}
+
+/* ============================================
+   PRINT STYLES FOR MEMBERSHIP
+   ============================================ */
+
+@media print {
+    .recommended-badge {
+        background: #E51B83 !important;
+        color: white !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    .membership-card-v2 {
+        page-break-inside: avoid;
+        border: 1px solid #E0E0E0 !important;
+    }
+    
+    .package-features li i {
+        color: #28A745 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}
